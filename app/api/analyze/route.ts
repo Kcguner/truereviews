@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { fetchReviews } from '@/lib/apify';
 import { analyzeReviews } from '@/lib/gemma';
 import { findCachedReport, saveReport } from '@/lib/store';
-import { normalizePlaceUrl, isGoogleMapsUrl, type PreviewData } from '@/lib/types';
+import { normalizePlaceUrl, isGoogleMapsUrl, type PreviewData, type ToneSplit } from '@/lib/types';
 import { checkQuota, logUsage } from '@/lib/quota';
 import { verifyTurnstile } from '@/lib/validation';
 import { locales } from '@/i18n.config';
@@ -13,6 +13,15 @@ function clientIp(req: NextRequest): string {
     req.headers.get('x-real-ip') ||
     'unknown'
   );
+}
+
+function toneSplit(ratings: number[]): ToneSplit {
+  const total = Math.max(ratings.length, 1);
+  const pos = ratings.filter((r) => (r || 3) >= 4).length;
+  const neg = ratings.filter((r) => (r || 3) <= 2).length;
+  const posPct = Math.round((pos / total) * 100);
+  const negPct = Math.round((neg / total) * 100);
+  return { pos: posPct, neu: Math.max(0, 100 - posPct - negPct), neg: negPct };
 }
 
 export async function POST(req: NextRequest) {
@@ -76,11 +85,16 @@ export async function POST(req: NextRequest) {
 
     const { report, mocked: gemmaMocked } = await analyzeReviews(businessName, reviews, locale);
 
+    // Puan dağılımı → ton yüzdeleri (önizlemede ve raporda ton çubuğu için; toplu istatistik, hassas veri değil)
+    const tone = toneSplit(reviews.map((r) => r.rating));
+    report.rating_histogram = tone;
+
     const preview: PreviewData = {
       score: report.score,
       teaser: report.summary.split('.').slice(0, 1).join('.') + '.',
       business_name: businessName,
-      review_count: reviews.length
+      review_count: reviews.length,
+      tone
     };
 
     const stored = await saveReport({

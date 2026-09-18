@@ -40,10 +40,21 @@
     "exceeded": "Cuota diaria llena, intenta mañana.",
     "rateLimited": "Demasiados intentos, intenta en 1 hora."
   },
-  "lang": { "label": "Idioma" },
-  "mock": { "badge": "Modo demo", "emailNote": "Correo no conectado — enlace abajo:" },
-  "theme": { "toggle": "Cambiar tema" },
-  "stats": { "reviews": "reseñas analizadas", "langs": "idiomas", "free": "totalmente gratis" },
+  "lang": {
+    "label": "Idioma"
+  },
+  "mock": {
+    "badge": "Modo demo",
+    "emailNote": "Correo no conectado — enlace abajo:"
+  },
+  "theme": {
+    "toggle": "Cambiar tema"
+  },
+  "stats": {
+    "reviews": "reseñas analizadas",
+    "langs": "idiomas",
+    "free": "totalmente gratis"
+  },
   "steps": {
     "title": "¿Cómo funciona?",
     "s1t": "Pega el enlace",
@@ -62,5 +73,146 @@
     "f3t": "Antispam",
     "f3d": "Límites, protección antibots y cuotas."
   },
-  "footer": { "note": "Vista gratuita • Informe completo por correo • Cuota diaria" }
+  "nb": {
+    "brand": {
+      "sub": "read · weigh · advise"
+    },
+    "head": {
+      "note": "Preview is free"
+    },
+    "intro": {
+      "eyebrow": "Free preview · No sign-up · ~40 seconds",
+      "h1a": "What are your customers",
+      "h1b": "<hl>really</hl> saying about you?",
+      "lede": "Paste your Google Maps link. We read <strong>every single one</strong> of your reviews and hand you a one-page honest summary: your satisfaction score, the topics that keep coming up, and the <strong>one concrete step</strong> you can take this week."
+    },
+    "input": {
+      "label": "Google Maps business link",
+      "paste": "Paste from clipboard",
+      "cta": "Prepare my report",
+      "demo": "Try it with a sample business →",
+      "hint": "Open your business on Google Maps, hit “Share”, copy the link and paste it here.",
+      "err": "That doesn't look like a Google Maps link. Open your business on Google Maps, tap “Share”, copy the link and paste it here."
+    },
+    "step1": {
+      "t": "Paste your link",
+      "d": "The link to your Google Maps business page is all we need. Nothing to install, nothing to connect."
+    },
+    "step2": {
+      "t": "We read them",
+      "d": "We pull down your recent reviews, read every one and separate the praise, the complaints and the recurring topics."
+    },
+    "step3": {
+      "t": "We sum it up",
+      "d": "One page: your score, the topics that repeat, and one concrete step for this week. No dashboard, no chart overload."
+    },
+    "gets": {
+      "h": "What's in your report"
+    },
+    "get1": {
+      "t": "Your satisfaction score",
+      "d": "One number out of 100, plus the tone split."
+    },
+    "get2": {
+      "t": "Recurring topics",
+      "d": "The most repeated praise and complaints, with how many reviews mention each."
+    },
+    "get3": {
+      "t": "One concrete suggestion",
+      "d": "We won't tell you to “fix everything”. Just one step you can take this week."
+    },
+    "assure": {
+      "text": "We don't edit your reviews, we don't delete them, we don't polish them. We read all of them and tell you the way someone would say it to your face.",
+      "sig": "YorumAnalizi · independent analysis"
+    },
+    "float": {
+      "cap": "Sample output",
+      "note": "“Waiting during lunch hours” appears in 31 reviews."
+    },
+    "load": {
+      "reading": "Reading your reviews…",
+      "foot": "Your reviews stay exactly as they are; we only read and summarise them. We don't ask for an email for this preview.",
+      "s1": "Finding your business",
+      "s2": "Downloading reviews",
+      "s3": "Reading every single one",
+      "s4": "Separating praise from complaints",
+      "s5": "Calculating your satisfaction score",
+      "s6": "Writing your report"
+    },
+    "rpt": {
+      "back": "← Analyse another business",
+      "stamp": {
+        "prev": "Preview",
+        "full": "Full report"
+      },
+      "date": "Report date",
+      "scope": "Last {r} reviews",
+      "score": {
+        "h": "Overall customer satisfaction",
+        "cap": "Satisfaction score"
+      },
+      "tone": {
+        "h": "The tone of your reviews",
+        "pos": "Praise",
+        "neu": "Neutral",
+        "neg": "Complaint"
+      },
+      "themes": {
+        "h": "The topics that keep coming up"
+      },
+      "praise": "Praise",
+      "complaint": "Complaints",
+      "inreview": "reviews mention this",
+      "orig": "Original review",
+      "pdf": "Download PDF",
+      "new": "Analyse another business"
+    },
+    "lock": {
+      "h": "Your report is ready — let's open the rest.",
+      "p": "The score and tone split are above. The recurring topics and the concrete suggestion live in the full report. Leave your email and we'll unlock everything.",
+      "ph": "you@mybusiness.com",
+      "cta": "Unlock the full report",
+      "note": "No ads, no bulk mail. Just this report and, if you want, one update a month.",
+      "err": "Please enter a valid email address.",
+      "done": "Unlocked",
+      "donet": "Your full report is open below. A copy is on its way to {e}.",
+      "donetMock": "Your full report is open below. (No copy was emailed because the email service is not connected.)"
+    },
+    "act": {
+      "k": "The one step to take this week"
+    },
+    "method": {
+      "h": "How we build this report",
+      "t": "The score is calculated from review volume, rating distribution and the weight of recurring topics. We never edit, delete or buy reviews. Quotes are shortened from real reviews."
+    },
+    "foot": {
+      "tagline": "An honest summary of your reviews, made for small businesses.",
+      "made": "Made in Istanbul",
+      "l1": "How it works",
+      "l2": "How we use your data",
+      "l3": "FAQ",
+      "l4": "Contact"
+    },
+    "band": {
+      "a": {
+        "t": "Very good",
+        "d": "Your customers have taken ownership of you. At this level the job is to not break what's working and to turn satisfaction into new customers."
+      },
+      "b": {
+        "t": "Good",
+        "d": "There's a solid foundation here. Two small touches will move this visibly upward — you'll see which topic in the full report."
+      },
+      "c": {
+        "t": "Average",
+        "d": "Not bad, but one single topic is dragging your score down. Touch that and the difference shows fast."
+      },
+      "d": {
+        "t": "Struggling",
+        "d": "There's a problem piling up here. The good news: the most repeated topic is very clear, so you know exactly where to start."
+      }
+    }
+  },
+  "footer": {
+    "note": "Vista gratuita • Informe completo por correo • Cuota diaria"
+  }
 }

@@ -1,3 +1,9 @@
+export interface ToneSplit {
+  pos: number; // yüzde
+  neu: number; // yüzde
+  neg: number; // yüzde
+}
+
 export interface AnalysisReport {
   score: number; // 0-10
   summary: string;
@@ -6,6 +12,7 @@ export interface AnalysisReport {
   action_suggestion: string;
   review_count: number;
   business_name: string;
+  rating_histogram?: ToneSplit;
 }
 
 export interface PreviewData {
@@ -13,6 +20,7 @@ export interface PreviewData {
   teaser: string;
   business_name: string;
   review_count: number;
+  tone?: ToneSplit;
 }
 
 export interface StoredReport {

@@ -40,10 +40,21 @@
     "exceeded": "Günlük analiz kotası doldu, yarın tekrar deneyin.",
     "rateLimited": "Çok sık denediniz, 1 saat sonra tekrar deneyin."
   },
-  "lang": { "label": "Dil" },
-  "mock": { "badge": "Demo modu", "emailNote": "E-posta servisi bağlı değil — onay linki aşağıda (geliştirici önizlemesi):" },
-  "theme": { "toggle": "Tema değiştir" },
-  "stats": { "reviews": "yorum analizi", "langs": "dil desteği", "free": "tamamen ücretsiz" },
+  "lang": {
+    "label": "Dil"
+  },
+  "mock": {
+    "badge": "Demo modu",
+    "emailNote": "E-posta servisi bağlı değil — onay linki aşağıda (geliştirici önizlemesi):"
+  },
+  "theme": {
+    "toggle": "Tema değiştir"
+  },
+  "stats": {
+    "reviews": "yorum analizi",
+    "langs": "dil desteği",
+    "free": "tamamen ücretsiz"
+  },
   "steps": {
     "title": "Nasıl çalışır?",
     "s1t": "Linki yapıştır",
@@ -62,5 +73,146 @@
     "f3t": "Spam korumalı",
     "f3d": "Hız limiti, bot koruması ve kota güvencesi."
   },
-  "footer": { "note": "Ücretsiz önizleme • Tam rapor e-posta onayı ile • Günlük kota uygulanır" }
+  "nb": {
+    "brand": {
+      "sub": "oku · tart · öner"
+    },
+    "head": {
+      "note": "Önizleme ücretsiz"
+    },
+    "intro": {
+      "eyebrow": "Önizleme ücretsiz · Kayıt gerekmez · ~40 saniye",
+      "h1a": "Müşterilerin senin",
+      "h1b": "hakkında <hl>aslında</hl> ne diyor?",
+      "lede": "Google Maps linkini yapıştır. Yorumlarının <strong>tamamını</strong> tek tek okuyalım; sana bir sayfalık dürüst bir özet çıkaralım: memnuniyet skorun, en çok tekrar eden övgü ve şikayetler, ve bu hafta atabileceğin <strong>tek somut adım</strong>."
+    },
+    "input": {
+      "label": "Google Maps işletme linki",
+      "paste": "Panodan yapıştır",
+      "cta": "Raporu hazırla",
+      "demo": "Örnek bir işletmeyle dene →",
+      "hint": "Linki Google Haritalar'da işletmeni açıp “Paylaş” ile kopyalayabilirsin.",
+      "err": "Bu bir Google Maps linkine benzemiyor. Google Haritalar'da işletmeni aç, “Paylaş”a bas, linki kopyala ve buraya yapıştır."
+    },
+    "step1": {
+      "t": "Linkini yapıştır",
+      "d": "Google Haritalar'daki işletme sayfanın linki yeterli. Başka bir şey kurman, bağlaman gerekmiyor."
+    },
+    "step2": {
+      "t": "Biz okuyalım",
+      "d": "Son yorumlarının tamamını indiriyoruz; tek tek okuyup övgüleri, şikayetleri ve tekrar eden konuları ayırıyoruz."
+    },
+    "step3": {
+      "t": "Sana özet geçelim",
+      "d": "Bir sayfa: skorun, en çok tekrar eden konular ve bu hafta atabileceğin tek somut adım. Dashboard yok, grafik yığını yok."
+    },
+    "gets": {
+      "h": "Raporunda ne var"
+    },
+    "get1": {
+      "t": "Memnuniyet skorun",
+      "d": "0–100 arası tek bir sayı ve ton dağılımı."
+    },
+    "get2": {
+      "t": "Tekrar eden konular",
+      "d": "En çok tekrar eden övgü ve şikayetler, kaç yorumda geçtiğiyle birlikte."
+    },
+    "get3": {
+      "t": "Tek somut öneri",
+      "d": "“Her şeyi düzelt” demiyoruz. Bu hafta yapabileceğin bir tek adım."
+    },
+    "assure": {
+      "text": "Yorumlarını değiştirmiyoruz, silmiyoruz, süslemiyoruz. Sadece hepsini okuyup sana birinin yüzüne söyleyeceği gibi anlatıyoruz.",
+      "sig": "YorumAnalizi · bağımsız analiz"
+    },
+    "float": {
+      "cap": "Örnek çıktı",
+      "note": "“Öğle saatlerinde bekleme” 31 yorumda geçiyor."
+    },
+    "load": {
+      "reading": "Yorumların okunuyor…",
+      "foot": "Yorumların orijinal hâliyle kalır; biz yalnızca okur ve özetleriz. Bu önizleme için e-posta istemiyoruz.",
+      "s1": "İşletme bulunuyor",
+      "s2": "Yorumlar indiriliyor",
+      "s3": "Hepsi tek tek okunuyor",
+      "s4": "Övgüler ve şikayetler ayrılıyor",
+      "s5": "Memnuniyet skoru hesaplanıyor",
+      "s6": "Raporun yazılıyor"
+    },
+    "rpt": {
+      "back": "← Yeni bir işletme analiz et",
+      "stamp": {
+        "prev": "Önizleme",
+        "full": "Tam rapor"
+      },
+      "date": "Rapor tarihi",
+      "scope": "Son {r} yorum",
+      "score": {
+        "h": "Genel müşteri memnuniyeti",
+        "cap": "Memnuniyet skoru"
+      },
+      "tone": {
+        "h": "Yorumların tonu",
+        "pos": "Övgü",
+        "neu": "Nötr",
+        "neg": "Şikayet"
+      },
+      "themes": {
+        "h": "En çok tekrar eden konular"
+      },
+      "praise": "Övgüler",
+      "complaint": "Şikayetler",
+      "inreview": "yorumda geçiyor",
+      "orig": "Orijinal yorum",
+      "pdf": "PDF indir",
+      "new": "Başka bir işletme analiz et"
+    },
+    "lock": {
+      "h": "Raporun hazır — kalanını açalım.",
+      "p": "Skor ve ton dağılımı yukarıda. Tekrar eden konular ve somut öneri tam raporda duruyor. E-postanı bırak, hepsini açalım.",
+      "ph": "ornek@isletmem.com",
+      "cta": "Tam raporu aç",
+      "note": "Reklam yok, seri mail yok. Sadece bu rapor ve istersen ayda bir güncellemesi.",
+      "err": "Geçerli bir e-posta adresi yaz.",
+      "done": "Açıldı",
+      "donet": "Tam raporun açık — aşağıda. Bir kopyası da {e} adresine yolda.",
+      "donetMock": "Tam raporun açık — aşağıda. (E-posta servisi bağlı olmadığı için kopya gönderilmedi.)"
+    },
+    "act": {
+      "k": "Bu hafta atacağın tek adım"
+    },
+    "method": {
+      "h": "Bu raporu nasıl üretiyoruz",
+      "t": "Skor; yorum sayısı, puan dağılımı ve tekrar eden temaların ağırlığı üzerinden hesaplanır. Yorumların içeriğini değiştirmeyiz, silmeyiz, satın almayız. Alıntılar gerçek yorumlardan kısaltılmıştır."
+    },
+    "foot": {
+      "tagline": "Küçük işletmeler için yorumlardan çıkan dürüst özet.",
+      "made": "İstanbul'da yapıldı",
+      "l1": "Nasıl çalışır",
+      "l2": "Verini nasıl kullanıyoruz",
+      "l3": "Sık sorulanlar",
+      "l4": "İletişim"
+    },
+    "band": {
+      "a": {
+        "t": "Çok iyi",
+        "d": "Müşterilerin seni sahipleniyor. Bu seviyede asıl iş, iyi giden şeyi bozmamak ve memnuniyeti yeni müşteriye çevirmek."
+      },
+      "b": {
+        "t": "İyi",
+        "d": "Sağlam bir zemin var. İki küçük dokunuşla belirgin şekilde yukarı çıkabilir — tam raporda hangi konu olduğunu göreceksin."
+      },
+      "c": {
+        "t": "Orta",
+        "d": "Kötü değil ama tek bir konu skorunu aşağı çekiyor. Oraya dokunursan fark hızlı görünür."
+      },
+      "d": {
+        "t": "Zorlanıyor",
+        "d": "Burada biriken bir sorun var. İyi haber: en çok tekrar eden konu çok net, yani nereden başlayacağın belli."
+      }
+    }
+  },
+  "footer": {
+    "note": "Ücretsiz önizleme • Tam rapor e-posta onayı ile • Günlük kota uygulanır"
+  }
 }

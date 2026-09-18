@@ -25,7 +25,9 @@ export async function GET(req: NextRequest) {
       ok: true,
       email: consumed.email,
       report: (report as unknown as { full_report: unknown }).full_report,
-      businessName: report.business_name
+      businessName: report.business_name,
+      reviewCount: (report.full_report as unknown as { review_count?: number }).review_count ?? report.reviews.length,
+      createdAt: report.created_at
     });
   } catch (e) {
     console.error('verify error', e);

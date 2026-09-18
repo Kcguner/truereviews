@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Yorum Defteri — Google yorumlarının dürüst özeti</title>
+<meta name="description" content="Google Maps linkini yapıştır; yorumlarının tamamını okuyup sana bir sayfalık dürüst bir özet çıkaralım.">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/fraunces/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/karla/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ibm-plex-mono/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ibm-plex-mono/600.css">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --paper:#F5EFE3;
+  --paper-hi:#FCF8EF;
+  --paper-lo:#EBE1CD;
+  --card:#FEFCF6;
+
+  --ink:#1F1C17;
+  --ink-2:#544C40;
+  --ink-3:#8B8272;
+  --line:#D6C9AF;
+  --line-2:#C3B394;
+
+  --brand:#17463C;
+  --brand-2:#0F332C;
+  --brand-soft:#DEE9E2;
+
+  --amber:#D8951F;
+  --amber-soft:#F5E3B8;
+  --clay:#AC452F;
+  --clay-soft:#F1DCD4;
+  --moss:#4B7A45;
+  --moss-soft:#DEE9D5;
+
+  --font-display:'Fraunces',Georgia,'Times New Roman',serif;
+  --font-body:'Karla',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  --sh:4px 4px 0 var(--ink);
+  --sh-sm:3px 3px 0 var(--ink);
+  --r:5px;
+  --maxw:720px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  margin:0;
+  background-color:var(--paper);
+  background-image:repeating-linear-gradient(to bottom,transparent 0 33px,rgba(31,28,23,.035) 33px 34px);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.62;
+  font-optical-sizing:auto;
+  overflow-x:hidden;
+}
+img,svg{display:block;max-width:100%}
+button,input{font:inherit;color:inherit}
+a{color:inherit}
+h1,h2,h3,h4,h5{margin:0;font-family:var(--font-display);font-weight:800;letter-spacing:-.015em;line-height:1.12}
+p{margin:0}
+ul,ol{margin:0;padding:0;list-style:none}
+
+::selection{background:var(--amber-soft);color:var(--ink)}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:2px}
+
+.grain{
+  position:fixed;inset:0;z-index:80;pointer-events:none;opacity:.42;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.42'/%3E%3C/svg%3E");
+}
+
+.wrap{width:100%;max-width:var(--maxw);margin-inline:auto;padding-inline:20px}
+.wrap--wide{max-width:1120px}
+.wrap--report{max-width:760px}
+
+/* ============ SHARED BITS ============ */
+.eyebrow{
+  font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--ink-3);line-height:1.5;
+}
+.eyebrow--tick::before{content:"◆ ";color:var(--amber);letter-spacing:0}
+.hl{
+  background-image:linear-gradient(100deg,rgba(216,149,31,.46),rgba(216,149,31,.30));
+  background-repeat:no-repeat;background-size:100% 46%;background-position:0 86%;
+  padding:0 .1em;border-radius:2px 7px 4px 9px;
+}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.55em;
+  font-weight:700;font-size:16px;padding:.82em 1.35em;
+  background:var(--paper-hi);color:var(--ink);
+  border:1.6px solid var(--ink);border-radius:var(--r);
+  box-shadow:var(--sh-sm);cursor:pointer;text-align:center;text-decoration:none;
+  transition:transform .13s ease,box-shadow .13s ease,background .16s ease;
+}
+.btn:hover{transform:translate(-1.5px,-1.5px);box-shadow:5px 5px 0 var(--ink)}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn--primary{background:var(--brand);color:#F7F2E6}
+.btn--primary:hover{background:var(--brand-2)}
+.btn--amber{background:var(--amber);color:#241D08}
+.btn--big{font-size:17.5px;padding:1em 1.5em;box-shadow:var(--sh)}
+.btn--big:hover{box-shadow:6px 6px 0 var(--ink)}
+.btn--full{width:100%}
+.btn--quiet{background:transparent;border-color:var(--line-2);box-shadow:none;color:var(--ink-2)}
+.btn--quiet:hover{background:var(--paper-hi);border-color:var(--ink);box-shadow:var(--sh-sm);transform:translate(-1px,-1px)}
+.btn[disabled]{opacity:.5;pointer-events:none}
+
+.linkish{
+  background:none;border:0;padding:0;cursor:pointer;font-weight:700;font-size:14.5px;
+  color:var(--brand);text-decoration:underline;text-decoration-style:dotted;
+  text-decoration-thickness:1.5px;text-underline-offset:4px;
+}
+.linkish:hover{color:var(--clay)}
+
+.chip{
+  display:inline-flex;align-items:center;gap:.4em;
+  font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  padding:.42em .7em;border:1.3px solid var(--line-2);border-radius:999px;color:var(--ink-2);
+  background:var(--paper-hi);white-space:nowrap;
+}
+.chip--moss{border-color:rgba(75,122,69,.45);background:var(--moss-soft);color:#33552F}
+.chip--clay{border-color:rgba(172,69,47,.4);background:var(--clay-soft);color:#7E3222}
+.chip--amber{border-color:rgba(216,149,31,.5);background:var(--amber-soft);color:#6B4A08}
+.chip--ink{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+
+.rule{height:0;border-top:1.5px dashed var(--line-2);margin:0}
+
+/* ============ HEADER ============ */
+.site-head{
+  position:sticky;top:0;z-index:50;
+  background:rgba(245,239,227,.96);
+  border-bottom:1.6px solid var(--ink);
+}
+.head-in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:66px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.brand__mark{width:34px;height:34px;flex:none}
+.brand__name{font-family:var(--font-display);font-weight:900;font-size:20px;letter-spacing:-.02em;line-height:1}
+.brand__name em{font-style:normal;color:var(--brand)}
+.brand__sub{display:block;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink-3);margin-top:3px}
+.head-right{display:flex;align-items:center;gap:10px}
+.head-note{display:none;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-3)}
+
+.lang{position:relative}
+.lang__btn{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--paper-hi);border:1.5px solid var(--ink);border-radius:999px;
+  padding:.5em .85em;font-size:13.5px;font-weight:700;cursor:pointer;
+  box-shadow:2px 2px 0 rgba(31,28,23,.18);transition:box-shadow .13s,transform .13s;
+}
+.lang__btn:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 rgba(31,28,23,.28)}
+.lang__btn svg{flex:none}
+.lang__btn .cv{transition:transform .2s}
+.lang[aria-expanded="true"] .cv{transform:rotate(180deg)}
+.lang__menu{
+  position:absolute;right:0;top:calc(100% + 10px);width:224px;max-height:70vh;overflow:auto;
+  background:var(--card);border:1.6px solid var(--ink);border-radius:6px;box-shadow:var(--sh);
+  padding:6px;z-index:60;
+}
+.lang__menu[hidden]{display:none}
+.lang__item{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;
+  background:none;border:0;border-radius:4px;padding:.55em .7em;cursor:pointer;text-align:left;
+  font-size:14.5px;font-weight:600;
+}
+.lang__item:hover{background:var(--paper-lo)}
+.lang__item[aria-current="true"]{background:var(--brand-soft);color:var(--brand-2)}
+.lang__item small{font-family:var(--font-mono);font-size:10px;color:var(--ink-3);letter-spacing:.06em}
+
+/* ============ SCREENS ============ */
+.screen{display:none}
+.screen.is-active{display:block;animation:screenIn .5s cubic-bezier(.2,.7,.3,1) both}
+@keyframes screenIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ============ HERO ============ */
+.hero{padding:38px 0 8px}
+.hero__grid{display:grid;gap:30px}
+.hero__h1{
+  font-size:clamp(2.15rem,8.2vw,3.5rem);font-weight:900;line-height:1.02;letter-spacing:-.028em;
+  margin:14px 0 0;
+}
+.hero__h1 span{display:block}
+.hero__lede{margin-top:18px;font-size:clamp(1rem,2.6vw,1.12rem);color:var(--ink-2);max-width:56ch}
+.hero__lede strong{color:var(--ink);font-weight:700}
+
+.paste{
+  margin-top:26px;background:var(--card);border:1.7px solid var(--ink);border-radius:7px;
+  box-shadow:var(--sh);padding:20px;position:relative;
+}
+.paste::before{
+  content:"";position:absolute;left:-1.7px;top:-1.7px;bottom:-1.7px;width:7px;
+  background:var(--clay);opacity:.85;border-radius:5px 0 0 5px;border-right:1.4px solid var(--ink);
+}
+.field__label{
+  display:block;font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--ink-3);margin:0 0 9px 10px;
+}
+.input-row{display:flex;gap:10px;align-items:stretch;margin-left:10px;flex-wrap:wrap}
+.input-row input{
+  flex:1 1 220px;min-width:0;
+  padding:.92em 1em;background:#fff;border:1.6px solid var(--ink);border-radius:var(--r);
+  font-size:15.5px;
+}
+.input-row input::placeholder{color:#A79C88}
+.icon-btn{
+  flex:none;width:50px;display:grid;place-items:center;background:var(--paper-lo);
+  border:1.6px solid var(--ink);border-radius:var(--r);cursor:pointer;transition:background .15s;
+}
+.icon-btn:hover{background:var(--amber-soft)}
+.field__err{
+  margin:12px 0 0 10px;padding:.7em .9em;border-left:3px solid var(--clay);
+  background:var(--clay-soft);color:#7E3222;font-size:14px;border-radius:0 4px 4px 0;
+}
+.field__err[hidden]{display:none}
+.paste__cta{margin:16px 0 0 10px}
+.paste__foot{
+  margin:16px 0 0 10px;padding-top:14px;border-top:1.5px dashed var(--line-2);
+  display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;
+}
+.paste__hint{font-size:13px;color:var(--ink-3);line-height:1.45;flex:1 1 200px}
+
+.hero__aside{display:flex;flex-direction:column;gap:18px;align-items:center;justify-content:center}
+.illo{width:100%;max-width:430px;height:auto}
+.float-score{
+  width:100%;max-width:300px;background:var(--card);border:1.6px solid var(--ink);
+  border-radius:6px;box-shadow:var(--sh-sm);padding:14px 16px;transform:rotate(-1.2deg);
+}
+.float-score__row{display:flex;align-items:baseline;gap:10px}
+.float-score__n{font-family:var(--font-display);font-weight:900;font-size:38px;line-height:1;letter-spacing:-.03em}
+.float-score__n small{font-size:15px;font-weight:700;color:var(--ink-3);letter-spacing:0}
+.float-score__bar{height:7px;background:var(--paper-lo);border:1px solid var(--line-2);margin-top:10px;display:flex}
+.float-score__bar i{display:block;height:100%}
+
+/* steps strip */
+.strip{margin-top:52px;border-top:1.7px solid var(--ink)}
+.strip__row{
+  display:grid;grid-template-columns:auto 1fr;gap:16px;padding:22px 0;
+  border-bottom:1.5px dashed var(--line-2);
+}
+.strip__n{
+  font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.06em;
+  width:34px;height:34px;flex:none;display:grid;place-items:center;
+  border:1.5px solid var(--ink);border-radius:4px;background:var(--paper-hi);
+}
+.strip__row h4{font-size:19px;margin-bottom:5px}
+.strip__row p{font-size:14.8px;color:var(--ink-2)}
+
+/* what you get */
+.gets{margin-top:52px}
+.gets__h{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.gets__h .rule{flex:1;border-top-style:solid;border-color:var(--line)}
+.gets__grid{display:grid;gap:14px}
+.get{
+  display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;
+  background:var(--paper-hi);border:1.5px solid var(--line-2);border-left:4px solid var(--brand);
+  border-radius:0 5px 5px 0;padding:16px 18px;
+}
+.get__ico{width:30px;height:30px;flex:none;color:var(--brand)}
+.get h5{font-family:var(--font-body);font-weight:700;font-size:16px;margin-bottom:3px}
+.get p{font-size:14.3px;color:var(--ink-2)}
+.get--amber{border-left-color:var(--amber)}
+.get--amber .get__ico{color:var(--amber)}
+.get--clay{border-left-color:var(--clay)}
+.get--clay .get__ico{color:var(--clay)}
+
+.assure{
+  margin:52px 0 0;padding:26px 24px;background:var(--brand);color:#EFE9DA;
+  border:1.7px solid var(--ink);border-radius:7px;box-shadow:var(--sh);
+}
+.assure p{font-family:var(--font-display);font-weight:600;font-size:clamp(1.05rem,3.4vw,1.3rem);line-height:1.42}
+.assure .sig{margin-top:14px;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:rgba(239,233,218,.62)}
+
+/* ============ LOADING ============ */
+.load{padding:64px 0 80px;min-height:70vh;display:flex;align-items:center}
+.load__card{
+  background:var(--card);border:1.7px solid var(--ink);border-radius:7px;box-shadow:var(--sh);
+  padding:clamp(22px,5vw,38px);width:100%;
+}
+.load__top{display:flex;align-items:center;gap:16px;margin-bottom:26px}
+.load__biz{min-width:0}
+.load__biz h2{font-size:clamp(1.3rem,4.6vw,1.75rem);overflow-wrap:anywhere}
+.load__biz p{font-size:13.5px;color:var(--ink-3);margin-top:4px}
+.load__track{height:12px;border:1.6px solid var(--ink);border-radius:999px;background:var(--paper-lo);overflow:hidden}
+.load__fill{height:100%;width:0%;background:repeating-linear-gradient(115deg,var(--brand) 0 10px,var(--brand-2) 10px 20px);
+  transition:width .5s ease;border-right:1.5px solid var(--ink)}
+.load__stages{margin-top:26px;display:grid;gap:2px}
+.stage{
+  display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:4px;
+  font-size:15px;color:var(--ink-3);transition:background .3s,color .3s;
+}
+.stage__dot{
+  width:18px;height:18px;flex:none;border:1.5px solid var(--line-2);border-radius:50%;
+  display:grid;place-items:center;background:var(--paper-hi);
+}
+.stage.is-done{color:var(--ink-2)}
+.stage.is-done .stage__dot{border-color:var(--moss);background:var(--moss-soft);color:var(--moss)}
+.stage.is-now{color:var(--ink);font-weight:700;background:var(--amber-soft)}
+.stage.is-now .stage__dot{border-color:var(--amber);background:#fff;color:var(--amber)}
+.stage.is-now .stage__dot::after{
+  content:"";width:7px;height:7px;border-radius:50%;background:var(--amber);animation:pulse 1s infinite ease-in-out;
+}
+@keyframes pulse{0%,100%{transform:scale(.6);opacity:.5}50%{transform:scale(1);opacity:1}}
+.load__foot{margin-top:24px;padding-top:18px;border-top:1.5px dashed var(--line-2);
+  font-size:13.5px;color:var(--ink-3);display:flex;gap:10px;align-items:flex-start}
+
+/* ============ REPORT ============ */
+.rpt{padding:28px 0 70px}
+.rpt__nav{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:26px}
+.rpt__stamp{
+  font-family:var(--font-mono);font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  border:1.6px solid var(--clay);color:var(--clay);border-radius:4px;padding:.45em .7em;
+  transform:rotate(-2deg);background:rgba(172,69,47,.06);
+}
+.rpt__head{border-bottom:2.2px solid var(--ink);padding-bottom:22px;margin-bottom:30px}
+.rpt__head h1{font-size:clamp(1.75rem,6.4vw,2.55rem);margin:10px 0 8px;overflow-wrap:anywhere}
+.rpt__sub{font-size:14.5px;color:var(--ink-2)}
+.rpt__chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+
+.block{margin-bottom:42px}
+.block__h{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.block__h .num{
+  font-family:var(--font-mono);font-size:11.5px;font-weight:600;width:28px;height:28px;flex:none;
+  display:grid;place-items:center;background:var(--ink);color:var(--paper);border-radius:3px;
+}
+.block__h h3{font-size:clamp(1.15rem,4vw,1.42rem);letter-spacing:-.01em}
+.block__h .rule{flex:1}
+
+/* score */
+.score{
+  display:grid;gap:24px;background:var(--card);border:1.7px solid var(--ink);border-radius:7px;
+  box-shadow:var(--sh);padding:clamp(20px,4.5vw,30px);
+}
+.gauge{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge svg{width:100%;max-width:230px;height:auto;overflow:visible}
+.gauge__val{
+  position:absolute;left:50%;bottom:12%;transform:translateX(-50%);text-align:center;
+}
+.gauge__n{font-family:var(--font-display);font-weight:900;font-size:clamp(46px,13vw,60px);line-height:.9;letter-spacing:-.04em}
+.gauge__n small{font-size:.34em;font-weight:700;color:var(--ink-3);letter-spacing:0;margin-left:2px}
+.gauge__cap{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-top:6px}
+.score__copy h4{font-size:clamp(1.2rem,4.4vw,1.5rem);margin-bottom:10px}
+.score__copy p{font-size:15.5px;color:var(--ink-2)}
+.score__facts{margin-top:18px;display:grid;gap:10px}
+.fact{display:flex;align-items:center;gap:10px;font-size:14px;flex-wrap:wrap}
+.fact__k{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);min-width:112px}
+.delta{display:inline-flex;align-items:center;gap:5px;font-weight:700;font-size:13.5px;
+  padding:.28em .6em;border-radius:999px;border:1.3px solid currentColor}
+.delta--up{color:var(--moss);background:var(--moss-soft)}
+.delta--down{color:var(--clay);background:var(--clay-soft)}
+.delta--flat{color:var(--ink-3);background:var(--paper-lo)}
+
+/* tone bar */
+.split{height:26px;display:flex;border:1.7px solid var(--ink);border-radius:4px;overflow:hidden;background:var(--paper-lo)}
+.split i{display:block;height:100%;position:relative;transition:width .9s cubic-bezier(.2,.7,.3,1)}
+.split i+i{border-left:1.5px solid var(--ink)}
+.split i:nth-child(1){background:var(--moss)}
+.split i:nth-child(2){background:var(--amber)}
+.split i:nth-child(3){background:var(--clay)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:14px}
+.legend li{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-2)}
+.legend b{font-family:var(--font-mono);font-size:13px;color:var(--ink)}
+.legend .sw{width:11px;height:11px;border:1.3px solid var(--ink);border-radius:2px;flex:none}
+
+/* themes */
+.subh{
+  display:flex;align-items:center;gap:10px;margin:26px 0 12px;
+  font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+}
+.subh .sw{width:9px;height:9px;border-radius:50%;flex:none}
+.subh--pos .sw{background:var(--moss)}
+.subh--neg .sw{background:var(--clay)}
+.subh .rule{flex:1;border-top:1.4px solid var(--line)}
+
+.theme{
+  padding:16px 16px 16px 18px;border-left:4px solid var(--line-2);
+  border-bottom:1.4px dashed var(--line-2);background:transparent;position:relative;
+}
+.theme--pos{border-left-color:var(--moss)}
+.theme--neg{border-left-color:var(--clay)}
+.theme__top{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap}
+.theme__t{font-weight:700;font-size:16.2px;line-height:1.35;overflow-wrap:anywhere}
+.theme__c{font-family:var(--font-mono);font-size:12.5px;font-weight:600;color:var(--ink-2);white-space:nowrap}
+.theme__c b{font-size:15px;color:var(--ink)}
+.theme__meter{height:6px;background:var(--paper-lo);border:1px solid var(--line);border-radius:99px;margin:10px 0 12px;overflow:hidden;max-width:280px}
+.theme__meter i{display:block;height:100%;border-radius:99px;transition:width 1s cubic-bezier(.2,.7,.3,1)}
+.theme--pos .theme__meter i{background:var(--moss)}
+.theme--neg .theme__meter i{background:var(--clay)}
+.theme__q{
+  margin:0;padding:10px 14px;background:var(--paper-hi);border:1.3px solid var(--line);
+  border-radius:0 4px 4px 0;font-size:14.4px;color:var(--ink-2);font-style:italic;
+}
+.theme__q footer{margin-top:7px;font-style:normal;font-family:var(--font-mono);font-size:10.5px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.theme.is-locked .theme__t,.theme.is-locked .theme__q,.theme.is-locked .theme__meter{
+  filter:blur(5.5px);opacity:.55;user-select:none;pointer-events:none;
+}
+.theme__lock{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  display:none;align-items:center;gap:7px;background:var(--ink);color:var(--paper);
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  padding:.5em .75em;border-radius:999px;
+}
+.theme.is-locked .theme__lock{display:inline-flex}
+.themes__foot{margin-top:16px;font-size:13.5px;color:var(--ink-3)}
+
+/* lockwall */
+.lockwall{
+  margin:34px 0;position:relative;background:var(--card);border:1.8px solid var(--ink);
+  border-radius:7px;box-shadow:var(--sh);overflow:hidden;
+  transition:opacity .4s ease,transform .4s ease;
+}
+.lockwall.is-gone{opacity:0;transform:translateY(-10px) scale(.99);pointer-events:none}
+.lockwall::before,.lockwall::after{
+  content:"";position:absolute;width:22px;height:22px;background:var(--paper);border:1.8px solid var(--ink);
+  border-radius:50%;top:50%;transform:translateY(-50%);
+}
+.lockwall::before{left:-13px;border-right-color:transparent}
+.lockwall::after{right:-13px;border-left-color:transparent}
+.lockwall__ghost{
+  position:relative;padding:22px clamp(18px,4vw,28px);
+  background-image:repeating-linear-gradient(45deg,rgba(31,28,23,.05) 0 8px,transparent 8px 16px);
+  border-bottom:1.8px dashed var(--line-2);
+}
+.ghost-box{filter:blur(6px);opacity:.5;user-select:none;pointer-events:none}
+.lockwall__body{padding:clamp(22px,4.5vw,32px)}
+.lock-ico{
+  width:44px;height:44px;display:grid;place-items:center;background:var(--amber-soft);
+  border:1.6px solid var(--ink);border-radius:5px;color:var(--brand);margin-bottom:16px;
+}
+.lockwall__body h3{font-size:clamp(1.3rem,4.6vw,1.7rem);margin-bottom:10px}
+.lockwall__body>p{color:var(--ink-2);font-size:15.4px;max-width:52ch}
+.mailform{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.mailform input{
+  flex:1 1 220px;min-width:0;padding:.92em 1em;background:#fff;
+  border:1.6px solid var(--ink);border-radius:var(--r);font-size:15.5px;
+}
+.mailform input::placeholder{color:#A79C88}
+.mailnote{margin-top:14px;font-size:13px;color:var(--ink-3);display:flex;gap:8px;align-items:flex-start}
+.mailerr{margin-top:12px;font-size:13.8px;color:var(--clay);font-weight:700}
+.mailerr[hidden]{display:none}
+.maildone{
+  margin-top:22px;padding:18px;background:var(--moss-soft);border:1.6px solid var(--moss);
+  border-radius:6px;display:flex;gap:12px;align-items:flex-start;
+}
+.maildone strong{display:block;font-family:var(--font-display);font-size:18px;margin-bottom:3px;color:#2E4E2A}
+.maildone p{font-size:14px;color:#3D5C38}
+
+/* action */
+.action{
+  background:var(--amber-soft);border:1.8px solid var(--ink);border-radius:7px;
+  box-shadow:var(--sh);padding:clamp(22px,4.5vw,32px);position:relative;overflow:hidden;
+}
+.action::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 100% 0%,rgba(216,149,31,.28),transparent 55%);
+  pointer-events:none;
+}
+.action__tag{
+  position:absolute;top:16px;right:-34px;transform:rotate(35deg);
+  background:var(--ink);color:var(--amber-soft);font-family:var(--font-mono);font-size:10px;
+  letter-spacing:.16em;text-transform:uppercase;padding:.45em 3em;
+}
+.action__k{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#7A5710;margin-bottom:12px}
+.action h3{font-size:clamp(1.3rem,4.8vw,1.72rem);margin-bottom:14px;max-width:22ch;position:relative}
+.action p{font-size:15.6px;color:#3B3222;position:relative;max-width:62ch}
+.action__meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;position:relative}
+.action__done{
+  margin-top:20px;display:flex;align-items:center;gap:12px;padding-top:18px;
+  border-top:1.5px dashed rgba(31,28,23,.35);position:relative;flex-wrap:wrap;
+}
+.tick{
+  width:24px;height:24px;flex:none;border:1.8px solid var(--ink);border-radius:4px;background:var(--card);
+  display:grid;place-items:center;cursor:pointer;color:transparent;transition:all .18s;
+}
+.tick:hover{background:#fff}
+.tick[aria-pressed="true"]{background:var(--moss);border-color:var(--moss);color:#fff}
+.action__done span{font-size:14.5px;font-weight:700}
+.action__done small{font-size:13px;color:var(--ink-2);font-weight:400}
+
+/* margin notes */
+.notes{border-left:3px solid var(--amber);padding:4px 0 4px 18px}
+.notes li{padding:11px 0;border-bottom:1.4px dashed var(--line-2);font-size:14.8px;color:var(--ink-2);
+  display:flex;gap:10px;align-items:flex-start}
+.notes li:last-child{border-bottom:0}
+.notes svg{flex:none;margin-top:3px;color:var(--amber)}
+
+/* report actions */
+.rpt__acts{display:flex;flex-wrap:wrap;gap:12px;margin-top:44px;padding-top:26px;border-top:2px solid var(--ink)}
+.method{
+  margin-top:34px;padding:18px;background:var(--paper-hi);border:1.4px solid var(--line-2);
+  border-radius:5px;font-size:13.4px;color:var(--ink-3);line-height:1.6;
+}
+.method b{color:var(--ink-2);font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;display:block;margin-bottom:6px}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(16px)}
+.reveal.in{opacity:1;transform:none;transition:opacity .55s ease,transform .55s cubic-bezier(.2,.7,.3,1)}
+
+/* footer */
+.site-foot{border-top:1.8px solid var(--ink);background:var(--paper-lo);padding:34px 0 46px;margin-top:20px}
+.foot-in{display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:flex-start}
+.foot-links{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:14px}
+.foot-links a{text-decoration:none;border-bottom:1.4px dotted var(--line-2)}
+.foot-links a:hover{color:var(--brand);border-color:var(--brand)}
+.foot-mono{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-top:16px}
+
+/* toast */
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,26px);z-index:90;
+  background:var(--ink);color:var(--paper);border-radius:5px;padding:.8em 1.2em;
+  font-size:14px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.25);
+  opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:calc(100vw - 40px);text-align:center;
+}
+.toast.is-on{opacity:1;transform:translate(-50%,0)}
+
+/* ============ RESPONSIVE ============ */
+@media(min-width:700px){
+  .gets__grid{grid-template-columns:repeat(3,1fr);gap:14px}
+  .get{grid-template-columns:1fr;gap:12px;padding:20px}
+}
+@media(min-width:960px){
+  body{font-size:17px}
+  .head-note{display:block}
+  .hero{padding:64px 0 8px}
+  .hero__grid{grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:52px;align-items:center}
+  .hero__aside{align-items:flex-end}
+  .score{grid-template-columns:250px minmax(0,1fr);align-items:center;gap:34px}
+  .float-score{max-width:270px}
+}
+@media(max-width:520px){
+  .paste{padding:16px 14px}
+  .paste::before{display:none}
+  .field__label,.input-row,.field__err,.paste__cta,.paste__foot{margin-left:0}
+  .btn--big{font-size:16.5px}
+  .strip__row{grid-template-columns:1fr;gap:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}
+}
+@media print{
+  .site-head,.site-foot,.rpt__nav,.rpt__acts,.grain,.lockwall,.toast{display:none!important}
+  body{background:#fff}
+  .score,.action,.lockwall{box-shadow:none}
+  .theme.is-locked .theme__t,.theme.is-locked .theme__q{filter:none;opacity:1}
+}
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ================= HEADER ================= -->
+<header class="site-head">
+  <div class="wrap wrap--wide head-in">
+    <a class="brand" href="#" id="brandHome" aria-label="Yorum Defteri">
+      <svg class="brand__mark" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+        <rect x="3.5" y="2.5" width="27" height="29" rx="2.5" fill="#FCF8EF" stroke="#1F1C17" stroke-width="2"/>
+        <path d="M11 2.5v29" stroke="#1F1C17" stroke-width="1.6"/>
+        <path d="M11 2.5h-7.5v29H11" fill="#AC452F" opacity=".18"/>
+        <path d="M15.5 18.2l4 4 8.4-9.4" stroke="#D8951F" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="27" cy="6.5" r="2.6" fill="#17463C"/>
+      </svg>
+      <span>
+        <span class="brand__name">Yorum<em>Defteri</em></span>
+        <span class="brand__sub" data-i18n="brand.sub">oku · tart · öner</span>
+      </span>
+    </a>
+
+    <div class="head-right">
+      <span class="head-note" data-i18n="head.note">Önizleme ücretsiz</span>
+      <div class="lang" id="langWrap">
+        <button class="lang__btn" id="langBtn" aria-expanded="false" aria-haspopup="true">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="8" cy="8" r="6.6" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M1.4 8h13.2M8 1.4c1.9 2 2.9 4.2 2.9 6.6S9.9 12.6 8 14.6C6.1 12.6 5.1 10.4 5.1 8S6.1 3.4 8 1.4z" stroke="currentColor" stroke-width="1.3"/>
+          </svg>
+          <span id="langCurrent">Türkçe</span>
+          <svg class="cv" width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1 3l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <ul class="lang__menu" id="langMenu" hidden role="menu"></ul>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- ================= INTRO ================= -->
+<section class="screen is-active" id="sc-intro">
+  <div class="wrap wrap--wide hero">
+    <div class="hero__grid">
+      <div class="hero__main">
+        <p class="eyebrow eyebrow--tick" data-i18n="intro.eyebrow">Önizleme ücretsiz · Kayıt gerekmez · ~40 saniye</p>
+        <h1 class="hero__h1">
+          <span data-i18n="intro.h1a">Müşterilerin senin</span>
+          <span data-i18n="intro.h1b">hakkında <span class="hl">aslında</span> ne diyor?</span>
+        </h1>
+        <p class="hero__lede" data-i18n-html="intro.lede">
+          Google Maps linkini yapıştır. Yorumlarının <strong>tamamını</strong> tek tek okuyalım; sana bir sayfalık dürüst bir özet çıkaralım: memnuniyet skorun, en çok tekrar eden övgü ve şikayetler, ve bu hafta atabileceğin <strong>tek somut adım</strong>.
+        </p>
+
+        <form class="paste" id="linkForm" novalidate>
+          <label class="field__label" for="linkInput" data-i18n="input.label">Google Maps işletme linki</label>
+          <div class="input-row">
+            <input id="linkInput" name="link" type="text" inputmode="url" autocomplete="off" spellcheck="false"
+                   placeholder="https://maps.app.goo.gl/…" aria-describedby="linkErr">
+            <button class="icon-btn" type="button" id="pasteBtn" data-i18n-title="input.paste" title="Panodan yapıştır" aria-label="Panodan yapıştır">
+              <svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <rect x="4.5" y="3.5" width="11" height="14" rx="1.6" stroke="#1F1C17" stroke-width="1.6"/>
+                <path d="M7.5 3.5V2.6a1 1 0 011-1h3a1 1 0 011 1v.9" stroke="#1F1C17" stroke-width="1.6"/>
+                <path d="M7.6 9h4.8M7.6 12h4.8" stroke="#17463C" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+          <p class="field__err" id="linkErr" role="alert" hidden></p>
+          <div class="paste__cta">
+            <button class="btn btn--primary btn--big btn--full" type="submit" id="goBtn">
+              <span data-i18n="input.cta">Raporu hazırla</span>
+              <svg width="17" height="17" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2.5 9h12M10 4.2L14.8 9 10 13.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <div class="paste__foot">
+            <button class="linkish" type="button" id="demoBtn" data-i18n="input.demo">Örnek bir işletmeyle dene →</button>
+            <span class="paste__hint" data-i18n="input.hint">Linki Google Haritalar'da işletmeni açıp “Paylaş” ile kopyalayabilirsin.</span>
+          </div>
+        </form>
+      </div>
+
+      <aside class="hero__aside">
+        <!-- inline illustration -->
+        <svg class="illo" viewBox="0 0 520 380" role="img" aria-label="Mahalle dükkanları ve önlerinde açık bir defter">
+          <defs>
+            <filter id="gr"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2"/><feColorMatrix type="saturate" values="0"/></filter>
+            <clipPath id="aw1"><rect x="40" y="112" width="128" height="26"/></clipPath>
+            <clipPath id="aw2"><rect x="186" y="88" width="128" height="26"/></clipPath>
+            <clipPath id="aw3"><rect x="332" y="126" width="128" height="26"/></clipPath>
+          </defs>
+
+          <circle cx="260" cy="176" r="152" fill="#17463C" opacity=".07"/>
+          <path d="M40 236h420" stroke="#1F1C17" stroke-width="2.4" stroke-linecap="round" opacity=".55"/>
+
+          <!-- shop 1 : barber -->
+          <rect x="48" y="138" width="112" height="98" fill="#FCF8EF" stroke="#1F1C17" stroke-width="2.4"/>
+          <rect x="66" y="164" width="34" height="40" fill="#DEE9E2" stroke="#1F1C17" stroke-width="2"/>
+          <rect x="110" y="164" width="34" height="40" fill="#DEE9E2" stroke="#1F1C17" stroke-width="2"/>
+          <rect x="40" y="112" width="128" height="26" fill="#AC452F"/>
+          <g clip-path="url(#aw1)">
+            <rect x="56" y="112" width="16" height="26" fill="#FCF8EF"/><rect x="88" y="112" width="16" height="26" fill="#FCF8EF"/>
+            <rect x="120" y="112" width="16" height="26" fill="#FCF8EF"/><rect x="152" y="112" width="16" height="26" fill="#FCF8EF"/>
+          </g>
+          <rect x="40" y="112" width="128" height="26" fill="none" stroke="#1F1C17" stroke-width="2.4"/>
+          <path d="M40,138 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0" fill="#AC452F" stroke="#1F1C17" stroke-width="2.2"/>
+          <rect x="30" y="150" width="10" height="86" rx="5" fill="#FCF8EF" stroke="#1F1C17" stroke-width="2.2"/>
+          <path d="M30 160h10M30 172h10M30 184h10M30 196h10M30 208h10M30 220h10" stroke="#AC452F" stroke-width="3"/>
+          <rect x="30" y="150" width="10" height="86" rx="5" fill="none" stroke="#1F1C17" stroke-width="2.2"/>
+
+          <!-- shop 2 : restaurant -->
+          <rect x="194" y="114" width="112" height="122" fill="#F5E3B8" stroke="#1F1C17" stroke-width="2.4"/>
+          <rect x="210" y="140" width="80" height="46" fill="#FCF8EF" stroke="#1F1C17" stroke-width="2"/>
+          <path d="M250 140v46M210 163h80" stroke="#1F1C17" stroke-width="1.4" opacity=".4"/>
+          <rect x="226" y="196" width="48" height="40" fill="#17463C" stroke="#1F1C17" stroke-width="2.2"/>
+          <circle cx="264" cy="216" r="3" fill="#D8951F"/>
+          <rect x="186" y="88" width="128" height="26" fill="#17463C"/>
+          <g clip-path="url(#aw2)">
+            <rect x="202" y="88" width="16" height="26" fill="#F5E3B8"/><rect x="234" y="88" width="16" height="26" fill="#F5E3B8"/>
+            <rect x="266" y="88" width="16" height="26" fill="#F5E3B8"/><rect x="298" y="88" width="16" height="26" fill="#F5E3B8"/>
+          </g>
+          <rect x="186" y="88" width="128" height="26" fill="none" stroke="#1F1C17" stroke-width="2.4"/>
+          <path d="M186,114 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0" fill="#17463C" stroke="#1F1C17" stroke-width="2.2"/>
+          <rect x="234" y="66" width="12" height="22" fill="#AC452F" stroke="#1F1C17" stroke-width="2"/>
+          <circle cx="240" cy="60" r="8" fill="#D8951F" stroke="#1F1C17" stroke-width="2"/>
+
+          <!-- shop 3 : grocery -->
+          <rect x="340" y="152" width="112" height="84" fill="#FCF8EF" stroke="#1F1C17" stroke-width="2.4"/>
+          <rect x="356" y="176" width="34" height="34" fill="#DEE9D5" stroke="#1F1C17" stroke-width="2"/>
+          <rect x="400" y="176" width="36" height="60" fill="#17463C" stroke="#1F1C17" stroke-width="2.2"/>
+          <rect x="332" y="126" width="128" height="26" fill="#D8951F"/>
+          <g clip-path="url(#aw3)">
+            <rect x="348" y="126" width="16" height="26" fill="#FCF8EF"/><rect x="380" y="126" width="16" height="26" fill="#FCF8EF"/>
+            <rect x="412" y="126" width="16" height="26" fill="#FCF8EF"/><rect x="444" y="126" width="16" height="26" fill="#FCF8EF"/>
+          </g>
+          <rect x="332" y="126" width="128" height="26" fill="none" stroke="#1F1C17" stroke-width="2.4"/>
+          <path d="M332,152 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0 a8,8 0 0,0 16,0" fill="#D8951F" stroke="#1F1C17" stroke-width="2.2"/>
+          <circle cx="332" cy="222" r="9" fill="#AC452F" stroke="#1F1C17" stroke-width="2"/>
+          <circle cx="350" cy="226" r="7" fill="#4B7A45" stroke="#1F1C17" stroke-width="2"/>
+
+          <!-- notebook foreground -->
+          <path d="M104 300c0-6 5-11 11-11h132c6 0 11 5 11 11v40c0 6-5 11-11 11H115c-6 0-11-5-11-11z" fill="#FCF8EF" stroke="#1F1C17" stroke-width="2.6"/>
+          <path d="M258 289h132c6 0 11 5 11 11v40c0 6-5 11-11 11H258z" fill="#FCF8EF" stroke="#1F1C17" stroke-width="2.6"/>
+          <path d="M258 286v70" stroke="#1F1C17" stroke-width="2.2"/>
+          <path d="M116 300h132" stroke="#AC452F" stroke-width="2" opacity=".7"/>
+          <g stroke="#C3B394" stroke-width="1.8">
+            <path d="M120 314h120M120 328h120M120 342h88"/>
+            <path d="M276 306h112M276 320h112M276 334h112M276 348h72"/>
+          </g>
+          <path d="M272 300l14 14 26-30" stroke="#4B7A45" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+          <!-- magnifier -->
+          <circle cx="410" cy="286" r="34" fill="#DEE9E2" stroke="#1F1C17" stroke-width="3"/>
+          <circle cx="410" cy="286" r="24" fill="none" stroke="#17463C" stroke-width="2" opacity=".5"/>
+          <path d="M434 310l22 22" stroke="#1F1C17" stroke-width="7" stroke-linecap="round"/>
+
+          <!-- tea glass -->
+          <path d="M62 286h30l-4 34c-.4 4-3.6 6-7.6 6H73.6c-4 0-7.2-2-7.6-6z" fill="#F5E3B8" stroke="#1F1C17" stroke-width="2.4"/>
+          <path d="M64 298h26" stroke="#AC452F" stroke-width="3"/>
+          <path d="M72 278c0-6 6-6 6-12M84 278c0-6 6-6 6-12" stroke="#8B8272" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+
+          <rect x="0" y="0" width="520" height="380" filter="url(#gr)" opacity=".16" style="mix-blend-mode:multiply"/>
+        </svg>
+
+        <div class="float-score" aria-hidden="true">
+          <p class="eyebrow" style="margin-bottom:8px">Örnek çıktı</p>
+          <div class="float-score__row">
+            <span class="float-score__n">71<small>/100</small></span>
+            <span class="delta delta--up" style="font-size:12px">▲ 3</span>
+          </div>
+          <div class="float-score__bar">
+            <i style="width:58%;background:var(--moss)"></i><i style="width:24%;background:var(--amber)"></i><i style="width:18%;background:var(--clay)"></i>
+          </div>
+          <p style="font-size:13px;color:var(--ink-2);margin-top:10px" data-i18n="float.note">“Öğle saatlerinde bekleme” 31 yorumda geçiyor.</p>
+        </div>
+      </aside>
+    </div>
+
+    <!-- steps -->
+    <div class="strip">
+      <div class="strip__row">
+        <span class="strip__n">01</span>
+        <div><h4 data-i18n="step1.t">Linkini yapıştır</h4><p data-i18n="step1.d">Google Haritalar'daki işletme sayfanın linki yeterli. Başka bir şey kurman, bağlaman gerekmiyor.</p></div>
+      </div>
+      <div class="strip__row">
+        <span class="strip__n">02</span>
+        <div><h4 data-i18n="step2.t">Biz okuyalım</h4><p data-i18n="step2.d">Son yorumlarının tamamını indiriyoruz; tek tek okuyup övgüleri, şikayetleri ve tekrar eden konuları ayırıyoruz.</p></div>
+      </div>
+      <div class="strip__row">
+        <span class="strip__n">03</span>
+        <div><h4 data-i18n="step3.t">Sana özet geçelim</h4><p data-i18n="step3.d">Bir sayfa: skorun, en çok tekrar eden konular ve bu hafta atabileceğin tek somut adım. Dashboard yok, grafik yığını yok.</p></div>
+      </div>
+    </div>
+
+    <!-- what you get -->
+    <div class="gets">
+      <div class="gets__h">
+        <p class="eyebrow" data-i18n="gets.h">Raporunda ne var</p>
+        <span class="rule"></span>
+      </div>
+      <div class="gets__grid">
+        <div class="get">
+          <svg class="get__ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9.4" stroke="currentColor" stroke-width="1.8"/><path d="M12 6.6v5.6l3.8 2.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <div><h5 data-i18n="get1.t">Memnuniyet skorun</h5><p data-i18n="get1.d">0–100 arası tek bir sayı ve bir önceki döneme göre yönü.</p></div>
+        </div>
+        <div class="get get--clay">
+          <svg class="get__ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3.5 18.5h17M5 18.5V9.8l7-5.3 7 5.3v8.7" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.6 18.5v-5h4.8v5" stroke="currentColor" stroke-width="1.8"/></svg>
+          <div><h5 data-i18n="get2.t">Tekrar eden konular</h5><p data-i18n="get2.d">En çok tekrar eden 5 övgü ve 5 şikayet, kaç yorumda geçtiğiyle birlikte.</p></div>
+        </div>
+        <div class="get get--amber">
+          <svg class="get__ico" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.2l2.5 5.4 5.9.7-4.4 4 1.2 5.8L12 16.2 6.8 19.1 8 13.3l-4.4-4 5.9-.7z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          <div><h5 data-i18n="get3.t">Tek somut öneri</h5><p data-i18n="get3.d">“Her şeyi düzelt” demiyoruz. Bu hafta yapabileceğin bir tek adım.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="assure">
+      <p data-i18n="assure.text">Yorumlarını değiştirmiyoruz, silmiyoruz, süslemiyoruz. Sadece hepsini okuyup sana birinin yüzüne söyleyeceği gibi anlatıyoruz.</p>
+      <p class="sig" data-i18n="assure.sig">Yorum Defteri · bağımsız analiz</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LOADING ================= -->
+<section class="screen" id="sc-load" aria-live="polite">
+  <div class="wrap">
+    <div class="load">
+      <div class="load__card">
+        <div class="load__top">
+          <svg width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+            <rect x="6" y="4" width="40" height="44" rx="3" fill="#FCF8EF" stroke="#1F1C17" stroke-width="2.4"/>
+            <path d="M16 4v44" stroke="#1F1C17" stroke-width="1.8"/>
+            <g stroke="#C3B394" stroke-width="2"><path d="M22 16h18M22 24h18M22 32h12"/></g>
+            <circle cx="38" cy="38" r="9" fill="#D8951F" stroke="#1F1C17" stroke-width="2.4">
+              <animateTransform attributeName="transform" type="rotate" from="0 38 38" to="360 38 38" dur="6s" repeatCount="indefinite"/>
+            </circle>
+            <path d="M44.5 44.5L49 49" stroke="#1F1C17" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          <div class="load__biz">
+            <h2 id="loadBizName">—</h2>
+            <p id="loadBizMeta">—</p>
+          </div>
+        </div>
+        <div class="load__track"><div class="load__fill" id="loadFill"></div></div>
+        <ul class="load__stages" id="loadStages"></ul>
+        <p class="load__foot">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex:none;margin-top:3px" aria-hidden="true"><circle cx="8" cy="8" r="6.6" stroke="#8B8272" stroke-width="1.4"/><path d="M8 7.2v4M8 4.8v.1" stroke="#8B8272" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span data-i18n="load.foot">Yorumların orijinal hâliyle kalır; biz yalnızca okur ve özetleriz. Bu önizleme için e-posta istemiyoruz.</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REPORT ================= -->
+<section class="screen" id="sc-report">
+  <div class="wrap wrap--report rpt">
+    <div class="rpt__nav">
+      <button class="linkish" type="button" id="backBtn" data-i18n="rpt.back">← Yeni bir işletme analiz et</button>
+      <span class="rpt__stamp" id="rptStamp">Önizleme</span>
+    </div>
+    <div id="rptBody"></div>
+  </div>
+</section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap wrap--wide foot-in">
+    <div>
+      <span class="brand__name" style="font-size:18px">Yorum<em>Defteri</em></span>
+      <p style="font-size:14px;color:var(--ink-2);margin-top:8px;max-width:38ch" data-i18n="foot.tagline">Küçük işletmeler için yorumlardan çıkan dürüst özet.</p>
+      <p class="foot-mono">© 2026 · <span data-i18n="foot.made">İstanbul'da yapıldı</span></p>
+    </div>
+    <nav class="foot-links" aria-label="Alt bilgi">
+      <a href="#" data-i18n="foot.l1">Nasıl çalışır</a>
+      <a href="#" data-i18n="foot.l2">Verini nasıl kullanıyoruz</a>
+      <a href="#" data-i18n="foot.l3">Sık sorulanlar</a>
+      <a href="#" data-i18n="foot.l4">İletişim</a>
+    </nav>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ==================== DATA ==================== */
+var DATASETS = [
+{
+  name:"Çınaraltı Ev Yemekleri", cat:"Restoran · Ev yemekleri", addr:"Caferağa Mah., Kadıköy / İstanbul",
+  mapId:"ChIJv-K0d2sFzRQRk2", reviews:248, prevReviews:231, score:71, prevScore:68,
+  pos:58, neu:24, neg:18, sinceYears:4, responseRate:34, avgDays:6, industry:64,
+  c:{
+    tr:{
+      praise:[
+        {t:"Ev yemeği tadı ve porsiyon büyüklüğü", n:37, q:"Annemin mutfağı gibi. Tabak dolu dolu geliyor, fiyatı da makul.", by:"3 hafta önce · 5 yıldız"},
+        {t:"Personelin samimiyeti, ismen tanımaları", n:29, q:"Garson bey üçüncü gelişimizde “her zamankinden mi?” dedi.", by:"1 ay önce · 5 yıldız"},
+        {t:"Fiyat–performans dengesi", n:18, q:"İki kişi çorba, ana yemek, tatlı; semtte bu fiyata zor bulunur.", by:"2 ay önce · 4 yıldız"}
+      ],
+      complaint:[
+        {t:"Öğle saatlerinde bekleme süresi", n:31, q:"12:40'ta girdik, yemek 13:15'te geldi. Ofise geç kaldım.", by:"2 hafta önce · 2 yıldız"},
+        {t:"Sokakta park yeri bulunamaması", n:12, q:"Arabayı üç sokak öteye bırakmak zorunda kaldık.", by:"1 ay önce · 3 yıldız"},
+        {t:"Yoğun saatte tuvaletlerin yetişmemesi", n:7, q:"Yemek çok iyiydi ama tuvaletler akşamüstü bakımsızdı.", by:"2 ay önce · 2 yıldız"}
+      ],
+      action:{
+        k:"Bu hafta atacağın tek adım",
+        h:"Öğle 12:00–14:00 arası için “hızlı tabak” şeridi aç",
+        b:"Bekleme şikayetlerinin %68'i 12:00–14:00 arasına yığılmış. Üç sabit tabaklık (çorba + ana yemek, pilav üstü, salata tabağı) önceden hazırlanmış bir “hızlı menü” şeridi servisi ortalama 9 dakikaya indirir. Menünün geri kalanına dokunmana gerek yok; sadece o iki saatte ayrı bir şerit.",
+        impact:"Bekleme kaynaklı olumsuz yorumlarda tahmini düşüş: %55–70",
+        effort:"1 gün hazırlık · ek maliyet yok"
+      },
+      notes:[
+        "Cumartesi akşamı yorumları, hafta içine göre ortalama 12 puan daha yüksek. Yoğunluğu oraya kaydırabilirsin.",
+        "“Annemin mutfağı gibi” ifadesi 9 ayrı yorumda geçiyor — bunu menüde ya da vitrinde kullan.",
+        "Olumsuz yorumların sadece %34'üne yanıt verilmiş. Yanıt verilen yorumlarda aynı müşterinin ikinci kez olumlu yazma oranı belirgin şekilde yüksek."
+      ],
+      cover:"248 yorumun %74'ünde en az bir konu tekrar ediyor. Kalan %26 genel memnuniyet ifadeleri."
+    },
+    en:{
+      praise:[
+        {t:"Home-cooked taste and generous portions", n:37, q:"Like my mother's kitchen. Plates come full and the price is fair.", by:"3 weeks ago · 5 stars"},
+        {t:"Warm staff who remember regulars", n:29, q:"On our third visit the waiter said “the usual?”", by:"1 month ago · 5 stars"},
+        {t:"Price–quality balance", n:18, q:"Soup, main and dessert for two — hard to beat in this neighbourhood.", by:"2 months ago · 4 stars"}
+      ],
+      complaint:[
+        {t:"Waiting time during lunch hours", n:31, q:"We sat down at 12:40, food arrived at 13:15. I was late for work.", by:"2 weeks ago · 2 stars"},
+        {t:"No street parking nearby", n:12, q:"We had to leave the car three streets away.", by:"1 month ago · 3 stars"},
+        {t:"Restrooms fall behind at peak times", n:7, q:"Food was great but the restrooms were neglected by late afternoon.", by:"2 months ago · 2 stars"}
+      ],
+      action:{
+        k:"The one step to take this week",
+        h:"Open a “fast plate” lane for 12:00–14:00",
+        b:"68% of the waiting-time complaints cluster between 12:00 and 14:00. A small pre-plated fast lane with three fixed plates (soup + main, rice bowl, salad plate) brings average service down to around 9 minutes. You don't need to touch the rest of the menu — just those two hours.",
+        impact:"Estimated drop in waiting-related negative reviews: 55–70%",
+        effort:"1 day to set up · no extra cost"
+      },
+      notes:[
+        "Saturday evening reviews run about 12 points higher than weekdays. Consider shifting capacity there.",
+        "The phrase “like my mother's kitchen” appears in 9 separate reviews — worth putting on your menu or window.",
+        "Only 34% of negative reviews got a reply. Reviewers who received a reply are noticeably more likely to leave a positive review later."
+      ],
+      cover:"At least one recurring topic appears in 74% of the 248 reviews. The remaining 26% are general praise."
+    }
+  }
+},
+{
+  name:"Salon Elif", cat:"Kuaför & Güzellik", addr:"Türkali Mah., Beşiktaş / İstanbul",
+  mapId:"ChIJp-9LmT1KzhQR4t", reviews:412, prevReviews:388, score:84, prevScore:81,
+  pos:71, neu:17, neg:12, sinceYears:6, responseRate:61, avgDays:3, industry:73,
+  c:{
+    tr:{
+      praise:[
+        {t:"Randevu saatine dakikası dakikasına uyulması", n:58, q:"14:00 randevum 14:02'de başladı. Bu şehirde mucize.", by:"1 hafta önce · 5 yıldız"},
+        {t:"İstenen modelin doğru anlaşılması", n:44, q:"Fotoğrafı gösterdim, “aynen böyle” dedim ve aynen öyle oldu.", by:"3 hafta önce · 5 yıldız"},
+        {t:"Hijyen ve salonun kokusu", n:26, q:"Havlular sıcak, aletler gözünün önünde paketten çıkıyor.", by:"1 ay önce · 5 yıldız"}
+      ],
+      complaint:[
+        {t:"Telefonla ulaşılamaması", n:23, q:"Randevu almak için altı kez aradım, kimse açmadı.", by:"2 hafta önce · 2 yıldız"},
+        {t:"Fiyatın iş başında söylenmemesi", n:15, q:"Koltuğa otururken fiyat konuşulmadı, kasada sürpriz yaşadım.", by:"1 ay önce · 3 yıldız"},
+        {t:"Cumartesi randevu bulmanın zorluğu", n:9, q:"İki hafta sonu üst üste yer yoktu.", by:"2 ay önce · 3 yıldız"}
+      ],
+      action:{
+        k:"Bu hafta atacağın tek adım",
+        h:"WhatsApp'a otomatik yanıt ve online randevu linki koy",
+        b:"Ulaşamama şikayetlerinin %72'si telefon hattından geliyor ve %80'i 10:00–12:00 ile 17:00–19:00 arasında — yani tam senin makas salladığın saatler. WhatsApp Business'a “Şu an bir müşterimizle ilgileniyoruz, buradan randevu alabilirsin: [link]” otomatik yanıtını kur. Kurulumu yaklaşık 20 dakika, ücreti yok.",
+        impact:"Kaçan randevu taleplerinde tahmini düşüş: %40–60",
+        effort:"20 dakika · ücretsiz"
+      },
+      notes:[
+        "Skorun sektör ortalamasının 11 puan üzerinde; asıl risk büyümede kalite kaybı, mevcut durumda değil.",
+        "“Fotoğrafı gösterdim, aynen öyle oldu” cümlesi 11 yorumda geçiyor — bunu Instagram biyografine taşı.",
+        "Pazar günleri yorum bırakma oranı hafta içine göre yaklaşık iki kat. Memnun müşteriyi pazar gününde yakala."
+      ],
+      cover:"412 yorumun %81'i net bir konuya değiniyor. Kalan %19 genel memnuniyet ifadeleri."
+    },
+    en:{
+      praise:[
+        {t:"Appointments start exactly on time", n:58, q:"My 14:00 appointment started at 14:02. A miracle in this city.", by:"1 week ago · 5 stars"},
+        {t:"They actually understand the look you ask for", n:44, q:"I showed a photo, said “exactly this”, and got exactly this.", by:"3 weeks ago · 5 stars"},
+        {t:"Hygiene and the smell of the salon", n:26, q:"Warm towels, tools opened in front of you.", by:"1 month ago · 5 stars"}
+      ],
+      complaint:[
+        {t:"Impossible to reach by phone", n:23, q:"I called six times to book. Nobody picked up.", by:"2 weeks ago · 2 stars"},
+        {t:"Price not stated before the service", n:15, q:"No price talk when I sat down, then a surprise at the till.", by:"1 month ago · 3 stars"},
+        {t:"Saturday slots hard to get", n:9, q:"Two weekends in a row there was nothing available.", by:"2 months ago · 3 stars"}
+      ],
+      action:{
+        k:"The one step to take this week",
+        h:"Add an auto-reply and a booking link on WhatsApp",
+        b:"72% of the “can't reach them” complaints come through the phone line, and 80% of them happen between 10:00–12:00 and 17:00–19:00 — exactly when your hands are busy. Set a WhatsApp Business auto-reply: “We're with a client right now, you can book here: [link]”. Roughly 20 minutes to set up, no cost.",
+        impact:"Estimated drop in lost booking requests: 40–60%",
+        effort:"20 minutes · free"
+      },
+      notes:[
+        "Your score sits 11 points above the category average. The real risk is losing quality while growing, not where you are today.",
+        "“I showed a photo and got exactly that” appears in 11 reviews — move it into your Instagram bio.",
+        "People leave reviews on Sundays about twice as often as on weekdays. Catch happy clients on Sunday."
+      ],
+      cover:"81% of the 412 reviews mention a specific topic. The remaining 19% are general praise."
+    }
+  }
+},
+{
+  name:"DentaCare Ağız ve Diş Sağlığı", cat:"Diş kliniği", addr:"Teşvikiye, Şişli / İstanbul",
+  mapId:"ChIJx-2AqZ4RzhQR7m", reviews:176, prevReviews:169, score:63, prevScore:66,
+  pos:47, neu:21, neg:32, sinceYears:3, responseRate:22, avgDays:11, industry:69,
+  c:{
+    tr:{
+      praise:[
+        {t:"Hekimlerin işlemi adım adım anlatması", n:34, q:"Ne yapacağını, neden yapacağını tek tek anlattı. İlk kez korkmadım.", by:"2 hafta önce · 5 yıldız"},
+        {t:"Ağrısız işlem", n:21, q:"İğne dahil hiçbir aşamada acı hissetmedim.", by:"1 ay önce · 5 yıldız"},
+        {t:"Bekleme salonunun sakinliği", n:12, q:"Işık, ses, koltuk… klinik gibi değil, ev gibi.", by:"2 ay önce · 4 yıldız"}
+      ],
+      complaint:[
+        {t:"Randevu saatinde başlanmaması", n:28, q:"45 dakika bekletildim, kimse nedenini söylemedi.", by:"1 hafta önce · 1 yıldız"},
+        {t:"Fiyatın ve ödeme planının net olmaması", n:24, q:"Tedavi planı çıkarıldı ama rakamı en sonda öğrendim.", by:"3 hafta önce · 2 yıldız"},
+        {t:"Hatırlatma mesajı gelmemesi", n:11, q:"Randevumu unuttum, arayan soran olmadı.", by:"1 ay önce · 2 yıldız"}
+      ],
+      action:{
+        k:"Bu hafta atacağın tek adım",
+        h:"Randevudan 24 saat önce otomatik hatırlatma kur",
+        b:"Gecikme şikayetlerinin yarısı aslında “bekletildim” değil, “bana haber verilmedi” temalı. Randevudan 24 saat önce giden bir SMS/WhatsApp hatırlatması hem boş randevu oranını düşürür hem de gecikme olacağında önceden haber vermeni sağlar. Kullandığın randevu yazılımında bu özellik büyük ihtimalle zaten var, sadece kapalı.",
+        impact:"Gecikme kaynaklı olumsuz yorumlarda tahmini düşüş: %35–50",
+        effort:"Yarım gün · mevcut yazılımında muhtemelen hazır"
+      },
+      notes:[
+        "Skorun son 60 günde 3 puan gerilemiş. Gerilemenin %70'i tek konudan geliyor: randevu gecikmesi.",
+        "Olumsuz yorumların yalnızca %22'sine yanıt verilmiş. Kliniklerde yanıt oranı güvenin en görünür parçası.",
+        "“Adım adım anlattı” teması en güçlü tarafın; bunu yeni hasta karşılama metninde öne çıkar."
+      ],
+      cover:"176 yorumun %69'u belirli bir konuya değiniyor. Kalan %31 genel ifadeler."
+    },
+    en:{
+      praise:[
+        {t:"Dentists explain every step of the procedure", n:34, q:"They explained what and why, step by step. First time I wasn't scared.", by:"2 weeks ago · 5 stars"},
+        {t:"Painless treatment", n:21, q:"No pain at any stage, including the injection.", by:"1 month ago · 5 stars"},
+        {t:"Calm waiting room", n:12, q:"The light, the sound, the chairs — feels like a home, not a clinic.", by:"2 months ago · 4 stars"}
+      ],
+      complaint:[
+        {t:"Appointments don't start on time", n:28, q:"Kept waiting 45 minutes and nobody told me why.", by:"1 week ago · 1 star"},
+        {t:"Price and payment plan unclear", n:24, q:"The treatment plan was drawn up but I learned the number at the very end.", by:"3 weeks ago · 2 stars"},
+        {t:"No reminder messages", n:11, q:"I forgot my appointment and nobody called.", by:"1 month ago · 2 stars"}
+      ],
+      action:{
+        k:"The one step to take this week",
+        h:"Set up an automatic reminder 24 hours before each appointment",
+        b:"Half of the lateness complaints aren't really “I was kept waiting” — they're “nobody told me”. A reminder 24 hours ahead cuts no-shows and gives you a channel to warn patients before a delay happens. Your booking software almost certainly has this feature; it's just switched off.",
+        impact:"Estimated drop in delay-related negative reviews: 35–50%",
+        effort:"Half a day · likely already built into your software"
+      },
+      notes:[
+        "Your score fell 3 points in the last 60 days, and 70% of that drop traces back to one topic: appointment delays.",
+        "Only 22% of negative reviews received a reply. In healthcare, reply rate is the most visible piece of trust.",
+        "“Explained every step” is your strongest asset — put it at the top of your new-patient welcome text."
+      ],
+      cover:"69% of the 176 reviews mention a specific topic. The remaining 31% are general statements."
+    }
+  }
+},
+{
+  name:"Anadolu Oto Servis", cat:"Oto bakım & servis", addr:"Dudullu OSB, Ümraniye / İstanbul",
+  mapId:"ChIJk-4BcQ8RzRQR1s", reviews:132, prevReviews:118, score:58, prevScore:61,
+  pos:39, neu:22, neg:39, sinceYears:8, responseRate:15, avgDays:14, industry:61,
+  c:{
+    tr:{
+      praise:[
+        {t:"İşçilik kalitesi", n:19, q:"İki yıldır geliyorum, yapılan iş bir kez geri dönmedi.", by:"1 ay önce · 5 yıldız"},
+        {t:"Aracı yıkanmış teslim etmeleri", n:11, q:"Arabayı aldığımda içi dışı pırıl pırıldı. Beklemiyordum.", by:"3 hafta önce · 5 yıldız"},
+        {t:"Ustanın ne yapıldığını anlatması", n:8, q:"Değişen parçayı gösterdi, eskisini de poşetleyip verdi.", by:"2 ay önce · 4 yıldız"}
+      ],
+      complaint:[
+        {t:"Verilen teslim saatine uyulmaması", n:26, q:"“Saat üçte hazır” dediler, arabayı akşam altıda aldım.", by:"1 hafta önce · 1 yıldız"},
+        {t:"Fiyatın iş bitince değişmesi", n:21, q:"Telefonda 2.400 dediler, kasada 3.900 oldu.", by:"2 hafta önce · 1 yıldız"},
+        {t:"Telefona çıkılmaması", n:14, q:"Aracımın durumunu öğrenmek için beş kez aradım.", by:"1 ay önce · 2 yıldız"}
+      ],
+      action:{
+        k:"Bu hafta atacağın tek adım",
+        h:"Her işe başlarken WhatsApp'tan fotoğraf + yazılı fiyat onayı gönder",
+        b:"“Fiyat sonradan değişti” şikayetlerinin %80'i, yazılı onay alınmamış işlerden geliyor. Aracı kaldırırken parçanın fotoğrafını ve net fiyatı WhatsApp'tan gönderip “onaylıyor musunuz?” diye sor. Otuz saniye sürer; sonrasında ne fiyat tartışması kalır ne de “bana söylenmedi” cümlesi.",
+        impact:"Fiyat kaynaklı olumsuz yorumlarda tahmini düşüş: %60–75",
+        effort:"Günlük 5 dakika · ek maliyet yok"
+      },
+      notes:[
+        "İşçilik kalitesi övgüsü yüksek ama teslim süresi şikayeti onu bastırıyor: insanlar iyi işi beklemeye razı, belirsizliğe değil.",
+        "Olumsuz yorumların %85'i yanıtsız kalmış. Servis sektöründe yanıtsızlık “umursamıyorlar” olarak okunuyor.",
+        "“Eski parçayı poşetleyip verdi” detayı tek bir yorumda geçiyor ama çok güçlü — bunu standart prosedür yap."
+      ],
+      cover:"132 yorumun %72'si belirli bir konuya değiniyor. Kalan %28 genel ifadeler."
+    },
+    en:{
+      praise:[
+        {t:"Quality of workmanship", n:19, q:"Two years coming here, not one job has come back.", by:"1 month ago · 5 stars"},
+        {t:"Car handed back washed", n:11, q:"The car was spotless inside and out when I picked it up. Didn't expect that.", by:"3 weeks ago · 5 stars"},
+        {t:"The mechanic explains what was done", n:8, q:"He showed me the replaced part and bagged the old one for me.", by:"2 months ago · 4 stars"}
+      ],
+      complaint:[
+        {t:"Promised handover time not met", n:26, q:"They said “ready at three”, I collected the car at six.", by:"1 week ago · 1 star"},
+        {t:"Price changes after the job", n:21, q:"2,400 on the phone, 3,900 at the counter.", by:"2 weeks ago · 1 star"},
+        {t:"Nobody answers the phone", n:14, q:"I called five times just to find out where my car was.", by:"1 month ago · 2 stars"}
+      ],
+      action:{
+        k:"The one step to take this week",
+        h:"Send a photo plus written price approval on WhatsApp before starting any job",
+        b:"80% of the “the price changed afterwards” complaints come from jobs where no written approval was taken. When the car goes up on the lift, send a photo of the part and the exact price on WhatsApp and ask “do you approve?”. It takes thirty seconds; afterwards there's no price argument and no “nobody told me”.",
+        impact:"Estimated drop in price-related negative reviews: 60–75%",
+        effort:"5 minutes a day · no extra cost"
+      },
+      notes:[
+        "Workmanship praise is high, but handover-time complaints drown it out: people accept waiting for good work, not uncertainty.",
+        "85% of negative reviews are unanswered. In the service trade, silence reads as “they don't care”.",
+        "The detail “he bagged the old part for me” appears in one review only — but it's powerful. Make it standard procedure."
+      ],
+      cover:"72% of the 132 reviews mention a specific topic. The remaining 28% are general statements."
+    }
+  }
+}
+];
+
+/* ==================== I18N ==================== */
+var LANGS=[
+  {c:"tr",n:"Türkçe",s:"TR"},{c:"en",n:"English",s:"EN"},{c:"de",n:"Deutsch",s:"DE"},
+  {c:"fr",n:"Français",s:"FR"},{c:"es",n:"Español",s:"ES"},{c:"it",n:"Italiano",s:"IT"},
+  {c:"nl",n:"Nederlands",s:"NL"},{c:"pl",n:"Polski",s:"PL"},{c:"pt",n:"Português",s:"PT"}
+];
+
+var I18N={
+tr:{
+ "brand.sub":"oku · tart · öner","head.note":"Önizleme ücretsiz",
+ "intro.eyebrow":"Önizleme ücretsiz · Kayıt gerekmez · ~40 saniye",
+ "intro.h1a":"Müşterilerin senin","intro.h1b":"hakkında <span class=\"hl\">aslında</span> ne diyor?",
+ "intro.lede":"Google Maps linkini yapıştır. Yorumlarının <strong>tamamını</strong> tek tek okuyalım; sana bir sayfalık dürüst bir özet çıkaralım: memnuniyet skorun, en çok tekrar eden övgü ve şikayetler, ve bu hafta atabileceğin <strong>tek somut adım</strong>.",
+ "input.label":"Google Maps işletme linki","input.paste":"Panodan yapıştır","input.cta":"Raporu hazırla",
+ "input.demo":"Örnek bir işletmeyle dene →","input.hint":"Linki Google Haritalar'da işletmeni açıp “Paylaş” ile kopyalayabilirsin.",
+ "input.err":"Bu bir Google Maps linkine benzemiyor. Google Haritalar'da işletmeni aç, “Paylaş”a bas, linki kopyala ve buraya yapıştır.",
+ "step1.t":"Linkini yapıştır","step1.d":"Google Haritalar'daki işletme sayfanın linki yeterli. Başka bir şey kurman, bağlaman gerekmiyor.",
+ "step2.t":"Biz okuyalım","step2.d":"Son yorumlarının tamamını indiriyoruz; tek tek okuyup övgüleri, şikayetleri ve tekrar eden konuları ayırıyoruz.",
+ "step3.t":"Sana özet geçelim","step3.d":"Bir sayfa: skorun, en çok tekrar eden konular ve bu hafta atabileceğin tek somut adım. Dashboard yok, grafik yığını yok.",
+ "gets.h":"Raporunda ne var",
+ "get1.t":"Memnuniyet skorun","get1.d":"0–100 arası tek bir sayı ve bir önceki döneme göre yönü.",
+ "get2.t":"Tekrar eden konular","get2.d":"En çok tekrar eden övgü ve şikayetler, kaç yorumda geçtiğiyle birlikte.",
+ "get3.t":"Tek somut öneri","get3.d":"“Her şeyi düzelt” demiyoruz. Bu hafta yapabileceğin bir tek adım.",
+ "assure.text":"Yorumlarını değiştirmiyoruz, silmiyoruz, süslemiyoruz. Sadece hepsini okuyup sana birinin yüzüne söyleyeceği gibi anlatıyoruz.",
+ "assure.sig":"Yorum Defteri · bağımsız analiz",
+ "float.note":"“Öğle saatlerinde bekleme” 31 yorumda geçiyor.",
+ "load.foot":"Yorumların orijinal hâliyle kalır; biz yalnızca okur ve özetleriz. Bu önizleme için e-posta istemiyoruz.",
+ "load.s1":"İşletme bulunuyor","load.s2":"Yorumlar indiriliyor","load.s3":"Hepsi tek tek okunuyor","load.s4":"Övgüler ve şikayetler ayrılıyor","load.s5":"Memnuniyet skoru hesaplanıyor","load.s6":"Raporun yazılıyor",
+ "rpt.back":"← Yeni bir işletme analiz et","rpt.stamp.prev":"Önizleme","rpt.stamp.full":"Tam rapor",
+ "rpt.date":"Rapor tarihi","rpt.reviews":"yorum","rpt.since":"{y} yıldır Google'da","rpt.scope":"Son {n} gün · {r} yorum",
+ "rpt.score.h":"Genel müşteri memnuniyeti","rpt.score.of":"/100","rpt.score.cap":"Memnuniyet skoru",
+ "rpt.f.trend":"Son 30 güne göre","rpt.f.industry":"Kategori ortalaması","rpt.f.response":"Yanıt verme oranı","rpt.f.avg":"Ortalama yanıt süresi",
+ "rpt.f.days":"{d} gün","rpt.f.pct":"%{p}",
+ "rpt.tone.h":"Yorumların tonu","rpt.tone.pos":"Övgü","rpt.tone.neu":"Nötr","rpt.tone.neg":"Şikayet",
+ "rpt.themes.h":"En çok tekrar eden konular","rpt.praise":"Övgüler","rpt.complaint":"Şikayetler",
+ "rpt.inreview":"yorumda geçiyor","rpt.lockpill":"Tam raporda","rpt.orig":"Orijinal yorum",
+ "lock.h":"Raporun hazır — kalanını açalım.","lock.p":"Skor ve ilk konular yukarıda. Somut öneri, kalan temalar ve kenar notları tam raporda duruyor. E-postanı bırak, hepsini açalım ve bir kopyasını da sana gönderelim.",
+ "lock.ph":"ornek@isletmem.com","lock.cta":"Tam raporu aç","lock.note":"Reklam yok, seri mail yok. Sadece bu rapor ve istersen ayda bir güncellemesi.",
+ "lock.err":"Geçerli bir e-posta adresi yaz.","lock.done":"Açıldı","lock.donet":"Tam raporun açık — aşağıda. Bir kopyası da {e} adresine yolda.",
+ "rpt.act.done":"Bunu yaptım olarak işaretle","rpt.act.donet":"İşaretlendi. 14 gün sonra skorundaki değişimi sana yazacağız.",
+ "rpt.notes.h":"Kenar notları",
+ "rpt.pdf":"PDF indir","rpt.copy":"Rapor linkini kopyala","rpt.new":"Başka bir işletme analiz et",
+ "rpt.copied":"Rapor linki kopyalandı.","rpt.copyfail":"Kopyalanamadı — adres çubuğundan alabilirsin.",
+ "method.h":"Bu raporu nasıl üretiyoruz","method.t":"Skor; yorum sayısı, yorumların yeniliği, duygu tonu ve tekrar eden temaların ağırlığı üzerinden hesaplanır. Yorumların içeriğini değiştirmeyiz, silmeyiz, satın almayız. Alıntılar gerçek yorumlardan kısaltılmıştır.",
+ "foot.tagline":"Küçük işletmeler için yorumlardan çıkan dürüst özet.","foot.made":"İstanbul'da yapıldı",
+ "foot.l1":"Nasıl çalışır","foot.l2":"Verini nasıl kullanıyoruz","foot.l3":"Sık sorulanlar","foot.l4":"İletişim",
+ "band.a.t":"Çok iyi","band.a.d":"Müşterilerin seni sahipleniyor. Bu seviyede asıl iş, iyi giden şeyi bozmamak ve memnuniyeti yeni müşteriye çevirmek.",
+ "band.b.t":"İyi","band.b.d":"Sağlam bir zemin var. İki küçük dokunuşla belirgin şekilde yukarı çıkabilir — aşağıda hangi konu olduğunu göreceksin.",
+ "band.c.t":"Orta","band.c.d":"Kötü değil ama tek bir konu skorunu aşağı çekiyor. Oraya dokunursan fark hızlı görünür.",
+ "band.d.t":"Zorlanıyor","band.d.d":"Burada biriken bir sorun var. İyi haber: en çok tekrar eden konu çok net, yani nereden başlayacağın belli."
+},
+en:{
+ "brand.sub":"read · weigh · advise","head.note":"Preview is free",
+ "intro.eyebrow":"Free preview · No sign-up · ~40 seconds",
+ "intro.h1a":"What are your customers","intro.h1b":"<span class=\"hl\">really</span> saying about you?",
+ "intro.lede":"Paste your Google Maps link. We read <strong>every single one</strong> of your reviews and hand you a one-page honest summary: your satisfaction score, the topics that keep coming up, and the <strong>one concrete step</strong> you can take this week.",
+ "input.label":"Google Maps business link","input.paste":"Paste from clipboard","input.cta":"Prepare my report",
+ "input.demo":"Try it with a sample business →","input.hint":"Open your business on Google Maps, hit “Share”, copy the link and paste it here.",
+ "input.err":"That doesn't look like a Google Maps link. Open your business on Google Maps, tap “Share”, copy the link and paste it here.",
+ "step1.t":"Paste your link","step1.d":"The link to your Google Maps business page is all we need. Nothing to install, nothing to connect.",
+ "step2.t":"We read them","step2.d":"We pull down your recent reviews, read every one and separate the praise, the complaints and the recurring topics.",
+ "step3.t":"We sum it up","step3.d":"One page: your score, the topics that repeat, and one concrete step for this week. No dashboard, no chart overload.",
+ "gets.h":"What's in your report",
+ "get1.t":"Your satisfaction score","get1.d":"One number out of 100, plus the direction versus the previous period.",
+ "get2.t":"Recurring topics","get2.d":"The most repeated praise and complaints, with how many reviews mention each.",
+ "get3.t":"One concrete suggestion","get3.d":"We won't tell you to “fix everything”. Just one step you can take this week.",
+ "assure.text":"We don't edit your reviews, we don't delete them, we don't polish them. We read all of them and tell you the way someone would say it to your face.",
+ "assure.sig":"Yorum Defteri · independent analysis",
+ "float.note":"“Waiting during lunch hours” appears in 31 reviews.",
+ "load.foot":"Your reviews stay exactly as they are; we only read and summarise them. We don't ask for an email for this preview.",
+ "load.s1":"Finding your business","load.s2":"Downloading reviews","load.s3":"Reading every single one","load.s4":"Separating praise from complaints","load.s5":"Calculating your satisfaction score","load.s6":"Writing your report",
+ "rpt.back":"← Analyse another business","rpt.stamp.prev":"Preview","rpt.stamp.full":"Full report",
+ "rpt.date":"Report date","rpt.reviews":"reviews","rpt.since":"On Google for {y} years","rpt.scope":"Last {n} days · {r} reviews",
+ "rpt.score.h":"Overall customer satisfaction","rpt.score.of":"/100","rpt.score.cap":"Satisfaction score",
+ "rpt.f.trend":"Versus last 30 days","rpt.f.industry":"Category average","rpt.f.response":"Reply rate","rpt.f.avg":"Average reply time",
+ "rpt.f.days":"{d} days","rpt.f.pct":"{p}%",
+ "rpt.tone.h":"The tone of your reviews","rpt.tone.pos":"Praise","rpt.tone.neu":"Neutral","rpt.tone.neg":"Complaint",
+ "rpt.themes.h":"The topics that keep coming up","rpt.praise":"Praise","rpt.complaint":"Complaints",
+ "rpt.inreview":"reviews mention this","rpt.lockpill":"In the full report","rpt.orig":"Original review",
+ "lock.h":"Your report is ready — let's open the rest.","lock.p":"The score and the first topics are above. The concrete suggestion, the remaining topics and the margin notes are in the full report. Leave your email and we'll unlock everything and send you a copy.",
+ "lock.ph":"you@mybusiness.com","lock.cta":"Unlock the full report","lock.note":"No ads, no email序列. Just this report and, if you want, one update a month.",
+ "lock.err":"Please enter a valid email address.","lock.done":"Unlocked","lock.donet":"Your full report is open below. A copy is on its way to {e}.",
+ "rpt.act.done":"Mark this as done","rpt.act.donet":"Marked. We'll write to you in 14 days with the change in your score.",
+ "rpt.notes.h":"Margin notes",
+ "rpt.pdf":"Download PDF","rpt.copy":"Copy report link","rpt.new":"Analyse another business",
+ "rpt.copied":"Report link copied.","rpt.copyfail":"Couldn't copy — grab it from the address bar.",
+ "method.h":"How we build this report","method.t":"The score is calculated from review volume, recency, sentiment tone and the weight of recurring topics. We never edit, delete or buy reviews. Quotes are shortened from real reviews.",
+ "foot.tagline":"An honest summary of your reviews, made for small businesses.","foot.made":"Made in Istanbul",
+ "foot.l1":"How it works","foot.l2":"How we use your data","foot.l3":"FAQ","foot.l4":"Contact",
+ "band.a.t":"Very good","band.a.d":"Your customers have taken ownership of you. At this level the job is to not break what's working and to turn satisfaction into new customers.",
+ "band.b.t":"Good","band.b.d":"There's a solid foundation here. Two small touches will move this visibly upward — you'll see which topic below.",
+ "band.c.t":"Average","band.c.d":"Not bad, but one single topic is dragging your score down. Touch that and the difference shows fast.",
+ "band.d.t":"Struggling","band.d.d":"There's a problem piling up here. The good news: the most repeated topic is very clear, so you know exactly where to start."
+},
+de:{
+ "brand.sub":"lesen · wägen · raten","head.note":"Vorschau kostenlos",
+ "intro.eyebrow":"Kostenlose Vorschau · Ohne Anmeldung · ~40 Sekunden",
+ "intro.h1a":"Was sagen deine Kunden","intro.h1b":"<span class=\"hl\">wirklich</span> über dich?",
+ "intro.lede":"Füge deinen Google-Maps-Link ein. Wir lesen <strong>wirklich jede</strong> deiner Bewertungen und geben dir eine ehrliche Zusammenfassung auf einer Seite: deinen Zufriedenheitswert, die Themen, die sich wiederholen, und den <strong>einen konkreten Schritt</strong>, den du diese Woche gehen kannst.",
+ "input.label":"Google-Maps-Unternehmenslink","input.paste":"Aus der Zwischenablage einfügen","input.cta":"Bericht erstellen",
+ "input.demo":"Mit einem Beispielbetrieb ausprobieren →","input.hint":"Öffne deinen Betrieb in Google Maps, tippe auf „Teilen“, kopiere den Link und füge ihn hier ein.",
+ "input.err":"Das sieht nicht nach einem Google-Maps-Link aus. Öffne deinen Betrieb in Google Maps, tippe auf „Teilen“, kopiere den Link und füge ihn hier ein.",
+ "step1.t":"Link einfügen","step1.d":"Der Link zu deiner Google-Maps-Seite reicht. Nichts installieren, nichts verbinden.",
+ "step2.t":"Wir lesen sie","step2.d":"Wir laden deine aktuellen Bewertungen herunter, lesen jede einzelne und trennen Lob, Beschwerden und wiederkehrende Themen.",
+ "step3.t":"Wir fassen zusammen","step3.d":"Eine Seite: dein Wert, die wiederkehrenden Themen und ein konkreter Schritt für diese Woche. Kein Dashboard, keine Diagrammflut.",
+ "gets.h":"Was in deinem Bericht steht",
+ "get1.t":"Dein Zufriedenheitswert","get1.d":"Eine Zahl von 0 bis 100, plus die Richtung im Vergleich zum Vorzeitraum.",
+ "get2.t":"Wiederkehrende Themen","get2.d":"Das am häufigsten genannte Lob und die Beschwerden — mit Anzahl der Nennungen.",
+ "get3.t":"Ein konkreter Vorschlag","get3.d":"Wir sagen nicht „alles reparieren“. Nur ein einziger Schritt für diese Woche.",
+ "assure.text":"Wir verändern deine Bewertungen nicht, wir löschen sie nicht, wir beschönigen sie nicht. Wir lesen sie alle und sagen es dir so, wie es dir jemand ins Gesicht sagen würde.",
+ "assure.sig":"Yorum Defteri · unabhängige Analyse",
+ "float.note":"„Wartezeit zur Mittagszeit“ kommt in 31 Bewertungen vor.",
+ "load.foot":"Deine Bewertungen bleiben unverändert; wir lesen und fassen sie nur zusammen. Für diese Vorschau brauchen wir keine E-Mail.",
+ "load.s1":"Betrieb wird gesucht","load.s2":"Bewertungen werden geladen","load.s3":"Jede einzelne wird gelesen","load.s4":"Lob und Beschwerden werden getrennt","load.s5":"Zufriedenheitswert wird berechnet","load.s6":"Dein Bericht wird geschrieben",
+ "rpt.back":"← Anderen Betrieb analysieren","rpt.stamp.prev":"Vorschau","rpt.stamp.full":"Vollständiger Bericht",
+ "rpt.date":"Berichtsdatum","rpt.reviews":"Bewertungen","rpt.since":"Seit {y} Jahren bei Google","rpt.scope":"Letzte {n} Tage · {r} Bewertungen",
+ "rpt.score.h":"Gesamtzufriedenheit der Kunden","rpt.score.of":"/100","rpt.score.cap":"Zufriedenheitswert",
+ "rpt.f.trend":"Gegenüber den letzten 30 Tagen","rpt.f.industry":"Kategoriedurchschnitt","rpt.f.response":"Antwortquote","rpt.f.avg":"Durchschnittliche Antwortzeit",
+ "rpt.f.days":"{d} Tage","rpt.f.pct":"{p} %",
+ "rpt.tone.h":"Der Ton deiner Bewertungen","rpt.tone.pos":"Lob","rpt.tone.neu":"Neutral","rpt.tone.neg":"Beschwerde",
+ "rpt.themes.h":"Die Themen, die sich wiederholen","rpt.praise":"Lob","rpt.complaint":"Beschwerden",
+ "rpt.inreview":"Bewertungen nennen das","rpt.lockpill":"Im vollständigen Bericht","rpt.orig":"Originalbewertung",
+ "lock.h":"Dein Bericht ist fertig — öffnen wir den Rest.","lock.p":"Der Wert und die ersten Themen stehen oben. Der konkrete Vorschlag, die übrigen Themen und die Randnotizen sind im vollständigen Bericht. Hinterlasse deine E-Mail und wir schalten alles frei und senden dir eine Kopie.",
+ "lock.ph":"du@meinbetrieb.de","lock.cta":"Vollständigen Bericht freischalten","lock.note":"Keine Werbung, keine Massenmails. Nur dieser Bericht und auf Wunsch eine Aktualisierung im Monat.",
+ "lock.err":"Bitte eine gültige E-Mail-Adresse eingeben.","lock.done":"Freigeschaltet","lock.donet":"Dein vollständiger Bericht ist unten offen. Eine Kopie ist unterwegs an {e}.",
+ "rpt.act.done":"Als erledigt markieren","rpt.act.donet":"Markiert. In 14 Tagen schreiben wir dir, wie sich dein Wert verändert hat.",
+ "rpt.notes.h":"Randnotizen",
+ "rpt.pdf":"PDF herunterladen","rpt.copy":"Berichtslink kopieren","rpt.new":"Anderen Betrieb analysieren",
+ "rpt.copied":"Berichtslink kopiert.","rpt.copyfail":"Kopieren nicht möglich — bitte aus der Adressleiste übernehmen.",
+ "method.h":"So erstellen wir diesen Bericht","method.t":"Der Wert wird aus Anzahl, Aktualität, Tonalität und Gewichtung wiederkehrender Themen berechnet. Wir verändern, löschen oder kaufen niemals Bewertungen. Zitate sind aus echten Bewertungen gekürzt.",
+ "foot.tagline":"Eine ehrliche Zusammenfassung deiner Bewertungen — für kleine Betriebe.","foot.made":"In Istanbul gemacht",
+ "foot.l1":"So funktioniert's","foot.l2":"Wie wir deine Daten nutzen","foot.l3":"Häufige Fragen","foot.l4":"Kontakt",
+ "band.a.t":"Sehr gut","band.a.d":"Deine Kunden stehen hinter dir. Auf diesem Niveau geht es darum, das Funktionierende nicht zu beschädigen und Zufriedenheit in neue Kunden zu verwandeln.",
+ "band.b.t":"Gut","band.b.d":"Es gibt ein solides Fundament. Zwei kleine Handgriffe bringen das deutlich nach oben — welches Thema es ist, siehst du unten.",
+ "band.c.t":"Durchschnittlich","band.c.d":"Nicht schlecht, aber ein einziges Thema drückt deinen Wert nach unten. Fass das an und der Unterschied zeigt sich schnell.",
+ "band.d.t":"Unter Druck","band.d.d":"Hier staut sich ein Problem. Die gute Nachricht: Das häufigste Thema ist sehr klar, du weißt also genau, wo du anfangen musst."
+}
+};
+
+/* ==================== STATE ==================== */
+var state={lang:"tr",data:null,unlocked:false,email:"",done:false};
+
+function t(k,vars){
+  var d=I18N[state.lang]||I18N.en;
+  var s=(d&&d[k]!==undefined)?d[k]:(I18N.en[k]!==undefined?I18N.en[k]:k);
+  if(vars){for(var v in vars){s=s.replace(new RegExp("\\{"+v+"\\}","g"),vars[v]);}}
+  return s;
+}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c];});}
+function body(){var c=state.data.c;return c[state.lang]||c.en||c.tr;}
+function fmt(n){try{return new Intl.NumberFormat(state.lang).format(n);}catch(e){return String(n);}}
+function today(){try{return new Intl.DateTimeFormat(state.lang,{day:"numeric",month:"long",year:"numeric"}).format(new Date());}catch(e){return "18 Eylül 2026";}}
+
+function band(s){return s>=85?"a":(s>=70?"b":(s>=55?"c":"d"));}
+function bandColor(s){return s>=85?"var(--moss)":(s>=70?"var(--amber)":(s>=55?"#C97A18":"var(--clay)"));}
+
+/* ==================== I18N APPLY ==================== */
+function applyI18n(){
+  document.documentElement.lang=state.lang;
+  document.querySelectorAll("[data-i18n]").forEach(function(el){el.textContent=t(el.getAttribute("data-i18n"));});
+  document.querySelectorAll("[data-i18n-html]").forEach(function(el){el.innerHTML=t(el.getAttribute("data-i18n-html"));});
+  document.querySelectorAll("[data-i18n-title]").forEach(function(el){el.title=t(el.getAttribute("data-i18n-title"));el.setAttribute("aria-label",t(el.getAttribute("data-i18n-title")));});
+  var cur=LANGS.filter(function(l){return l.c===state.lang;})[0];
+  document.getElementById("langCurrent").textContent=cur?cur.n:"English";
+  if(state.data){renderReport();}
+}
+
+/* lang menu */
+var langWrap=document.getElementById("langWrap"),langBtn=document.getElementById("langBtn"),langMenu=document.getElementById("langMenu");
+function buildLangMenu(){
+  langMenu.innerHTML=LANGS.map(function(l){
+    return '<li role="none"><button class="lang__item" role="menuitem" type="button" data-c="'+l.c+'" aria-current="'+(l.c===state.lang)+'">'+
+      '<span>'+esc(l.n)+'</span><small>'+l.s+(I18N[l.c]?"":" · EN")+'</small></button></li>';
+  }).join("");
+}
+langBtn.addEventListener("click",function(e){
+  e.stopPropagation();
+  var open=langMenu.hasAttribute("hidden");
+  if(open){langMenu.removeAttribute("hidden");langWrap.setAttribute("aria-expanded","true");langBtn.setAttribute("aria-expanded","true");}
+  else{langMenu.setAttribute("hidden","");langWrap.setAttribute("aria-expanded","false");langBtn.setAttribute("aria-expanded","false");}
+});
+langMenu.addEventListener("click",function(e){
+  var b=e.target.closest(".lang__item");if(!b)return;
+  state.lang=b.getAttribute("data-c");
+  langMenu.setAttribute("hidden","");langWrap.setAttribute("aria-expanded","false");langBtn.setAttribute("aria-expanded","false");
+  buildLangMenu();applyI18n();
+});
+document.addEventListener("click",function(){langMenu.setAttribute("hidden","");langWrap.setAttribute("aria-expanded","false");langBtn.setAttribute("aria-expanded","false");});
+
+/* ==================== SCREENS ==================== */
+function show(id){
+  document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("is-active");});
+  var el=document.getElementById(id);el.classList.add("is-active");
+  window.scrollTo({top:0,behavior:"auto"});
+}
+
+/* ==================== TOAST ==================== */
+var toastEl=document.getElementById("toast"),toastT;
+function toast(msg){
+  toastEl.textContent=msg;toastEl.classList.add("is-on");
+  clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove("is-on");},2600);
+}
+
+/* ==================== ANALYSIS FLOW ==================== */
+var linkInput=document.getElementById("linkInput"),linkErr=document.getElementById("linkErr");
+
+function pickDataset(str){
+  var h=0;for(var i=0;i<str.length;i++){h=(h*33+str.charCodeAt(i))|0;}
+  return DATASETS[Math.abs(h)%DATASETS.length];
+}
+function looksLikeLink(v){
+  v=v.trim();
+  return v.length>8 && /(maps|goo\.gl|google|g\.page|place|search|business)/i.test(v);
+}
+
+document.getElementById("linkForm").addEventListener("submit",function(e){
+  e.preventDefault();
+  var v=linkInput.value.trim();
+  if(!v){linkErr.textContent=t("input.err");linkErr.hidden=false;linkInput.focus();return;}
+  if(!looksLikeLink(v)){linkErr.textContent=t("input.err");linkErr.hidden=false;return;}
+  linkErr.hidden=true;
+  startAnalysis(pickDataset(v));
+});
+
+document.getElementById("demoBtn").addEventListener("click",function(){
+  linkInput.value="https://maps.app.goo.gl/CinaraltiEvYemekleri";
+  linkErr.hidden=true;
+  startAnalysis(DATASETS[0]);
+});
+
+document.getElementById("pasteBtn").addEventListener("click",async function(){
+  try{
+    var txt=await navigator.clipboard.readText();
+    if(txt){linkInput.value=txt.trim();linkErr.hidden=true;}
+  }catch(err){linkInput.focus();}
+});
+
+document.getElementById("brandHome").addEventListener("click",function(e){e.preventDefault();reset();});
+document.getElementById("backBtn").addEventListener("click",function(){reset();});
+
+function reset(){
+  state.data=null;state.unlocked=false;state.email="";state.done=false;
+  linkInput.value="";show("sc-intro");
+}
+
+var STAGES=["load.s1","load.s2","load.s3","load.s4","load.s5","load.s6"];
+function startAnalysis(d){
+  state.data=d;state.unlocked=false;state.email="";state.done=false;
+  document.getElementById("loadBizName").textContent=d.name;
+  document.getElementById("loadBizMeta").textContent=d.cat+" · "+d.addr;
+  var stagesEl=document.getElementById("loadStages");
+  stagesEl.innerHTML=STAGES.map(function(k,i){
+    return '<li class="stage" data-i="'+i+'"><span class="stage__dot"></span><span>'+t(k)+'</span></li>';
+  }).join("");
+  var fill=document.getElementById("loadFill");fill.style.width="0%";
+  show("sc-load");
+
+  var idx=0,total=STAGES.length;
+  function step(){
+    var items=stagesEl.querySelectorAll(".stage");
+    if(idx>0){items[idx-1].classList.remove("is-now");items[idx-1].classList.add("is-done");
+      items[idx-1].querySelector(".stage__dot").innerHTML='<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5.2l2.3 2.3L8.5 2.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';}
+    if(idx>=total){
+      fill.style.width="100%";
+      setTimeout(function(){show("sc-report");renderReport();},520);
+      return;
+    }
+    items[idx].classList.add("is-now");
+    fill.style.width=Math.round(((idx+0.5)/total)*100)+"%";
+    idx++;
+    setTimeout(step, idx===1?700:(560+Math.random()*520));
+  }
+  setTimeout(step,380);
+}
+
+/* ==================== REPORT RENDER ==================== */
+function gaugeSVG(score){
+  var r=92,cx=110,cy=118,len=Math.PI*r;
+  var ticks="";
+  [0,.25,.5,.75,1].forEach(function(f){
+    var a=Math.PI*(1-f);
+    var x1=cx+104*Math.cos(a),y1=cy-104*Math.sin(a);
+    var x2=cx+113*Math.cos(a),y2=cy-113*Math.sin(a);
+    ticks+='<path d="M'+x1.toFixed(1)+' '+y1.toFixed(1)+'L'+x2.toFixed(1)+' '+y2.toFixed(1)+'" stroke="#C3B394" stroke-width="2" stroke-linecap="round"/>';
+  });
+  return '<svg viewBox="0 0 220 132" role="img" aria-label="'+score+'/100">'+
+    ticks+
+    '<path d="M18 118 A92 92 0 0 1 202 118" fill="none" stroke="#E4D9C2" stroke-width="15" stroke-linecap="round"/>'+
+    '<path class="gauge-arc" d="M18 118 A92 92 0 0 1 202 118" fill="none" stroke="'+bandColor(score)+'" stroke-width="15" stroke-linecap="round" stroke-dasharray="'+len.toFixed(1)+'" stroke-dashoffset="'+len.toFixed(1)+'" data-len="'+len.toFixed(1)+'" data-score="'+score+'"/>'+
+  '</svg>';
+}
+
+function deltaHTML(cur,prev){
+  var d=cur-prev;
+  if(d>0)return '<span class="delta delta--up">▲ '+fmt(d)+'</span>';
+  if(d<0)return '<span class="delta delta--down">▼ '+fmt(Math.abs(d))+'</span>';
+  return '<span class="delta delta--flat">— 0</span>';
+}
+
+function themeRow(item,max,type,locked){
+  var pct=Math.max(6,Math.round(item.n/max*100));
+  return '<li class="theme theme--'+type+(locked?' is-locked':'')+'"'+(locked?' aria-hidden="true"':'')+'>'+
+    '<div class="theme__top"><span class="theme__t">'+esc(item.t)+'</span>'+
+    '<span class="theme__c"><b>'+fmt(item.n)+'</b> '+t("rpt.inreview")+'</span></div>'+
+    '<div class="theme__meter"><i style="width:'+pct+'%"></i></div>'+
+    '<blockquote class="theme__q">“'+esc(item.q)+'”<footer>'+esc(item.by)+' · '+t("rpt.orig")+'</footer></blockquote>'+
+    '<span class="theme__lock"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true"><rect x="2" y="5.4" width="8" height="5.6" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M3.8 5.4V3.8a2.2 2.2 0 014.4 0v1.6" stroke="currentColor" stroke-width="1.3"/></svg>'+t("rpt.lockpill")+'</span>'+
+  '</li>';
+}
+
+function renderReport(){
+  var d=state.data;if(!d)return;
+  var c=body(),b=band(d.score);
+  var allMax=Math.max.apply(null,c.praise.map(function(x){return x.n;}).concat(c.complaint.map(function(x){return x.n;}));
+  var unlocked=state.unlocked;
+
+  var praiseHTML=c.praise.map(function(it,i){return themeRow(it,allMax,"pos",!unlocked&&i>1);}).join("");
+  var complaintHTML=c.complaint.map(function(it,i){return themeRow(it,allMax,"neg",!unlocked&&i>0);}).join("");
+
+  var html='';
+  html+='<header class="rpt__head">'+
+    '<p class="eyebrow">'+t("rpt.date")+' · '+today()+'</p>'+
+    '<h1>'+esc(d.name)+'</h1>'+
+    '<p class="rpt__sub">'+esc(d.cat)+' · '+esc(d.addr)+'</p>'+
+    '<div class="rpt__chips">'+
+      '<span class="chip">'+t("rpt.scope",{n:"90",r:fmt(d.reviews)})+'</span>'+
+      '<span class="chip">'+t("rpt.since",{y:fmt(d.sinceYears)})+'</span>'+
+      (unlocked?'<span class="chip chip--ink">'+t("rpt.stamp.full")+'</span>':'<span class="chip chip--amber">'+t("rpt.stamp.prev")+'</span>')+
+    '</div>'+
+  '</header>';
+
+  /* 01 score */
+  html+='<section class="block reveal"><div class="block__h"><span class="num">01</span><h3>'+t("rpt.score.h")+'</h3><span class="rule"></span></div>'+
+    '<div class="score">'+
+      '<div class="gauge">'+gaugeSVG(d.score)+
+        '<div class="gauge__val"><div class="gauge__n" id="scoreNum">0<small>'+t("rpt.score.of")+'</small></div><div class="gauge__cap">'+t("rpt.score.cap")+'</div></div>'+
+      '</div>'+
+      '<div class="score__copy">'+
+        '<h4>'+t("band."+b+".t")+'</h4>'+
+        '<p>'+t("band."+b+".d")+'</p>'+
+        '<div class="score__facts">'+
+          '<div class="fact"><span class="fact__k">'+t("rpt.f.trend")+'</span>'+deltaHTML(d.score,d.prevScore)+'</div>'+
+          '<div class="fact"><span class="fact__k">'+t("rpt.f.industry")+'</span><b>'+fmt(d.industry)+'/100</b></div>'+
+          '<div class="fact"><span class="fact__k">'+t("rpt.f.response")+'</span><b>'+t("rpt.f.pct",{p:d.responseRate})+'</b></div>'+
+          '<div class="fact"><span class="fact__k">'+t("rpt.f.avg")+'</span><b>'+t("rpt.f.days",{d:d.avgDays})+'</b></div>'+
+        '</div>'+
+      '</div>'+
+    '</div></section>';
+
+  /* 02 tone */
+  html+='<section class="block reveal"><div class="block__h"><span class="num">02</span><h3>'+t("rpt.tone.h")+'</h3><span class="rule"></span></div>'+
+    '<div class="split" id="splitBar">'+
+      '<i style="width:0%" data-w="'+d.pos+'"></i><i style="width:0%" data-w="'+d.neu+'"></i><i style="width:0%" data-w="'+d.neg+'"></i>'+
+    '</div>'+
+    '<ul class="legend">'+
+      '<li><span class="sw" style="background:var(--moss)"></span>'+t("rpt.tone.pos")+' <b>%'+d.pos+'</b></li>'+
+      '<li><span class="sw" style="background:var(--amber)"></span>'+t("rpt.tone.neu")+' <b>%'+d.neu+'</b></li>'+
+      '<li><span class="sw" style="background:var(--clay)"></span>'+t("rpt.tone.neg")+' <b>%'+d.neg+'</b></li>'+
+    '</ul></section>';
+
+  /* 03 themes */
+  html+='<section class="block reveal"><div class="block__h"><span class="num">03</span><h3>'+t("rpt.themes.h")+'</h3><span class="rule"></span></div>'+
+    '<div class="subh subh--pos"><span class="sw"></span>'+t("rpt.praise")+'<span class="rule"></span></div>'+
+    '<ul class="themes">'+praiseHTML+'</ul>'+
+    '<div class="subh subh--neg"><span class="sw"></span>'+t("rpt.complaint")+'<span class="rule"></span></div>'+
+    '<ul class="themes">'+complaintHTML+'</ul>'+
+    '<p class="themes__foot">'+esc(c.cover)+'</p>'+
+  '</section>';
+
+  /* lockwall */
+  if(!unlocked){
+    html+='<div class="lockwall" id="lockwall">'+
+      '<div class="lockwall__ghost" aria-hidden="true"><div class="ghost-box">'+
+        '<div class="action__k" style="margin-bottom:10px">'+t("rpt.act.done")+'</div>'+
+        '<h3 style="font-size:1.3rem;margin-bottom:10px">'+esc(c.action.h)+'</h3>'+
+        '<p style="font-size:14.5px;color:var(--ink-2)">'+esc(c.action.b)+'</p>'+
+      '</div></div>'+
+      '<div class="lockwall__body">'+
+        '<div class="lock-ico"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><rect x="4" y="9.5" width="14" height="9.5" rx="1.6" stroke="currentColor" stroke-width="1.9"/><path d="M7.4 9.5V6.8a4.6 4.6 0 019.2 0v2.7" stroke="currentColor" stroke-width="1.9"/></svg></div>'+
+        '<h3>'+t("lock.h")+'</h3>'+
+        '<p>'+t("lock.p")+'</p>'+
+        '<form class="mailform" id="mailForm" novalidate>'+
+          '<input type="email" id="mailInput" placeholder="'+esc(t("lock.ph"))+'" autocomplete="email" aria-label="E-posta">'+
+          '<button class="btn btn--primary btn--big" type="submit">'+t("lock.cta")+'</button>'+
+        '</form>'+
+        '<p class="mailerr" id="mailErr" hidden></p>'+
+        '<p class="mailnote"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex:none;margin-top:4px" aria-hidden="true"><path d="M7 1.2l5 2.2v3.4c0 3-2.1 5.3-5 6-2.9-.7-5-3-5-6V3.4z" stroke="#8B8272" stroke-width="1.3" stroke-linejoin="round"/></svg>'+t("lock.note")+'</p>'+
+      '</div>'+
+    '</div>';
+  }else{
+    html+='<div class="maildone reveal" id="mailDone">'+
+      '<svg width="22" height="22" viewBox="0 0 22 22" fill="none" style="flex:none;margin-top:2px" aria-hidden="true"><circle cx="11" cy="11" r="9.4" stroke="#4B7A45" stroke-width="1.9"/><path d="M6.6 11.3l3 3 5.8-6.4" stroke="#4B7A45" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+      '<div><strong>'+t("lock.done")+'</strong><p>'+t("lock.donet",{e:esc(state.email)})+'</p></div></div>';
+  }
+
+  /* 04 action */
+  html+='<section class="block reveal" id="actionBlock" '+(unlocked?'':'hidden')+'>'+
+    '<div class="block__h"><span class="num">04</span><h3>'+esc(c.action.k)+'</h3><span class="rule"></span></div>'+
+    '<div class="action">'+
+      '<span class="action__tag">01</span>'+
+      '<p class="action__k">'+esc(c.action.k)+'</p>'+
+      '<h3>'+esc(c.action.h)+'</h3>'+
+      '<p>'+esc(c.action.b)+'</p>'+
+      '<div class="action__meta">'+
+        '<span class="chip chip--moss">'+esc(c.action.impact)+'</span>'+
+        '<span class="chip">'+esc(c.action.effort)+'</span>'+
+      '</div>'+
+      '<div class="action__done">'+
+        '<button class="tick" id="tickBtn" type="button" aria-pressed="'+(state.done?'true':'false')+'" aria-label="'+t("rpt.act.done")+'">'+
+          '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 7.3l3 3 6-6.6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+        '</button>'+
+        '<span id="tickLabel">'+(state.done?t("rpt.act.donet"):t("rpt.act.done"))+'</span>'+
+      '</div>'+
+    '</div></section>';
+
+  /* 05 notes */
+  html+='<section class="block reveal" id="notesBlock" '+(unlocked?'':'hidden')+'>'+
+    '<div class="block__h"><span class="num">05</span><h3>'+t("rpt.notes.h")+'</h3><span class="rule"></span></div>'+
+    '<ul class="notes">'+c.notes.map(function(n){
+      return '<li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M11.2 1.9l1.9 1.9-8 8-2.6.7.7-2.6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><span>'+esc(n)+'</span></li>';
+    }).join("")+'</ul></section>';
+
+  /* actions */
+  html+='<div class="rpt__acts reveal" id="rptActs" '+(unlocked?'':'hidden')+'>'+
+    '<button class="btn" type="button" id="pdfBtn"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.8v8.4M4.8 7.2L8 10.4l3.2-3.2M2.4 13.4h11.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>'+t("rpt.pdf")+'</button>'+
+    '<button class="btn btn--quiet" type="button" id="copyBtn"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5.4" y="5.4" width="8.4" height="8.4" rx="1.4" stroke="currentColor" stroke-width="1.5"/><path d="M10.6 5.4V3.2a1 1 0 00-1-1H3.2a1 1 0 00-1 1v6.4a1 1 0 001 1h2.2" stroke="currentColor" stroke-width="1.5"/></svg>'+t("rpt.copy")+'</button>'+
+    '<button class="btn btn--primary" type="button" id="newBtn">'+t("rpt.new")+'</button>'+
+  '</div>';
+
+  html+='<div class="method reveal"><b>'+t("method.h")+'</b>'+t("method.t")+'</div>';
+
+  document.getElementById("rptBody").innerHTML=html;
+  document.getElementById("rptStamp").textContent=unlocked?t("rpt.stamp.full"):t("rpt.stamp.prev");
+  document.getElementById("rptStamp").style.borderColor=unlocked?"var(--moss)":"var(--clay)";
+  document.getElementById("rptStamp").style.color=unlocked?"var(--moss)":"var(--clay)";
+
+  wireReport();
+  animateReport();
+}
+
+function animateReport(){
+  var arc=document.querySelector(".gauge-arc");
+  if(arc){
+    var len=parseFloat(arc.getAttribute("data-len")),sc=parseFloat(arc.getAttribute("data-score"));
+    requestAnimationFrame(function(){
+      setTimeout(function(){
+        arc.style.transition="stroke-dashoffset 1.3s cubic-bezier(.2,.7,.3,1)";
+        arc.style.strokeDashoffset=(len-(len*sc/100)).toFixed(1);
+      },140);
+    });
+  }
+  var num=document.getElementById("scoreNum");
+  if(num){
+    var target=state.data.score,start=null,dur=1200;
+    function tick(ts){
+      if(!start)start=ts;
+      var p=Math.min((ts-start)/dur,1);
+      var e=1-Math.pow(1-p,3);
+      num.innerHTML=Math.round(target*e)+'<small>'+t("rpt.score.of")+'</small>';
+      if(p<1)requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  var bars=document.querySelectorAll("#splitBar i");
+  bars.forEach(function(el,i){setTimeout(function(){el.style.width=el.getAttribute("data-w")+"%";},260+i*130);});
+
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target);}
+    });
+  },{threshold:.12,rootMargin:"0px 0px -40px 0px"});
+  document.querySelectorAll(".reveal").forEach(function(el,i){
+    el.style.transitionDelay=(i%6)*70+"ms";
+    io.observe(el);
+  });
+}
+
+function wireReport(){
+  var mf=document.getElementById("mailForm");
+  if(mf){
+    mf.addEventListener("submit",function(e){
+      e.preventDefault();
+      var inp=document.getElementById("mailInput"),err=document.getElementById("mailErr");
+      var v=(inp.value||"").trim();
+      if(!/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(v)){
+        err.textContent=t("lock.err");err.hidden=false;inp.focus();return;
+      }
+      err.hidden=true;state.email=v;state.unlocked=true;
+      var lw=document.getElementById("lockwall");
+      lw.classList.add("is-gone");
+      setTimeout(function(){renderReport();window.scrollTo({top:Math.max(0,lw.getBoundingClientRect().top+window.scrollY-140),behavior:"smooth"});},380);
+    });
+  }
+  var tb=document.getElementById("tickBtn");
+  if(tb){
+    tb.addEventListener("click",function(){
+      state.done=!state.done;
+      tb.setAttribute("aria-pressed",state.done?"true":"false");
+      document.getElementById("tickLabel").textContent=state.done?t("rpt.act.donet"):t("rpt.act.done");
+    });
+  }
+  var pb=document.getElementById("pdfBtn");
+  if(pb)pb.addEventListener("click",function(){window.print();});
+  var cb=document.getElementById("copyBtn");
+  if(cb)cb.addEventListener("click",function(){
+    var url=location.href.split("#")[0]+"#/rapor/"+state.data.mapId;
+    var ok=function(){toast(t("rpt.copied"));};
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(ok).catch(function(){fallback();});
+    }else{fallback();}
+    function fallback(){
+      var ta=document.createElement("textarea");ta.value=url;document.body.appendChild(ta);ta.select();
+      try{document.execCommand("copy");ok();}catch(e){toast(t("rpt.copyfail"));}
+      document.body.removeChild(ta);
+    }
+  });
+  var nb=document.getElementById("newBtn");
+  if(nb)nb.addEventListener("click",function(){reset();});
+}
+
+/* ==================== INIT ==================== */
+buildLangMenu();
+applyI18n();
+})();
+</script>
+</body>
+</html>

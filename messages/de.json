@@ -40,10 +40,21 @@
     "exceeded": "Tageskontingent erschöpft, versuchen Sie es morgen erneut.",
     "rateLimited": "Zu viele Versuche, versuchen Sie es in 1 Stunde erneut."
   },
-  "lang": { "label": "Sprache" },
-  "mock": { "badge": "Demo-Modus", "emailNote": "E-Mail-Dienst nicht verbunden — Bestätigungslink unten:" },
-  "theme": { "toggle": "Theme wechseln" },
-  "stats": { "reviews": "analysierte Bewertungen", "langs": "Sprachen", "free": "komplett kostenlos" },
+  "lang": {
+    "label": "Sprache"
+  },
+  "mock": {
+    "badge": "Demo-Modus",
+    "emailNote": "E-Mail-Dienst nicht verbunden — Bestätigungslink unten:"
+  },
+  "theme": {
+    "toggle": "Theme wechseln"
+  },
+  "stats": {
+    "reviews": "analysierte Bewertungen",
+    "langs": "Sprachen",
+    "free": "komplett kostenlos"
+  },
   "steps": {
     "title": "Wie funktioniert's?",
     "s1t": "Link einfügen",
@@ -62,5 +73,146 @@
     "f3t": "Spam-sicher",
     "f3d": "Limits, Bot-Schutz und Kontingentwächter."
   },
-  "footer": { "note": "Kostenlose Vorschau • Vollbericht per E-Mail-Bestätigung • Tageskontingent gilt" }
+  "nb": {
+    "brand": {
+      "sub": "lesen · wägen · raten"
+    },
+    "head": {
+      "note": "Vorschau kostenlos"
+    },
+    "intro": {
+      "eyebrow": "Kostenlose Vorschau · Ohne Anmeldung · ~40 Sekunden",
+      "h1a": "Was sagen deine Kunden",
+      "h1b": "<hl>wirklich</hl> über dich?",
+      "lede": "Füge deinen Google-Maps-Link ein. Wir lesen <strong>wirklich jede</strong> deiner Bewertungen und geben dir eine ehrliche Zusammenfassung auf einer Seite: deinen Zufriedenheitswert, die Themen, die sich wiederholen, und den <strong>einen konkreten Schritt</strong>, den du diese Woche gehen kannst."
+    },
+    "input": {
+      "label": "Google-Maps-Unternehmenslink",
+      "paste": "Aus der Zwischenablage einfügen",
+      "cta": "Bericht erstellen",
+      "demo": "Mit einem Beispielbetrieb ausprobieren →",
+      "hint": "Öffne deinen Betrieb in Google Maps, tippe auf „Teilen“, kopiere den Link und füge ihn hier ein.",
+      "err": "Das sieht nicht nach einem Google-Maps-Link aus. Öffne deinen Betrieb in Google Maps, tippe auf „Teilen“, kopiere den Link und füge ihn hier ein."
+    },
+    "step1": {
+      "t": "Link einfügen",
+      "d": "Der Link zu deiner Google-Maps-Seite reicht. Nichts installieren, nichts verbinden."
+    },
+    "step2": {
+      "t": "Wir lesen sie",
+      "d": "Wir laden deine aktuellen Bewertungen herunter, lesen jede einzelne und trennen Lob, Beschwerden und wiederkehrende Themen."
+    },
+    "step3": {
+      "t": "Wir fassen zusammen",
+      "d": "Eine Seite: dein Wert, die wiederkehrenden Themen und ein konkreter Schritt für diese Woche. Kein Dashboard, keine Diagrammflut."
+    },
+    "gets": {
+      "h": "Was in deinem Bericht steht"
+    },
+    "get1": {
+      "t": "Dein Zufriedenheitswert",
+      "d": "Eine Zahl von 0 bis 100, plus die Tonverteilung."
+    },
+    "get2": {
+      "t": "Wiederkehrende Themen",
+      "d": "Das am häufigsten genannte Lob und die Beschwerden — mit Anzahl der Nennungen."
+    },
+    "get3": {
+      "t": "Ein konkreter Vorschlag",
+      "d": "Wir sagen nicht „alles reparieren“. Nur ein einziger Schritt für diese Woche."
+    },
+    "assure": {
+      "text": "Wir verändern deine Bewertungen nicht, wir löschen sie nicht, wir beschönigen sie nicht. Wir lesen sie alle und sagen es dir so, wie es dir jemand ins Gesicht sagen würde.",
+      "sig": "YorumAnalizi · unabhängige Analyse"
+    },
+    "float": {
+      "cap": "Beispielausgabe",
+      "note": "„Wartezeit zur Mittagszeit“ kommt in 31 Bewertungen vor."
+    },
+    "load": {
+      "reading": "Deine Bewertungen werden gelesen…",
+      "foot": "Deine Bewertungen bleiben unverändert; wir lesen und fassen sie nur zusammen. Für diese Vorschau brauchen wir keine E-Mail.",
+      "s1": "Betrieb wird gesucht",
+      "s2": "Bewertungen werden geladen",
+      "s3": "Jede einzelne wird gelesen",
+      "s4": "Lob und Beschwerden werden getrennt",
+      "s5": "Zufriedenheitswert wird berechnet",
+      "s6": "Dein Bericht wird geschrieben"
+    },
+    "rpt": {
+      "back": "← Anderen Betrieb analysieren",
+      "stamp": {
+        "prev": "Vorschau",
+        "full": "Vollständiger Bericht"
+      },
+      "date": "Berichtsdatum",
+      "scope": "Letzte {r} Bewertungen",
+      "score": {
+        "h": "Gesamtzufriedenheit der Kunden",
+        "cap": "Zufriedenheitswert"
+      },
+      "tone": {
+        "h": "Der Ton deiner Bewertungen",
+        "pos": "Lob",
+        "neu": "Neutral",
+        "neg": "Beschwerde"
+      },
+      "themes": {
+        "h": "Die Themen, die sich wiederholen"
+      },
+      "praise": "Lob",
+      "complaint": "Beschwerden",
+      "inreview": "Bewertungen nennen das",
+      "orig": "Originalbewertung",
+      "pdf": "PDF herunterladen",
+      "new": "Anderen Betrieb analysieren"
+    },
+    "lock": {
+      "h": "Dein Bericht ist fertig — öffnen wir den Rest.",
+      "p": "Der Wert und die Tonverteilung stehen oben. Die wiederkehrenden Themen und der konkrete Vorschlag sind im vollständigen Bericht. Hinterlasse deine E-Mail und wir schalten alles frei.",
+      "ph": "du@meinbetrieb.de",
+      "cta": "Vollständigen Bericht freischalten",
+      "note": "Keine Werbung, keine Massenmails. Nur dieser Bericht und auf Wunsch eine Aktualisierung im Monat.",
+      "err": "Bitte eine gültige E-Mail-Adresse eingeben.",
+      "done": "Freigeschaltet",
+      "donet": "Dein vollständiger Bericht ist unten offen. Eine Kopie ist unterwegs an {e}.",
+      "donetMock": "Dein vollständiger Bericht ist unten offen. (Keine Kopie versendet, da der E-Mail-Dienst nicht verbunden ist.)"
+    },
+    "act": {
+      "k": "Der eine Schritt für diese Woche"
+    },
+    "method": {
+      "h": "So erstellen wir diesen Bericht",
+      "t": "Der Wert wird aus Anzahl, Sterneverteilung und Gewichtung wiederkehrender Themen berechnet. Wir verändern, löschen oder kaufen niemals Bewertungen. Zitate sind aus echten Bewertungen gekürzt."
+    },
+    "foot": {
+      "tagline": "Eine ehrliche Zusammenfassung deiner Bewertungen — für kleine Betriebe.",
+      "made": "In Istanbul gemacht",
+      "l1": "So funktioniert's",
+      "l2": "Wie wir deine Daten nutzen",
+      "l3": "Häufige Fragen",
+      "l4": "Kontakt"
+    },
+    "band": {
+      "a": {
+        "t": "Sehr gut",
+        "d": "Deine Kunden stehen hinter dir. Auf diesem Niveau geht es darum, das Funktionierende nicht zu beschädigen und Zufriedenheit in neue Kunden zu verwandeln."
+      },
+      "b": {
+        "t": "Gut",
+        "d": "Es gibt ein solides Fundament. Zwei kleine Handgriffe bringen das deutlich nach oben — welches Thema es ist, siehst du im vollständigen Bericht."
+      },
+      "c": {
+        "t": "Durchschnittlich",
+        "d": "Nicht schlecht, aber ein einziges Thema drückt deinen Wert nach unten. Fass das an und der Unterschied zeigt sich schnell."
+      },
+      "d": {
+        "t": "Unter Druck",
+        "d": "Hier staut sich ein Problem. Die gute Nachricht: Das häufigste Thema ist sehr klar, du weißt also genau, wo du anfangen musst."
+      }
+    }
+  },
+  "footer": {
+    "note": "Kostenlose Vorschau • Vollbericht per E-Mail-Bestätigung • Tageskontingent gilt"
+  }
 }
