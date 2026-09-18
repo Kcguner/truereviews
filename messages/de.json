@@ -1,0 +1,66 @@
+{
+  "hero": {
+    "badge": "Kostenlos • Vorschau ohne Anmeldung",
+    "title": "Google Maps Bewertungen kostenlos analysieren",
+    "subtitle": "Fügen Sie Ihren Unternehmenslink ein, wir analysieren 20 Bewertungen: Ihre Punktzahl, das größte Problem und 1 Handlungstipp. Die erste Vorschau braucht keine Anmeldung."
+  },
+  "form": {
+    "urlLabel": "Google Maps Unternehmenslink",
+    "urlPlaceholder": "https://www.google.com/maps/place/...",
+    "submit": "Kostenlos analysieren",
+    "analyzing": "Bewertungen werden abgerufen und analysiert..."
+  },
+  "preview": {
+    "title": "Ihre Vorschau ist fertig",
+    "score": "Gesamtpunktzahl",
+    "reviews": "Bewertungen",
+    "unlockTitle": "E-Mail hinterlassen für den vollständigen Bericht",
+    "unlockNote": "Der vollständige Bericht öffnet sich nach Klick auf den Bestätigungslink."
+  },
+  "lead": {
+    "emailLabel": "Ihre E-Mail-Adresse",
+    "emailPlaceholder": "sie@ihrefirma.com",
+    "submit": "Vollständigen Bericht senden",
+    "sending": "Wird gesendet...",
+    "checkEmail": "Prüfen Sie Ihr Postfach! Nach Klick auf den Bestätigungslink öffnet sich Ihr Bericht.",
+    "invalidEmail": "Bitte geben Sie eine gültige E-Mail ein.",
+    "disposable": "Wegwerf-E-Mails werden nicht akzeptiert."
+  },
+  "report": {
+    "title": "Vollständiger Bericht",
+    "summary": "Zusammenfassung",
+    "complaints": "Häufigste Beschwerde-Themen",
+    "praises": "Häufigste Lob-Themen",
+    "action": "Wichtigste Maßnahme",
+    "verified": "Ihre E-Mail ist bestätigt, Ihr Bericht folgt unten.",
+    "invalid": "Bestätigungslink ungültig oder abgelaufen.",
+    "loading": "Bericht wird verifiziert..."
+  },
+  "quota": {
+    "exceeded": "Tageskontingent erschöpft, versuchen Sie es morgen erneut.",
+    "rateLimited": "Zu viele Versuche, versuchen Sie es in 1 Stunde erneut."
+  },
+  "lang": { "label": "Sprache" },
+  "mock": { "badge": "Demo-Modus", "emailNote": "E-Mail-Dienst nicht verbunden — Bestätigungslink unten:" },
+  "theme": { "toggle": "Theme wechseln" },
+  "stats": { "reviews": "analysierte Bewertungen", "langs": "Sprachen", "free": "komplett kostenlos" },
+  "steps": {
+    "title": "Wie funktioniert's?",
+    "s1t": "Link einfügen",
+    "s1d": "Unternehmenslink einfügen; 20 Bewertungen werden automatisch abgerufen.",
+    "s2t": "Vorschau ansehen",
+    "s2d": "Punktzahl und erste Erkenntnis sofort, ohne Anmeldung.",
+    "s3t": "Bericht öffnen",
+    "s3d": "E-Mail bestätigen und den vollständigen Bericht lesen."
+  },
+  "features": {
+    "title": "Warum dieses Tool?",
+    "f1t": "Sofort-Punktzahl",
+    "f1d": "Klare 0-10 Gesamtpunktzahl aus 20 Bewertungen.",
+    "f2t": "Echte Themen",
+    "f2d": "Häufigste Beschwerden und Lob, mit Beispielen.",
+    "f3t": "Spam-sicher",
+    "f3d": "Limits, Bot-Schutz und Kontingentwächter."
+  },
+  "footer": { "note": "Kostenlose Vorschau • Vollbericht per E-Mail-Bestätigung • Tageskontingent gilt" }
+}

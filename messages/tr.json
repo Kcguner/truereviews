@@ -1,0 +1,66 @@
+{
+  "hero": {
+    "badge": "Ücretsiz • Kayıtsız önizleme",
+    "title": "Google Maps Yorumlarınızı Ücretsiz Analiz Edin",
+    "subtitle": "İşletme linkinizi yapıştırın, 20 yorumu analiz edelim: puanınız, en büyük sorun ve 1 aksiyon önerisi. İlk özet kayıt gerektirmez."
+  },
+  "form": {
+    "urlLabel": "Google Maps işletme linki",
+    "urlPlaceholder": "https://www.google.com/maps/place/...",
+    "submit": "Ücretsiz Analiz Et",
+    "analyzing": "Yorumlar çekiliyor ve analiz ediliyor..."
+  },
+  "preview": {
+    "title": "Önizlemeniz hazır",
+    "score": "Genel skor",
+    "reviews": "yorum",
+    "unlockTitle": "Tam raporu görmek için e-postanızı bırakın",
+    "unlockNote": "Onay linkine tıkladığınızda tam rapor açılır (2. ve son hakkınız)."
+  },
+  "lead": {
+    "emailLabel": "E-posta adresiniz",
+    "emailPlaceholder": "ornek@sirketiniz.com",
+    "submit": "Tam Raporu Gönder",
+    "sending": "Gönderiliyor...",
+    "checkEmail": "E-postanızı kontrol edin! Onay linkine tıklayınca tam raporunuz açılacak.",
+    "invalidEmail": "Geçerli bir e-posta girin.",
+    "disposable": "Geçici e-posta adresleri kabul edilmiyor."
+  },
+  "report": {
+    "title": "Tam Rapor",
+    "summary": "Özet",
+    "complaints": "En sık şikayet konuları",
+    "praises": "En sık övgü konuları",
+    "action": "Öncelikli aksiyon önerisi",
+    "verified": "E-postanız doğrulandı, raporunuz aşağıda.",
+    "invalid": "Onay linki geçersiz veya süresi dolmuş.",
+    "loading": "Rapor doğrulanıyor..."
+  },
+  "quota": {
+    "exceeded": "Günlük analiz kotası doldu, yarın tekrar deneyin.",
+    "rateLimited": "Çok sık denediniz, 1 saat sonra tekrar deneyin."
+  },
+  "lang": { "label": "Dil" },
+  "mock": { "badge": "Demo modu", "emailNote": "E-posta servisi bağlı değil — onay linki aşağıda (geliştirici önizlemesi):" },
+  "theme": { "toggle": "Tema değiştir" },
+  "stats": { "reviews": "yorum analizi", "langs": "dil desteği", "free": "tamamen ücretsiz" },
+  "steps": {
+    "title": "Nasıl çalışır?",
+    "s1t": "Linki yapıştır",
+    "s1d": "Google Maps işletme linkinizi girin, 20 yorum otomatik çekilir.",
+    "s2t": "Önizlemeyi gör",
+    "s2d": "Skorunuzu ve ilk bulguyu anında, kayıtsız görün.",
+    "s3t": "Tam raporu aç",
+    "s3d": "E-postanızı onaylayın, detaylı rapor açılsın."
+  },
+  "features": {
+    "title": "Neden bu araç?",
+    "f1t": "Anında skor",
+    "f1d": "20 yorumdan 0-10 arası net bir genel puan.",
+    "f2t": "Gerçek konular",
+    "f2d": "En sık şikayet ve övgüler, örnekleriyle.",
+    "f3t": "Spam korumalı",
+    "f3d": "Hız limiti, bot koruması ve kota güvencesi."
+  },
+  "footer": { "note": "Ücretsiz önizleme • Tam rapor e-posta onayı ile • Günlük kota uygulanır" }
+}

@@ -1,0 +1,66 @@
+{
+  "hero": {
+    "badge": "Gratis • Preview zonder registratie",
+    "title": "Analyseer je Google Maps-reviews gratis",
+    "subtitle": "Plak je bedrijfslink en wij analyseren 20 reviews: je score, het grootste probleem en 1 actietip. Eerste preview zonder registratie."
+  },
+  "form": {
+    "urlLabel": "Google Maps-bedrijfslink",
+    "urlPlaceholder": "https://www.google.com/maps/place/...",
+    "submit": "Gratis analyseren",
+    "analyzing": "Reviews ophalen en analyseren..."
+  },
+  "preview": {
+    "title": "Je preview is klaar",
+    "score": "Totale score",
+    "reviews": "reviews",
+    "unlockTitle": "Laat je e-mail achter voor het volledige rapport",
+    "unlockNote": "Het volledige rapport opent na klik op de bevestigingslink."
+  },
+  "lead": {
+    "emailLabel": "Je e-mailadres",
+    "emailPlaceholder": "jij@bedrijf.com",
+    "submit": "Volledig rapport sturen",
+    "sending": "Verzenden...",
+    "checkEmail": "Check je inbox! Het rapport opent na de klik.",
+    "invalidEmail": "Voer een geldig e-mailadres in.",
+    "disposable": "Tijdelijke e-mails worden niet geaccepteerd."
+  },
+  "report": {
+    "title": "Volledig rapport",
+    "summary": "Samenvatting",
+    "complaints": "Belangrijkste klachten",
+    "praises": "Belangrijkste complimenten",
+    "action": "Prioritaire actie",
+    "verified": "E-mail geverifieerd, je rapport hieronder.",
+    "invalid": "Link ongeldig of verlopen.",
+    "loading": "Rapport verifiëren..."
+  },
+  "quota": {
+    "exceeded": "Dagquotum vol, probeer het morgen opnieuw.",
+    "rateLimited": "Te veel pogingen, probeer over 1 uur opnieuw."
+  },
+  "lang": { "label": "Taal" },
+  "mock": { "badge": "Demomodus", "emailNote": "E-mail niet gekoppeld — link hieronder:" },
+  "theme": { "toggle": "Thema wisselen" },
+  "stats": { "reviews": "reviews geanalyseerd", "langs": "talen", "free": "helemaal gratis" },
+  "steps": {
+    "title": "Hoe werkt het?",
+    "s1t": "Plak de link",
+    "s1d": "Voer je bedrijfslink in; 20 reviews worden automatisch opgehaald.",
+    "s2t": "Bekijk de preview",
+    "s2d": "Je score en eerste inzicht direct, zonder registratie.",
+    "s3t": "Open het rapport",
+    "s3d": "Bevestig je e-mail om het volledige rapport te openen."
+  },
+  "features": {
+    "title": "Waarom deze tool?",
+    "f1t": "Directe score",
+    "f1d": "Een heldere 0-10 totaalscore uit 20 reviews.",
+    "f2t": "Echte thema's",
+    "f2d": "Belangrijkste klachten en complimenten, met voorbeelden.",
+    "f3t": "Spamveilig",
+    "f3d": "Limieten, botbescherming en quotabewaking."
+  },
+  "footer": { "note": "Gratis preview • Volledig rapport via e-mail • Dagquotum" }
+}
