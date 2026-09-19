@@ -36,8 +36,8 @@ export interface StoredReport {
   email_unlocked: string | null;
 }
 
-// ---- In-memory fallback (Supabase yokken / mock mod) ----
-// Not: serverless ortamda kalıcı değildir; gerçek kullanımda Supabase şarttır.
+// ---- In-memory fallback (Redis yokken / mock mod) ----
+// Not: serverless ortamda kalıcı değildir; gerçek kullanımda Upstash Redis şarttır.
 const memReports = new Map<string, StoredReport>();
 const memByPlace = new Map<string, StoredReport>();
 const memLeads: Record<string, unknown>[] = [];

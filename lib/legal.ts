@@ -119,7 +119,7 @@ const DOCS: Record<string, Record<string, LegalDoc>> = {
         {
           h: 'Saklama ve silme',
           p: [
-            'Raporlar ve e-postalar güvenli altyapıda (Supabase) saklanır. Verilerinizin silinmesini isterseniz İletişim sayfasından yazmanız yeterli.'
+            'Raporlar ve e-postalar güvenli altyapıda (Upstash Redis + Resend) saklanır. Verilerinizin silinmesini isterseniz İletişim sayfasından yazmanız yeterli.'
           ]
         },
         {
@@ -140,7 +140,7 @@ const DOCS: Record<string, Record<string, LegalDoc>> = {
       sections: [
         { h: 'Data we collect', p: ['The Google Maps business link you paste, the email address you leave for the full report, and IP/quota logs to prevent abuse.'] },
         { h: 'Purpose', p: ['Data is used only to generate the report, complete email confirmation and enforce quotas. No ads, no marketing blasts.'] },
-        { h: 'Storage and deletion', p: ['Reports and emails are stored on secure infrastructure (Supabase). Write to us via the Contact page to delete your data.'] },
+        { h: 'Storage and deletion', p: ['Reports and emails are stored on secure infrastructure (Upstash Redis + Resend). Write to us via the Contact page to delete your data.'] },
         { h: 'Third parties', p: ['Limited sharing with email delivery (Resend), review fetching (Apify), analysis (Google AI) and bot protection (Cloudflare Turnstile).'] },
         { h: 'Cookies', p: ['No tracking cookies; your theme preference is stored only in your browser (localStorage).'] }
       ]
@@ -151,7 +151,7 @@ const DOCS: Record<string, Record<string, LegalDoc>> = {
       sections: [
         { h: 'Erhobene Daten', p: ['Der eingefügte Google-Maps-Link, Ihre E-Mail-Adresse für den vollständigen Bericht sowie IP-/Kontingentprotokolle gegen Missbrauch.'] },
         { h: 'Zweck', p: ['Die Daten dienen nur der Berichtserstellung, der E-Mail-Bestätigung und der Kontingentkontrolle. Keine Werbung, keine Newsletter.'] },
-        { h: 'Speicherung und Löschung', p: ['Sichere Speicherung (Supabase). Zur Löschung Ihrer Daten schreiben Sie uns über die Kontaktseite.'] },
+        { h: 'Speicherung und Löschung', p: ['Sichere Speicherung (Upstash Redis + Resend). Zur Löschung Ihrer Daten schreiben Sie uns über die Kontaktseite.'] },
         { h: 'Dritte', p: ['Begrenzte Weitergabe an E-Mail-Versand (Resend), Bewertungsabruf (Apify), Analyse (Google AI) und Bot-Schutz (Cloudflare Turnstile).'] },
         { h: 'Cookies', p: ['Keine Tracking-Cookies; das Theme wird nur lokal in Ihrem Browser gespeichert.'] }
       ]
