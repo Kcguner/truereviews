@@ -24,12 +24,16 @@ sadece aşağıdaki 5-10 dakikalık işlemler sizde kaldı (API anahtarları ben
    AI Studio'da farklıysa listedeki gerçek model id'yi yazın.
 4. Anahtar yokken heuristic (ortalama-bazlı) özet üretilir.
 
-## 4) Resend (double opt-in e-postası için — SIKI MOD seçtiniz)
-1. https://resend.com → domain ekleyip doğrulayın, API key alın
-2. `RESEND_API_KEY` + `RESEND_FROM` yazın
-3. Anahtar yokken MOCK e-posta moduna düşer: onay linki ekrandaki
+## 4) Brevo (double opt-in e-postası için — domainsiz sender)
+1. https://brevo.com → ücretsiz hesap (telefon istemez, e-posta doğrulamalı)
+2. Senders bölümünde Gmail adresinizi doğrulayın (gelen kutunuza kod gelir)
+3. SMTP & API sayfasından API key üretin
+4. `BREVO_API_KEY` + `BREVO_FROM` (örn. `TrueReviews <adres@gmail.com>`,
+   doğruladığınız adresle birebir) yazın
+5. Anahtar yokken MOCK e-posta moduna düşer: onay linki ekrandaki
    "geliştirici önizlemesi" kutusunda + Vercel loglarında görünür.
    Sıkı double opt-in akışı yine de zorunludur (linke tıklanmadan rapor açılmaz).
+   Ücretsiz kota: günde 300 e-posta.
 
 ## 5) Cloudflare Turnstile (önerilir — bot koruması)
 1. https://dash.cloudflare.com → Turnstile → site ekleyin

@@ -1,6 +1,5 @@
 import { randomUUID } from 'crypto';
 import { getRedis, keyLead, keyPlace, keyReport, keyToken } from './redis';
-import { warnProdOnce } from './env-guard';
 import { memStore, type StoredReport, type PreviewData, type AnalysisReport } from './types';
 
 const CACHE_TTL_HOURS = Number(process.env.CACHE_TTL_HOURS || 24);
@@ -88,30 +87,10 @@ export async function upsertLead(email: string, reportId: string, locale: string
     await redis.hset(keyLead(norm), { report_id: reportId, locale, verified: verified ? '1' : '0' });
     await redis.sadd('ya:leads', norm);
   }
-  // Lead'in asıl evi: Resend audience (bülten + tekilleştirme orada).
-  await syncLeadToAudience(norm).catch((e) => {
-    // eslint-disable-next-line no-console
-    console.error('audience sync error', e);
-  });
-}
-
-async function syncLeadToAudience(email: string): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY;
-  const audienceId = process.env.RESEND_AUDIENCE_ID;
-  if (!apiKey || !audienceId) {
-    warnProdOnce(
-      'audience-missing',
-      'RESEND_AUDIENCE_ID tanımlı değil — leadler yalnızca Redis/memoryde, bülten listesine eklenmiyor.'
-    );
-    return;
-  }
-  const { Resend } = await import('resend');
-  const resend = new Resend(apiKey);
-  const { error } = await resend.contacts.create({ audienceId, email, unsubscribed: false });
-  // Zaten listedeyse sorun değil.
-  if (error && !/exist|duplicate|already/i.test(error.message)) {
-    throw new Error(`Resend audience hatası: ${error.message}`);
-  }
+  // Lead'in evi: Redis lead seti (dışa aktarım / bülten için).
+  // Not: SendGrid Single Sender ile gönderim yapılır; toplu bülten için
+  // ileride Marketing Contacts + doğrulanmış domain gerekir.
+  return;
 }
 
 export async function createVerificationToken(reportId: string, email: string): Promise<string> {

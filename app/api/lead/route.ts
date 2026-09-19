@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       ok: true,
       // Sıkı double opt-in: rapor linki SADECE e-posta onayından sonra açılır.
-      // Mock modda (RESEND yoksa) onay linki yanıtta devPreviewUrl olarak da döner.
+      // Mock modda (SENDGRID yoksa) onay linki yanıtta devPreviewUrl olarak da döner.
       ...(sent.mocked ? { devPreviewUrl: verifyUrl, mockEmail: true } : {})
     });
   } catch (e) {

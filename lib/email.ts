@@ -1,45 +1,59 @@
 import { warnProdOnce } from './env-guard';
 
-export function isResendConfigured(): boolean {
-  return Boolean(process.env.RESEND_API_KEY);
+export function isEmailConfigured(): boolean {
+  return Boolean(process.env.BREVO_API_KEY);
 }
 
-const PLACEHOLDER_FROM = 'rapor@ornek.com';
+function parseFrom(raw: string): { name: string; email: string } | null {
+  const m = raw.match(/^(.*)<([^<>@\s]+@[^<>@\s]+)>\s*$/);
+  if (m) return { name: m[1].trim().replace(/^["']|["']$/g, '') || 'TrueReviews', email: m[2].trim() };
+  const email = raw.trim();
+  if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { name: 'TrueReviews', email };
+  return null;
+}
 
 export async function sendDoubleOptInEmail(
   to: string,
   verifyUrl: string,
   locale: string
 ): Promise<{ mocked: boolean; id?: string }> {
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM;
+  const apiKey = process.env.BREVO_API_KEY;
+  const fromRaw = process.env.BREVO_FROM;
 
   // Mock mod: e-posta gönderilmez, link loglanır + API yanıtında devPreviewUrl döner.
   if (!apiKey) {
     warnProdOnce(
-      'resend-mock',
-      'RESEND_API_KEY tanımlı değil — üretimde MOCK e-posta modundasınız, leadler e-posta almaz!'
+      'email-mock',
+      'BREVO_API_KEY tanımlı değil — üretimde MOCK e-posta modundasınız, leadler e-posta almaz!'
     );
+    // eslint-disable-next-line no-console
     console.log(`[MOCK-EMAIL] to=${to} locale=${locale} verifyUrl=${verifyUrl}`);
     return { mocked: true };
   }
 
-  // Anahtar varken placeholder göndericiyle mail atmak deliverability'yi öldürür:
+  // Doğrulanmamış/placeholder göndericiyle atım deliverability'yi öldürür:
   // sessizce devam etmek yerine yüksek sesle patla.
-  if (!from || from.includes('ornek.com') || from.includes(PLACEHOLDER_FROM)) {
+  const sender = fromRaw ? parseFrom(fromRaw) : null;
+  if (!sender || /ornek\.com|example\.com/i.test(sender.email)) {
     throw new Error(
-      'RESEND_FROM eksik ya da placeholder (rapor@ornek.com). Resend dashboardda domain doğrulayıp gerçek gönderici adresini tanımlayın.'
+      'BREVO_FROM eksik ya da geçersiz (örn. "TrueReviews <adresin@gmail.com>"). Brevo → Senders bölümünde adresinizi doğrulayıp env olarak tanımlayın.'
     );
   }
 
-  const { Resend } = await import('resend');
-  const resend = new Resend(apiKey);
-  const { data, error } = await resend.emails.send({
-    from,
-    to,
-    subject: 'Raporunuz hazır — e-postanızı onaylayın',
-    html: `<p>Merhaba,</p><p>Yorum analiz raporunuz hazır. Tam raporu görmek için aşağıdaki linke tıklayın:</p><p><a href="${verifyUrl}">Raporu Aç</a></p><p>Bu link 48 saat geçerlidir.</p>`
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },
+    body: JSON.stringify({
+      sender,
+      to: [{ email: to }],
+      subject: 'Raporunuz hazır — e-postanızı onaylayın',
+      htmlContent: `<p>Merhaba,</p><p>Yorum analiz raporunuz hazır. Tam raporu görmek için aşağıdaki linke tıklayın:</p><p><a href="${verifyUrl}">Raporu Aç</a></p><p>Bu link 48 saat geçerlidir.</p>`
+    })
   });
-  if (error) throw new Error(`Resend hatası: ${error.message}`);
-  return { mocked: false, id: data?.id };
+  if (!res.ok) {
+    const t = await res.text().catch(() => '');
+    throw new Error(`Brevo hatası (${res.status}): ${t.slice(0, 300)}`);
+  }
+  const data = (await res.json().catch(() => ({}))) as { messageId?: string };
+  return { mocked: false, id: data.messageId };
 }

@@ -58,7 +58,7 @@ describe('store (memory fallback)', () => {
     await expect(consumeVerificationToken(token)).resolves.toBeNull();
     await expect(consumeVerificationToken('yok-boyle-token')).resolves.toBeNull();
   });
-  it('upsertLead Resend yokken patlamaz', async () => {
+  it('upsertLead e-posta servisi yokken patlamaz', async () => {
     await expect(upsertLead('lead@test.co', 'rep-1', 'tr', false)).resolves.toBeUndefined();
   });
 });
