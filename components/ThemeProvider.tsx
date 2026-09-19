@@ -3,25 +3,26 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 
 type Theme = 'light' | 'dark';
 
-const ThemeCtx = createContext<{ theme: Theme; toggle: () => void }>({ theme: 'light', toggle: () => {} });
+const ThemeCtx = createContext<{ theme: Theme; toggle: () => void }>({ theme: 'dark', toggle: () => {} });
 
 export function useTheme() {
   return useContext(ThemeCtx);
 }
 
 /** Boyanmadan önce <html> class'ını ayarlayan betik (FOUC önler). Layout içinde body başına konur. */
+/** Kural: kayıtlı tercih varsa o; yoksa varsayılan DARK. */
 export function ThemeScript() {
   return (
     <script
       dangerouslySetInnerHTML={{
-        __html: `(function(){try{var t=localStorage.getItem('ya-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`
+        __html: `(function(){try{var t=localStorage.getItem('ya-theme');if(t!=='light'){document.documentElement.classList.add('dark')}}catch(e){document.documentElement.classList.add('dark')}})()`
       }}
     />
   );
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('light');
+  const [theme, setTheme] = useState<Theme>('dark');
 
   useEffect(() => {
     setTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
