@@ -1,6 +1,9 @@
 import type { AnalysisReport } from './types';
 import type { ScrapedReview } from './apify';
 
+/** Varsayılan model. Üretimde GEMMA_MODEL ile AI Studio'daki gerçek id yazılmalı. */
+export const GEMMA_MODEL_DEFAULT = 'gemma-3-27b-it';
+
 const LANGUAGE_NAMES: Record<string, string> = {
   tr: 'Türkçe',
   en: 'English',
@@ -58,7 +61,7 @@ function heuristicReport(
   const high = reviews.filter((r) => (r.rating || 3) >= 4);
   return {
     score,
-    summary: `(${locale}) ${businessName}: ${reviews.length} yorumun ortalaması ${avg.toFixed(1)}/5. Mock/heuristic analiz — GOOGLE_AI_API_KEY eklendiğinde Gemma 4 ile gerçek analiz üretilir.`,
+    summary: `(${locale}) ${businessName}: ${reviews.length} yorumun ortalaması ${avg.toFixed(1)}/5. Mock/heuristic analiz — GOOGLE_AI_API_KEY eklendiğinde GEMMA_MODEL (${GEMMA_MODEL_DEFAULT}) ile gerçek analiz üretilir.`,
     top_complaints: low.slice(0, 3).map((r) => ({
       topic: 'Genel iyileştirme alanı',
       count: Math.max(1, Math.round(low.length / 3)),
@@ -84,7 +87,7 @@ export async function analyzeReviews(
   const apiKey = process.env.GOOGLE_AI_API_KEY;
   if (!apiKey) return { report: heuristicReport(businessName, reviews, locale), mocked: true };
 
-  const model = process.env.GEMMA_MODEL || 'gemma-3-27b-it';
+  const model = process.env.GEMMA_MODEL || GEMMA_MODEL_DEFAULT;
   const prompt = buildPrompt(businessName, reviews, locale);
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`,

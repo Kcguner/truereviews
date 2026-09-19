@@ -1,31 +1,4 @@
 {
-  "hero": {
-    "badge": "Gratuit • Aperçu sans inscription",
-    "title": "Analysez vos avis Google Maps gratuitement",
-    "subtitle": "Collez le lien de votre établissement, nous analysons 20 avis : votre score, le problème principal et 1 conseil. Premier aperçu sans inscription."
-  },
-  "form": {
-    "urlLabel": "Lien Google Maps de l'établissement",
-    "urlPlaceholder": "https://www.google.com/maps/place/...",
-    "submit": "Analyser gratuitement",
-    "analyzing": "Récupération et analyse des avis..."
-  },
-  "preview": {
-    "title": "Votre aperçu est prêt",
-    "score": "Score global",
-    "reviews": "avis",
-    "unlockTitle": "Laissez votre e-mail pour le rapport complet",
-    "unlockNote": "Le rapport complet s'ouvre après le clic sur le lien de confirmation."
-  },
-  "lead": {
-    "emailLabel": "Votre adresse e-mail",
-    "emailPlaceholder": "vous@entreprise.com",
-    "submit": "Envoyer le rapport complet",
-    "sending": "Envoi...",
-    "checkEmail": "Vérifiez votre boîte ! Le rapport s'ouvrira après le clic.",
-    "invalidEmail": "Veuillez saisir un e-mail valide.",
-    "disposable": "Les e-mails temporaires ne sont pas acceptés."
-  },
   "report": {
     "title": "Rapport complet",
     "summary": "Résumé",
@@ -36,42 +9,11 @@
     "invalid": "Lien invalide ou expiré.",
     "loading": "Vérification du rapport..."
   },
-  "quota": {
-    "exceeded": "Quota quotidien atteint, réessayez demain.",
-    "rateLimited": "Trop de tentatives, réessayez dans 1 heure."
-  },
-  "lang": {
-    "label": "Langue"
-  },
   "mock": {
-    "badge": "Mode démo",
     "emailNote": "Service e-mail non connecté — lien ci-dessous :"
   },
   "theme": {
     "toggle": "Changer de thème"
-  },
-  "stats": {
-    "reviews": "avis analysés",
-    "langs": "langues",
-    "free": "totalement gratuit"
-  },
-  "steps": {
-    "title": "Comment ça marche ?",
-    "s1t": "Collez le lien",
-    "s1d": "Saisissez le lien de l'établissement ; 20 avis sont récupérés.",
-    "s2t": "Voyez l'aperçu",
-    "s2d": "Score et premier insight aussitôt, sans inscription.",
-    "s3t": "Ouvrez le rapport",
-    "s3d": "Confirmez votre e-mail pour ouvrir le rapport complet."
-  },
-  "features": {
-    "title": "Pourquoi cet outil ?",
-    "f1t": "Score instantané",
-    "f1d": "Un score global clair de 0 à 10 basé sur 20 avis.",
-    "f2t": "Thèmes réels",
-    "f2d": "Plaintes et satisfactions principales, avec exemples.",
-    "f3t": "Anti-spam",
-    "f3d": "Limites de débit, protection anti-bot et quotas."
   },
   "nb": {
     "brand": {
@@ -187,11 +129,7 @@
     },
     "foot": {
       "tagline": "An honest summary of your reviews, made for small businesses.",
-      "made": "Made in Istanbul",
-      "l1": "How it works",
-      "l2": "How we use your data",
-      "l3": "FAQ",
-      "l4": "Contact"
+      "made": "Made in Istanbul"
     },
     "band": {
       "a": {
@@ -211,8 +149,5 @@
         "d": "There's a problem piling up here. The good news: the most repeated topic is very clear, so you know exactly where to start."
       }
     }
-  },
-  "footer": {
-    "note": "Aperçu gratuit • Rapport complet par e-mail • Quota quotidien"
   }
 }

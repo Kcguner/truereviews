@@ -1,31 +1,4 @@
 {
-  "hero": {
-    "badge": "Free • No-signup preview",
-    "title": "Analyze Your Google Maps Reviews for Free",
-    "subtitle": "Paste your business link and we'll analyze 20 reviews: your score, top issue and 1 action tip. The first preview needs no sign-up."
-  },
-  "form": {
-    "urlLabel": "Google Maps business link",
-    "urlPlaceholder": "https://www.google.com/maps/place/...",
-    "submit": "Analyze for Free",
-    "analyzing": "Fetching and analyzing reviews..."
-  },
-  "preview": {
-    "title": "Your preview is ready",
-    "score": "Overall score",
-    "reviews": "reviews",
-    "unlockTitle": "Leave your email to see the full report",
-    "unlockNote": "The full report opens after you click the confirmation link (your 2nd and final pass)."
-  },
-  "lead": {
-    "emailLabel": "Your email address",
-    "emailPlaceholder": "you@yourcompany.com",
-    "submit": "Send Full Report",
-    "sending": "Sending...",
-    "checkEmail": "Check your inbox! Your full report will open after you click the confirmation link.",
-    "invalidEmail": "Please enter a valid email.",
-    "disposable": "Temporary email addresses are not accepted."
-  },
   "report": {
     "title": "Full Report",
     "summary": "Summary",
@@ -36,42 +9,11 @@
     "invalid": "Confirmation link is invalid or expired.",
     "loading": "Verifying report..."
   },
-  "quota": {
-    "exceeded": "Daily analysis quota is full, try again tomorrow.",
-    "rateLimited": "Too many attempts, try again in 1 hour."
-  },
-  "lang": {
-    "label": "Language"
-  },
   "mock": {
-    "badge": "Demo mode",
     "emailNote": "Email service not connected — confirmation link below (dev preview):"
   },
   "theme": {
     "toggle": "Toggle theme"
-  },
-  "stats": {
-    "reviews": "reviews analyzed",
-    "langs": "languages",
-    "free": "totally free"
-  },
-  "steps": {
-    "title": "How it works?",
-    "s1t": "Paste the link",
-    "s1d": "Enter your Google Maps business link; 20 reviews are fetched automatically.",
-    "s2t": "See the preview",
-    "s2d": "Get your score and first insight instantly, no sign-up.",
-    "s3t": "Unlock the report",
-    "s3d": "Confirm your email to open the full report."
-  },
-  "features": {
-    "title": "Why this tool?",
-    "f1t": "Instant score",
-    "f1d": "A clear 0-10 overall score from 20 reviews.",
-    "f2t": "Real themes",
-    "f2d": "Top complaints and praises, with examples.",
-    "f3t": "Spam-safe",
-    "f3d": "Rate limits, bot protection and quota guards."
   },
   "nb": {
     "brand": {
@@ -187,11 +129,7 @@
     },
     "foot": {
       "tagline": "An honest summary of your reviews, made for small businesses.",
-      "made": "Made in Istanbul",
-      "l1": "How it works",
-      "l2": "How we use your data",
-      "l3": "FAQ",
-      "l4": "Contact"
+      "made": "Made in Istanbul"
     },
     "band": {
       "a": {
@@ -211,8 +149,5 @@
         "d": "There's a problem piling up here. The good news: the most repeated topic is very clear, so you know exactly where to start."
       }
     }
-  },
-  "footer": {
-    "note": "Free preview • Full report via email confirmation • Daily quota applies"
   }
 }

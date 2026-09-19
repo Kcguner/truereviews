@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
+import { getConsent } from '@/lib/legal';
 import Gauge from './Gauge';
 import ToneBar from './ToneBar';
 import ThemeRow from './ThemeRow';
@@ -43,6 +44,8 @@ export default function ReportView({
   const [mail, setMail] = useState('');
   const [mailErr, setMailErr] = useState('');
   const [sending, setSending] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+  const consent = getConsent(locale);
 
   const score100 = Math.round(preview.score * 10);
   const band = bandOf(score100);
@@ -58,6 +61,10 @@ export default function ReportView({
 
   async function submitMail(e: React.FormEvent) {
     e.preventDefault();
+    if (!agreed) {
+      setMailErr(consent.error);
+      return;
+    }
     const v = mail.trim();
     if (!/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(v)) {
       setMailErr(t('lock.err'));
@@ -199,6 +206,23 @@ export default function ReportView({
                 {t('lock.cta')}
               </button>
             </form>
+            <label className="mailnote" style={{ display: 'flex', gap: 8, cursor: 'pointer', marginTop: 10 }}>
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => {
+                  setAgreed(e.target.checked);
+                  if (mailErr) setMailErr('');
+                }}
+                style={{ marginTop: 4 }}
+              />
+              <span>
+                {consent.label}{' '}
+                <a className="linkish" href={`/${locale}/kvkk`}>
+                  {consent.link}
+                </a>
+              </span>
+            </label>
             {mailErr && (
               <p className="mailerr" role="alert">
                 {mailErr}

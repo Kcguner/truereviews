@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { consumeVerificationToken, getReportById, markReportUnlocked, upsertLead } from '@/lib/store';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const token = new URL(req.url).searchParams.get('token') || '';

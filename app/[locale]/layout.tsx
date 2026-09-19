@@ -1,9 +1,13 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { Fraunces, Karla, IBM_Plex_Mono } from 'next/font/google';
 import { locales, defaultLocale, rtlLocales, type Locale } from '@/i18n.config';
+import { getSiteUrl } from '@/lib/site';
+import { LEGAL_SLUGS, getLegalName } from '@/lib/legal';
+import Analytics from '@/components/Analytics';
+import SeoJsonLd from '@/components/SeoJsonLd';
 import LangMenu from '@/components/notebook/LangMenu';
 import ThemeToggle from '@/components/ThemeToggle';
 import { ThemeProvider, ThemeScript } from '@/components/ThemeProvider';
@@ -41,16 +45,81 @@ const META: Record<string, { title: string; description: string }> = {
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const locale = (locales as readonly string[]).includes(params.locale) ? params.locale : defaultLocale;
   const m = META[locale] || META.tr;
-  const base = (process.env.NEXT_PUBLIC_APP_URL || 'https://ornek.vercel.app').replace(/\/+$/, '');
+  const base = getSiteUrl();
+  const canonical = `${base}/${locale}`;
   const languages: Record<string, string> = {};
   for (const l of locales) languages[l] = `${base}/${l}`;
-  languages['x-default'] = `${base}/en`;
+  languages['x-default'] = base;
+  const ogImage = `${base}/${locale}/opengraph-image`;
+  const keywords = KEYWORDS[locale] || KEYWORDS.en;
   return {
     title: m.title,
     description: m.description,
-    alternates: { canonical: `${base}/${locale}`, languages }
+    keywords,
+    authors: [{ name: 'YorumAnalizi' }],
+    creator: 'YorumAnalizi',
+    publisher: 'YorumAnalizi',
+    category: 'business',
+    alternates: { canonical, languages },
+    openGraph: {
+      type: 'website',
+      siteName: 'YorumAnalizi',
+      locale: OG_LOCALE[locale] || OG_LOCALE.en,
+      url: canonical,
+      title: m.title,
+      description: m.description,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: m.title }]
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: m.title,
+      description: m.description,
+      images: [ogImage]
+    },
+    robots: { index: true, follow: true },
+    icons: {
+      icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+      shortcut: '/icon.svg',
+      apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }]
+    },
+    manifest: `${base}/manifest.webmanifest`,
+    verification: {
+      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined
+    }
   };
 }
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#17463c'
+};
+
+const KEYWORDS: Record<string, string[]> = {
+  tr: ['google yorum analizi', 'google maps yorum analizi', 'işletme yorum analizi', 'müşteri yorum özeti', 'yorum analizi'],
+  en: ['google review analysis', 'google maps review summary', 'business review insights', 'customer feedback summary'],
+  de: ['google bewertungsanalyse', 'google maps bewertungen zusammenfassung', 'kundenfeedback analyse'],
+  fr: ['analyse avis google', 'résumé avis google maps'],
+  es: ['análisis reseñas google', 'resumen reseñas google maps'],
+  nl: ['google review analyse', 'google maps reviews samenvatting'],
+  ar: ['تحليل تقييمات جوجل', 'ملخص تقييمات خرائط جوجل'],
+  ru: ['анализ отзывов google', 'сводка отзывов google maps'],
+  fa: ['تحلیل نظرات گوگل', 'خلاصه نظرات گوگل‌مپس'],
+  az: ['google rəy təhlili', 'google maps rəylər xülasəsi']
+};
+
+const OG_LOCALE: Record<string, string> = {
+  tr: 'tr_TR',
+  en: 'en_US',
+  de: 'de_DE',
+  ar: 'ar_AR',
+  ru: 'ru_RU',
+  fr: 'fr_FR',
+  es: 'es_ES',
+  nl: 'nl_NL',
+  fa: 'fa_IR',
+  az: 'az_AZ'
+};
 
 function BrandMark() {
   return (
@@ -76,6 +145,7 @@ export default async function LocaleLayout({
   const t = await getTranslations('nb');
   const locale = params.locale as Locale;
   const dir = rtlLocales.includes(locale) ? 'rtl' : 'ltr';
+  const m = META[locale] || META.tr;
 
   return (
     <html
@@ -85,6 +155,8 @@ export default async function LocaleLayout({
       className={`${display.variable} ${bodyFont.variable} ${mono.variable}`}
     >
       <body className="nb-body">
+        <Analytics />
+        <SeoJsonLd locale={locale} title={m.title} description={m.description} />
         <ThemeScript />
         <div className="grain" aria-hidden="true" />
         <NextIntlClientProvider messages={messages}>
@@ -122,9 +194,9 @@ export default async function LocaleLayout({
                   <p className="foot-mono">© 2026 · {t('foot.made')}</p>
                 </div>
                 <nav className="foot-links" aria-label="Alt bilgi">
-                  {(['l1', 'l2', 'l3', 'l4'] as const).map((k) => (
-                    <a key={k} href={`/${locale}`}>
-                      {t(`foot.${k}`)}
+                  {LEGAL_SLUGS.map((slug) => (
+                    <a key={slug} href={`/${locale}/${slug}`}>
+                      {getLegalName(slug, locale)}
                     </a>
                   ))}
                 </nav>

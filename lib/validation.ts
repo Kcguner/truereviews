@@ -1,4 +1,5 @@
 import disposableDomains from 'disposable-email-domains';
+import { warnProdOnce } from './env-guard';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -16,7 +17,13 @@ export function isDisposableEmail(email: string): boolean {
 export async function verifyTurnstile(token: string | null, ip: string | null): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
   // Anahtar yoksa pasif mod: form çalışmaya devam eder (mock).
-  if (!secret) return true;
+  if (!secret) {
+    warnProdOnce(
+      'turnstile-missing',
+      'TURNSTILE_SECRET_KEY tanımlı değil — bot koruması PASİF, analiz kotası suistimale açık.'
+    );
+    return true;
+  }
   if (!token) return false;
   try {
     const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {

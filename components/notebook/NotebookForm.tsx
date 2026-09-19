@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import TurnstileWidget from '../TurnstileWidget';
 import ShopIllo from './ShopIllo';
 import ReportView from './ReportView';
+import { getFaqHeading, getFaqs } from '@/lib/faq';
 import type { NbPreview } from './types';
 
 const STAGE_KEYS = ['load.s1', 'load.s2', 'load.s3', 'load.s4', 'load.s5', 'load.s6'] as const;
@@ -356,6 +357,23 @@ export default function NotebookForm() {
                 <p>{t('get3.d')}</p>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="gets">
+          <div className="gets__h">
+            <p className="eyebrow">{getFaqHeading(locale)}</p>
+            <span className="rule" />
+          </div>
+          <div className="gets__grid">
+            {getFaqs(locale).map((f) => (
+              <details className="get" key={f.q}>
+                <summary>
+                  <h5>{f.q}</h5>
+                </summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
           </div>
         </div>
 

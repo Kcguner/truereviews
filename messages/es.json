@@ -1,31 +1,4 @@
 {
-  "hero": {
-    "badge": "Gratis • Vista sin registro",
-    "title": "Analiza gratis tus reseñas de Google Maps",
-    "subtitle": "Pega el enlace de tu negocio y analizamos 20 reseñas: tu puntuación, el problema principal y 1 consejo. Primera vista sin registro."
-  },
-  "form": {
-    "urlLabel": "Enlace del negocio en Google Maps",
-    "urlPlaceholder": "https://www.google.com/maps/place/...",
-    "submit": "Analizar gratis",
-    "analyzing": "Obteniendo y analizando reseñas..."
-  },
-  "preview": {
-    "title": "Tu vista previa está lista",
-    "score": "Puntuación general",
-    "reviews": "reseñas",
-    "unlockTitle": "Deja tu correo para ver el informe completo",
-    "unlockNote": "El informe completo se abre tras hacer clic en el enlace de confirmación."
-  },
-  "lead": {
-    "emailLabel": "Tu correo electrónico",
-    "emailPlaceholder": "tu@empresa.com",
-    "submit": "Enviar informe completo",
-    "sending": "Enviando...",
-    "checkEmail": "¡Revisa tu correo! El informe se abrirá tras el clic.",
-    "invalidEmail": "Ingresa un correo válido.",
-    "disposable": "No se aceptan correos temporales."
-  },
   "report": {
     "title": "Informe completo",
     "summary": "Resumen",
@@ -36,42 +9,11 @@
     "invalid": "Enlace inválido o caducado.",
     "loading": "Verificando informe..."
   },
-  "quota": {
-    "exceeded": "Cuota diaria llena, intenta mañana.",
-    "rateLimited": "Demasiados intentos, intenta en 1 hora."
-  },
-  "lang": {
-    "label": "Idioma"
-  },
   "mock": {
-    "badge": "Modo demo",
     "emailNote": "Correo no conectado — enlace abajo:"
   },
   "theme": {
     "toggle": "Cambiar tema"
-  },
-  "stats": {
-    "reviews": "reseñas analizadas",
-    "langs": "idiomas",
-    "free": "totalmente gratis"
-  },
-  "steps": {
-    "title": "¿Cómo funciona?",
-    "s1t": "Pega el enlace",
-    "s1d": "Ingresa el enlace del negocio; se obtienen 20 reseñas.",
-    "s2t": "Mira la vista previa",
-    "s2d": "Tu puntuación y primer hallazgo al instante, sin registro.",
-    "s3t": "Abre el informe",
-    "s3d": "Confirma tu correo para abrir el informe completo."
-  },
-  "features": {
-    "title": "¿Por qué esta herramienta?",
-    "f1t": "Puntuación instantánea",
-    "f1d": "Puntuación global clara de 0-10 con 20 reseñas.",
-    "f2t": "Temas reales",
-    "f2d": "Quejas y elogios principales, con ejemplos.",
-    "f3t": "Antispam",
-    "f3d": "Límites, protección antibots y cuotas."
   },
   "nb": {
     "brand": {
@@ -187,11 +129,7 @@
     },
     "foot": {
       "tagline": "An honest summary of your reviews, made for small businesses.",
-      "made": "Made in Istanbul",
-      "l1": "How it works",
-      "l2": "How we use your data",
-      "l3": "FAQ",
-      "l4": "Contact"
+      "made": "Made in Istanbul"
     },
     "band": {
       "a": {
@@ -211,8 +149,5 @@
         "d": "There's a problem piling up here. The good news: the most repeated topic is very clear, so you know exactly where to start."
       }
     }
-  },
-  "footer": {
-    "note": "Vista gratuita • Informe completo por correo • Cuota diaria"
   }
 }

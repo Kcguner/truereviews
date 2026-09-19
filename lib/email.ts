@@ -1,6 +1,10 @@
+import { warnProdOnce } from './env-guard';
+
 export function isResendConfigured(): boolean {
   return Boolean(process.env.RESEND_API_KEY);
 }
+
+const PLACEHOLDER_FROM = 'rapor@ornek.com';
 
 export async function sendDoubleOptInEmail(
   to: string,
@@ -8,12 +12,24 @@ export async function sendDoubleOptInEmail(
   locale: string
 ): Promise<{ mocked: boolean; id?: string }> {
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM || 'Yorum Analizi <rapor@ornek.com>';
+  const from = process.env.RESEND_FROM;
 
   // Mock mod: e-posta gönderilmez, link loglanır + API yanıtında devPreviewUrl döner.
   if (!apiKey) {
+    warnProdOnce(
+      'resend-mock',
+      'RESEND_API_KEY tanımlı değil — üretimde MOCK e-posta modundasınız, leadler e-posta almaz!'
+    );
     console.log(`[MOCK-EMAIL] to=${to} locale=${locale} verifyUrl=${verifyUrl}`);
     return { mocked: true };
+  }
+
+  // Anahtar varken placeholder göndericiyle mail atmak deliverability'yi öldürür:
+  // sessizce devam etmek yerine yüksek sesle patla.
+  if (!from || from.includes('ornek.com') || from.includes(PLACEHOLDER_FROM)) {
+    throw new Error(
+      'RESEND_FROM eksik ya da placeholder (rapor@ornek.com). Resend dashboardda domain doğrulayıp gerçek gönderici adresini tanımlayın.'
+    );
   }
 
   const { Resend } = await import('resend');

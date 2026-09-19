@@ -2,13 +2,13 @@
   "name": "yorum-analizi-lead-magnet",
   "version": "1.0.0",
   "private": true,
-  "description": "Ücretsiz işletme yorum analiz aracı (lead magnet) — Google Maps + Apify + Gemma 4 31B",
+  "description": "Ücretsiz işletme yorum analiz aracı (lead magnet) — Google Maps + Apify + Gemma",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postbuild": "next-sitemap"
+    "test": "vitest run"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
@@ -27,7 +27,9 @@
     "next-sitemap": "^4.2.3",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.12",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.1"
   },
   "engines": {
     "node": ">=18.17.0"

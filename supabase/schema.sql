@@ -45,3 +45,20 @@ create table if not exists usage_log (
 );
 create index if not exists usage_log_date_idx on usage_log (log_date);
 create index if not exists usage_log_ip_idx on usage_log (ip, created_at desc);
+
+-- ── GÜVENLİK: Row Level Security ─────────────────────────────────
+-- Uygulama DB'ye service_role ile bağlanır (RLS'yi bypass eder).
+-- Politika TANIMLANMADAN RLS açılırsa anon/authenticated rolleri
+-- hiçbir satırı okuyamaz/yazamaz → lead e-postaları korunur.
+-- NOT: Tablolar daha önce oluşturulduysa bu dosyayı SQL Editor'de
+-- TEKRAR çalıştırmanız yeterli (if not exists + alter güvenlidir).
+alter table reports enable row level security;
+alter table leads enable row level security;
+alter table verification_tokens enable row level security;
+alter table usage_log enable row level security;
+
+-- Kemer + pantolon askısı: anon/authenticated rollerinden tüm yetkileri al.
+-- (Politika yokken zaten deny olur; bu satırlar yanlışlıkla eklenen
+--  permissive policy'lere karşı ek güvencedir.)
+revoke all on reports, leads, verification_tokens, usage_log from anon, authenticated;
+grant all on reports, leads, verification_tokens, usage_log to service_role;

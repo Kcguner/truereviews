@@ -1,31 +1,4 @@
 {
-  "hero": {
-    "badge": "Pulsuz • Qeydiyyatsız önizləmə",
-    "title": "Google Maps rəylərinizi pulsuz təhlil edin",
-    "subtitle": "Biznes linkinizi yapışdırın, 20 rəyi təhlil edək: balınız, ən böyük problem və 1 tövsiyə. İlk önizləmə qeydiyyatsızdır."
-  },
-  "form": {
-    "urlLabel": "Google Maps biznes linki",
-    "urlPlaceholder": "https://www.google.com/maps/place/...",
-    "submit": "Pulsuz təhlil et",
-    "analyzing": "Rəylər çəkilir və təhlil edilir..."
-  },
-  "preview": {
-    "title": "Önizləməniz hazırdır",
-    "score": "Ümumi bal",
-    "reviews": "rəy",
-    "unlockTitle": "Tam hesabat üçün e-poçtunuzu qeyd edin",
-    "unlockNote": "Tam hesabat təsdiq linkinə kliklədikdən sonra açılır."
-  },
-  "lead": {
-    "emailLabel": "E-poçt ünvanınız",
-    "emailPlaceholder": "siz@sirket.com",
-    "submit": "Tam hesabatı göndər",
-    "sending": "Göndərilir...",
-    "checkEmail": "Poçtunuzu yoxlayın! Linkə kliklədikdən sonra hesabat açılacaq.",
-    "invalidEmail": "Düzgün e-poçt daxil edin.",
-    "disposable": "Müvəqqəti e-poçtlar qəbul edilmir."
-  },
   "report": {
     "title": "Tam hesabat",
     "summary": "Xülasə",
@@ -36,42 +9,11 @@
     "invalid": "Təsdiq linki yanlışdır və ya vaxtı keçib.",
     "loading": "Hesabat yoxlanılır..."
   },
-  "quota": {
-    "exceeded": "Günlük kota doldu, sabah yenidən cəhd edin.",
-    "rateLimited": "Çox cəhd etdiniz, 1 saat sonra cəhd edin."
-  },
-  "lang": {
-    "label": "Dil"
-  },
   "mock": {
-    "badge": "Demo rejimi",
     "emailNote": "E-poçt xidməti bağlı deyil — link aşağıda:"
   },
   "theme": {
     "toggle": "Temanı dəyiş"
-  },
-  "stats": {
-    "reviews": "rəy təhlil edilir",
-    "langs": "dil",
-    "free": "tamamilə pulsuz"
-  },
-  "steps": {
-    "title": "Necə işləyir?",
-    "s1t": "Linki yapışdır",
-    "s1d": "Biznes linkini daxil et; 20 rəy avtomatik çəkilir.",
-    "s2t": "Önizləməyə bax",
-    "s2d": "Balını və ilk tapıntını dərhal, qeydiyyatsız gör.",
-    "s3t": "Hesabatı aç",
-    "s3d": "Tam hesabat üçün e-poçtunu təsdiqlə."
-  },
-  "features": {
-    "title": "Niyə bu alət?",
-    "f1t": "Ani bal",
-    "f1d": "20 rəy əsasında aydın 0-10 ümumi bal.",
-    "f2t": "Real mövzular",
-    "f2d": "Ən çox şikayət və təriflər, nümunələrlə.",
-    "f3t": "Spamdan qorunan",
-    "f3d": "Limitlər, bot qoruması və kota nəzarəti."
   },
   "nb": {
     "brand": {
@@ -187,11 +129,7 @@
     },
     "foot": {
       "tagline": "An honest summary of your reviews, made for small businesses.",
-      "made": "Made in Istanbul",
-      "l1": "How it works",
-      "l2": "How we use your data",
-      "l3": "FAQ",
-      "l4": "Contact"
+      "made": "Made in Istanbul"
     },
     "band": {
       "a": {
@@ -211,8 +149,5 @@
         "d": "There's a problem piling up here. The good news: the most repeated topic is very clear, so you know exactly where to start."
       }
     }
-  },
-  "footer": {
-    "note": "Pulsuz önizləmə • E-poçt təsdiqi ilə tam hesabat • Günlük kota"
   }
 }
