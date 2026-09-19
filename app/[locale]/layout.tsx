@@ -22,24 +22,24 @@ export function generateStaticParams() {
 
 const META: Record<string, { title: string; description: string }> = {
   tr: {
-    title: 'YorumAnalizi — Google yorumlarının dürüst özeti',
+    title: 'TrueReviews — Google yorumlarının dürüst özeti',
     description: "Google Maps linkini yapıştır; yorumlarının tamamını okuyup sana bir sayfalık dürüst bir özet çıkaralım."
   },
   en: {
-    title: 'YorumAnalizi — An honest summary of your Google reviews',
+    title: 'TrueReviews — An honest summary of your Google reviews',
     description: 'Paste your Google Maps link; we read every review and hand you a one-page honest summary.'
   },
   de: {
-    title: 'YorumAnalizi — Ehrliche Zusammenfassung deiner Google-Bewertungen',
+    title: 'TrueReviews — Ehrliche Zusammenfassung deiner Google-Bewertungen',
     description: 'Füge deinen Google-Maps-Link ein; wir lesen alle Bewertungen und fassen sie ehrlich zusammen.'
   },
-  ar: { title: 'YorumAnalizi — ملخص صادق لتقييمات Google', description: 'حلّل تقييمات خرائط Google.' },
-  ru: { title: 'YorumAnalizi — честная сводка отзывов Google', description: 'Анализируйте отзывы Google Maps.' },
-  fr: { title: 'YorumAnalizi — résumé honnête de vos avis Google', description: 'Analysez vos avis Google Maps.' },
-  es: { title: 'YorumAnalizi — resumen honesto de tus reseñas de Google', description: 'Analiza tus reseñas de Google Maps.' },
-  nl: { title: 'YorumAnalizi — eerlijke samenvatting van je Google-reviews', description: 'Analyseer je Google Maps-reviews.' },
-  fa: { title: 'YorumAnalizi — خلاصه صادقانه نظرات گوگل', description: 'نظرات گوگل‌مپس را تحلیل کنید.' },
-  az: { title: 'YorumAnalizi — Google rəylərinin dürüst xülasəsi', description: 'Google Maps rəylərinizi təhlil edin.' }
+  ar: { title: 'TrueReviews — ملخص صادق لتقييمات Google', description: 'حلّل تقييمات خرائط Google.' },
+  ru: { title: 'TrueReviews — честная сводка отзывов Google', description: 'Анализируйте отзывы Google Maps.' },
+  fr: { title: 'TrueReviews — résumé honnête de vos avis Google', description: 'Analysez vos avis Google Maps.' },
+  es: { title: 'TrueReviews — resumen honesto de tus reseñas de Google', description: 'Analiza tus reseñas de Google Maps.' },
+  nl: { title: 'TrueReviews — eerlijke samenvatting van je Google-reviews', description: 'Analyseer je Google Maps-reviews.' },
+  fa: { title: 'TrueReviews — خلاصه صادقانه نظرات گوگل', description: 'نظرات گوگل‌مپس را تحلیل کنید.' },
+  az: { title: 'TrueReviews — Google rəylərinin dürüst xülasəsi', description: 'Google Maps rəylərinizi təhlil edin.' }
 };
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
@@ -56,14 +56,14 @@ export async function generateMetadata({ params }: { params: { locale: string } 
     title: m.title,
     description: m.description,
     keywords,
-    authors: [{ name: 'YorumAnalizi' }],
-    creator: 'YorumAnalizi',
-    publisher: 'YorumAnalizi',
+    authors: [{ name: 'TrueReviews' }],
+    creator: 'TrueReviews',
+    publisher: 'TrueReviews',
     category: 'business',
     alternates: { canonical, languages },
     openGraph: {
       type: 'website',
-      siteName: 'YorumAnalizi',
+      siteName: 'TrueReviews',
       locale: OG_LOCALE[locale] || OG_LOCALE.en,
       url: canonical,
       title: m.title,
@@ -163,11 +163,11 @@ export default async function LocaleLayout({
           <ThemeProvider>
             <header className="site-head">
               <div className="wrap wrap--wide head-in">
-                <a className="brand" href={`/${locale}`} aria-label="YorumAnalizi">
+                <a className="brand" href={`/${locale}`} aria-label="TrueReviews">
                   <BrandMark />
                   <span>
                     <span className="brand__name">
-                      Yorum<em>Analizi</em>
+                      True<em>Reviews</em>
                     </span>
                     <span className="brand__sub">{t('brand.sub')}</span>
                   </span>
@@ -186,7 +186,7 @@ export default async function LocaleLayout({
               <div className="wrap wrap--wide foot-in">
                 <div>
                   <span className="brand__name" style={{ fontSize: 18 }}>
-                    Yorum<em>Analizi</em>
+                    True<em>Reviews</em>
                   </span>
                   <p style={{ fontSize: 14, color: 'var(--ink-2)', marginTop: 8, maxWidth: '38ch' }}>
                     {t('foot.tagline')}

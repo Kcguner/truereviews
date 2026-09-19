@@ -32,28 +32,28 @@ const PAGE_NAMES: Record<LegalSlug, Record<string, string>> = {
 
 const PAGE_DESC: Record<LegalSlug, Record<string, string>> = {
   sss: {
-    tr: 'YorumAnalizi hakkında sık sorulan sorular ve yanıtları.',
-    en: 'Frequently asked questions about YorumAnalizi.',
-    de: 'Häufige Fragen zu YorumAnalizi.',
-    fr: 'Questions fréquentes sur YorumAnalizi.',
-    es: 'Preguntas frecuentes sobre YorumAnalizi.',
-    nl: 'Veelgestelde vragen over YorumAnalizi.',
-    ar: 'الأسئلة الشائعة حول YorumAnalizi.',
-    ru: 'Частые вопросы о YorumAnalizi.',
-    fa: 'سؤالات پرتکرار درباره YorumAnalizi.',
-    az: 'YorumAnalizi haqqında tez-tez verilən suallar.'
+    tr: 'TrueReviews hakkında sık sorulan sorular ve yanıtları.',
+    en: 'Frequently asked questions about TrueReviews.',
+    de: 'Häufige Fragen zu TrueReviews.',
+    fr: 'Questions fréquentes sur TrueReviews.',
+    es: 'Preguntas frecuentes sobre TrueReviews.',
+    nl: 'Veelgestelde vragen over TrueReviews.',
+    ar: 'الأسئلة الشائعة حول TrueReviews.',
+    ru: 'Частые вопросы о TrueReviews.',
+    fa: 'سؤالات پرتکرار درباره TrueReviews.',
+    az: 'TrueReviews haqqında tez-tez verilən suallar.'
   },
   gizlilik: {
-    tr: 'YorumAnalizi verilerinizi nasıl toplar, kullanır ve korur?',
-    en: 'How YorumAnalizi collects, uses and protects your data.',
-    de: 'Wie YorumAnalizi Ihre Daten erhebt, nutzt und schützt.',
-    fr: 'Comment YorumAnalizi collecte, utilise et protège vos données.',
-    es: 'Cómo YorumAnalizi recopila, usa y protege tus datos.',
-    nl: 'Hoe YorumAnalizi je gegevens verzamelt, gebruikt en beschermt.',
-    ar: 'كيف يجمع YorumAnalizi بياناتك ويستخدمها ويحميها.',
-    ru: 'Как YorumAnalizi собирает, использует и защищает ваши данные.',
-    fa: 'YorumAnalizi داده‌های شما را چگونه جمع‌آوری، استفاده و محافظت می‌کند.',
-    az: 'YorumAnalizi məlumatlarınızı necə toplayır, istifadə edir və qoruyur.'
+    tr: 'TrueReviews verilerinizi nasıl toplar, kullanır ve korur?',
+    en: 'How TrueReviews collects, uses and protects your data.',
+    de: 'Wie TrueReviews Ihre Daten erhebt, nutzt und schützt.',
+    fr: 'Comment TrueReviews collecte, utilise et protège vos données.',
+    es: 'Cómo TrueReviews recopila, usa y protege tus datos.',
+    nl: 'Hoe TrueReviews je gegevens verzamelt, gebruikt en beschermt.',
+    ar: 'كيف يجمع TrueReviews بياناتك ويستخدمها ويحميها.',
+    ru: 'Как TrueReviews собирает, использует и защищает ваши данные.',
+    fa: 'TrueReviews داده‌های شما را چگونه جمع‌آوری، استفاده و محافظت می‌کند.',
+    az: 'TrueReviews məlumatlarınızı necə toplayır, istifadə edir və qoruyur.'
   },
   kvkk: {
     tr: '6698 sayılı KVKK kapsamında veri işlemeye dair aydınlatma metni.',
@@ -68,23 +68,23 @@ const PAGE_DESC: Record<LegalSlug, Record<string, string>> = {
     az: 'Məlumatların emalı barədə bildiriş (KVKK).'
   },
   iletisim: {
-    tr: 'YorumAnalizi ile iletişime geçin.',
-    en: 'Get in touch with YorumAnalizi.',
-    de: 'Kontaktieren Sie YorumAnalizi.',
-    fr: 'Contactez YorumAnalizi.',
-    es: 'Contacta con YorumAnalizi.',
-    nl: 'Neem contact op met YorumAnalizi.',
-    ar: 'تواصل مع YorumAnalizi.',
-    ru: 'Свяжитесь с YorumAnalizi.',
-    fa: 'با YorumAnalizi در تماس باشید.',
-    az: 'YorumAnalizi ilə əlaqə saxlayın.'
+    tr: 'TrueReviews ile iletişime geçin.',
+    en: 'Get in touch with TrueReviews.',
+    de: 'Kontaktieren Sie TrueReviews.',
+    fr: 'Contactez TrueReviews.',
+    es: 'Contacta con TrueReviews.',
+    nl: 'Neem contact op met TrueReviews.',
+    ar: 'تواصل مع TrueReviews.',
+    ru: 'Свяжитесь с TrueReviews.',
+    fa: 'با TrueReviews در تماس باشید.',
+    az: 'TrueReviews ilə əlaqə saxlayın.'
   }
 };
 
 export function getLegalMeta(slug: LegalSlug, locale: string): { title: string; description: string } {
   const l = (PAGE_NAMES[slug][locale] || PAGE_NAMES[slug].en) as string;
   const d = (PAGE_DESC[slug][locale] || PAGE_DESC[slug].en) as string;
-  return { title: `${l} — YorumAnalizi`, description: d };
+  return { title: `${l} — TrueReviews`, description: d };
 }
 
 export function getLegalName(slug: LegalSlug, locale: string): string {
@@ -102,7 +102,7 @@ const DOCS: Record<string, Record<string, LegalDoc>> = {
   gizlilik: {
     tr: {
       title: 'Gizlilik Politikası',
-      intro: 'Bu politika, YorumAnalizini kullanırken verilerinizin nasıl işlendiğini açıklar.',
+      intro: 'Bu politika, TrueReviews kullanırken verilerinizin nasıl işlendiğini açıklar.',
       sections: [
         {
           h: 'Toplanan veriler',
@@ -136,7 +136,7 @@ const DOCS: Record<string, Record<string, LegalDoc>> = {
     },
     en: {
       title: 'Privacy Policy',
-      intro: 'This policy explains how your data is processed when you use YorumAnalizi.',
+      intro: 'This policy explains how your data is processed when you use TrueReviews.',
       sections: [
         { h: 'Data we collect', p: ['The Google Maps business link you paste, the email address you leave for the full report, and IP/quota logs to prevent abuse.'] },
         { h: 'Purpose', p: ['Data is used only to generate the report, complete email confirmation and enforce quotas. No ads, no marketing blasts.'] },
@@ -147,7 +147,7 @@ const DOCS: Record<string, Record<string, LegalDoc>> = {
     },
     de: {
       title: 'Datenschutzerklärung',
-      intro: 'Diese Erklärung beschreibt, wie Ihre Daten bei YorumAnalizi verarbeitet werden.',
+      intro: 'Diese Erklärung beschreibt, wie Ihre Daten bei TrueReviews verarbeitet werden.',
       sections: [
         { h: 'Erhobene Daten', p: ['Der eingefügte Google-Maps-Link, Ihre E-Mail-Adresse für den vollständigen Bericht sowie IP-/Kontingentprotokolle gegen Missbrauch.'] },
         { h: 'Zweck', p: ['Die Daten dienen nur der Berichtserstellung, der E-Mail-Bestätigung und der Kontingentkontrolle. Keine Werbung, keine Newsletter.'] },
@@ -160,7 +160,7 @@ const DOCS: Record<string, Record<string, LegalDoc>> = {
   kvkk: {
     tr: {
       title: 'KVKK Aydınlatma Metni',
-      intro: '6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında veri sorumlusu YorumAnalizidir.',
+      intro: '6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında veri sorumlusu TrueReviews’dir.',
       sections: [
         {
           h: 'İşlenen veriler ve amaç',
@@ -179,7 +179,7 @@ const DOCS: Record<string, Record<string, LegalDoc>> = {
     },
     en: {
       title: 'Privacy Notice (KVKK/GDPR)',
-      intro: 'YorumAnalizi is the data controller for the data described below.',
+      intro: 'TrueReviews is the data controller for the data described below.',
       sections: [
         { h: 'Data and purpose', p: ['Your email (report delivery), business link (analysis) and IP/quota logs (security), processed on the basis of your explicit consent.'] },
         { h: 'Retention', p: ['Data is deleted on request; confirmation records are kept only as long as legally required.'] },
@@ -188,7 +188,7 @@ const DOCS: Record<string, Record<string, LegalDoc>> = {
     },
     de: {
       title: 'KVKK-Datenschutzhinweis',
-      intro: 'YorumAnalizi ist Verantwortlicher für die unten beschriebenen Daten.',
+      intro: 'TrueReviews ist Verantwortlicher für die unten beschriebenen Daten.',
       sections: [
         { h: 'Daten und Zweck', p: ['Ihre E-Mail (Berichtversand), Ihr Unternehmenslink (Analyse) und IP-/Kontingentprotokolle (Sicherheit) — auf Grundlage Ihrer Einwilligung.'] },
         { h: 'Speicherdauer', p: ['Löschung auf Anfrage; Nachweise nur so lange wie gesetzlich erforderlich.'] },
@@ -236,7 +236,7 @@ export function getLegalDoc(slug: LegalSlug, locale: string): { doc: LegalDoc; f
   }
   // sss: içerik FAQ verisinden sayfada üretilir
   const meta = getLegalMeta(slug, locale);
-  return { doc: { title: meta.title.replace(' — YorumAnalizi', ''), intro: meta.description, sections: [] }, fallbackNote: '' };
+  return { doc: { title: meta.title.replace(' — TrueReviews', ''), intro: meta.description, sections: [] }, fallbackNote: '' };
 }
 
 // ── E-posta kilidindeki KVKK onayı ──

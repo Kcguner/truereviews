@@ -43,7 +43,7 @@ export default function LegalPage({ params }: { params: Params }) {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'YorumAnalizi', item: `${base}/${locale}` },
+      { '@type': 'ListItem', position: 1, name: 'TrueReviews', item: `${base}/${locale}` },
       { '@type': 'ListItem', position: 2, name: doc.title, item: `${base}/${locale}/${page}` }
     ]
   };
@@ -57,7 +57,7 @@ export default function LegalPage({ params }: { params: Params }) {
         />
         <div className="rpt__nav">
           <a className="linkish" href={`/${locale}`}>
-            ← YorumAnalizi
+            ← TrueReviews
           </a>
         </div>
         <header className="rpt__head">

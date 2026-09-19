@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'YorumAnalizi — Google Yorum Analizi',
-    short_name: 'YorumAnalizi',
+    name: 'TrueReviews — Google Yorum Analizi',
+    short_name: 'TrueReviews',
     description: 'Google Maps yorumlarınızın dürüst özeti: skor, tekrar eden konular ve tek somut adım.',
     start_url: '/tr',
     display: 'standalone',

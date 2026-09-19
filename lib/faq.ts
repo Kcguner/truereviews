@@ -11,7 +11,7 @@ export const FAQS: Record<string, Faq[]> = {
       a: 'Google Maps işletme linkinizi yapıştırıyorsunuz; son yorumlar okunup size tek sayfalık dürüst bir özet çıkarılıyor: memnuniyet skoru, en çok tekrar eden övgü ve şikayetler ve bu hafta atabileceğiniz tek somut adım.'
     },
     {
-      q: 'YorumAnalizi ücretsiz mi?',
+      q: 'TrueReviews ücretsiz mi?',
       a: 'Evet. Önizleme ücretsiz ve kayıt gerektirmez; tam rapor e-posta onayı ile açılır. Reklam ve seri mail gönderilmez.'
     },
     {
@@ -25,7 +25,7 @@ export const FAQS: Record<string, Faq[]> = {
       a: 'Paste your Google Maps business link; recent reviews are read and turned into a one-page honest summary: a satisfaction score, recurring praise and complaints, and one concrete step for this week.'
     },
     {
-      q: 'Is YorumAnalizi free?',
+      q: 'Is TrueReviews free?',
       a: 'Yes. The preview is free with no sign-up; the full report unlocks after email confirmation. No ads, no newsletter spam.'
     },
     {
@@ -39,7 +39,7 @@ export const FAQS: Record<string, Faq[]> = {
       a: 'Fügen Sie Ihren Google-Maps-Unternehmenslink ein; aktuelle Bewertungen werden gelesen und zu einer einseitigen ehrlichen Zusammenfassung verdichtet: Zufriedenheitsscore, wiederkehrende Lob- und Kritikthemen und ein konkreter Schritt für diese Woche.'
     },
     {
-      q: 'Ist YorumAnalizi kostenlos?',
+      q: 'Ist TrueReviews kostenlos?',
       a: 'Ja. Die Vorschau ist kostenlos ohne Registrierung; der vollständige Bericht wird nach E-Mail-Bestätigung freigeschaltet.'
     },
     {
@@ -53,7 +53,7 @@ export const FAQS: Record<string, Faq[]> = {
       a: "Collez le lien de votre établissement ; les avis récents sont lus et résumés en une page : score de satisfaction, éloges et plaintes récurrentes, et une action concrète pour cette semaine."
     },
     {
-      q: 'YorumAnalizi est-il gratuit ?',
+      q: 'TrueReviews est-il gratuit ?',
       a: "Oui. L'aperçu est gratuit sans inscription ; le rapport complet est débloqué après confirmation de votre e-mail."
     },
     {
@@ -67,7 +67,7 @@ export const FAQS: Record<string, Faq[]> = {
       a: 'Pega el enlace de tu negocio; las reseñas recientes se leen y se resumen en una página: puntuación, elogios y quejas recurrentes, y una acción concreta para esta semana.'
     },
     {
-      q: '¿YorumAnalizi es gratis?',
+      q: '¿TrueReviews es gratis?',
       a: 'Sí. La vista previa es gratis sin registro; el informe completo se desbloquea tras confirmar tu correo.'
     },
     {
@@ -81,7 +81,7 @@ export const FAQS: Record<string, Faq[]> = {
       a: 'Plak de link van je bedrijf; recente reviews worden gelezen en samengevat op één pagina: score, terugkerende plus- en minpunten en één concrete actie voor deze week.'
     },
     {
-      q: 'Is YorumAnalizi gratis?',
+      q: 'Is TrueReviews gratis?',
       a: 'Ja. De preview is gratis zonder registratie; het volledige rapport volgt na e-mailbevestiging.'
     },
     {
@@ -95,7 +95,7 @@ export const FAQS: Record<string, Faq[]> = {
       a: 'الصق رابط منشأتك؛ تُقرأ التقييمات الأخيرة وتُلخَّص في صفحة واحدة: درجة الرضا، وأبرز المدح والشكاوى المتكررة، وخطوة عملية واحدة لهذا الأسبوع.'
     },
     {
-      q: 'هل YorumAnalizi مجاني؟',
+      q: 'هل TrueReviews مجاني؟',
       a: 'نعم. المعاينة مجانية دون تسجيل؛ ويُفتح التقرير الكامل بعد تأكيد بريدك الإلكتروني.'
     },
     {
@@ -109,7 +109,7 @@ export const FAQS: Record<string, Faq[]> = {
       a: 'Вставьте ссылку на вашу компанию; свежие отзывы читаются и сводятся на одну страницу: оценка, повторяющиеся похвалы и жалобы и один конкретный шаг на неделю.'
     },
     {
-      q: 'YorumAnalizi бесплатный?',
+      q: 'TrueReviews бесплатный?',
       a: 'Да. Предпросмотр бесплатен без регистрации; полный отчёт открывается после подтверждения e-mail.'
     },
     {
@@ -123,7 +123,7 @@ export const FAQS: Record<string, Faq[]> = {
       a: 'پیوند کسب‌وکارتان را بچسبانید؛ نظرات اخیر خوانده و در یک صفحه خلاصه می‌شود: امتیاز رضایت، تحسین‌ها و شکایت‌های پرتکرار و یک اقدام مشخص برای این هفته.'
     },
     {
-      q: 'آیا YorumAnalizi رایگان است؟',
+      q: 'آیا TrueReviews رایگان است؟',
       a: 'بله. پیش‌نمایش بدون ثبت‌نام رایگان است؛ گزارش کامل پس از تأیید ایمیل باز می‌شود.'
     },
     {
@@ -137,7 +137,7 @@ export const FAQS: Record<string, Faq[]> = {
       a: 'Müəssisə linkini yapışdırın; son rəylər oxunub bir səhifədə xülasə olunur: məmnuniyyət balı, təkrarlanan tərif və şikayətlər və bu həftə üçün bir konkret addım.'
     },
     {
-      q: 'YorumAnalizi pulsuzdur?',
+      q: 'TrueReviews pulsuzdur?',
       a: 'Bəli. Önizləmə qeydiyyatsız pulsuzdur; tam hesabat e-poçt təsdiqindən sonra açılır.'
     },
     {

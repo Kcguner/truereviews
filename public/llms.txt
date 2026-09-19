@@ -1,4 +1,4 @@
-# YorumAnalizi — AI / GEO rehberi
+# TrueReviews — AI / GEO rehberi
 
 > Google Maps yorumlarının dürüst özeti. İşletme linkini yapıştır;
 > son yorumlar okunup tek sayfalık özet çıkarılır: memnuniyet skoru (0-100),

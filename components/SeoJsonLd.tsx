@@ -17,21 +17,21 @@ export default function SeoJsonLd({
     {
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: 'YorumAnalizi',
+      name: 'TrueReviews',
       url: base,
       logo: `${base}/icon.svg`
     },
     {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
-      name: 'YorumAnalizi',
+      name: 'TrueReviews',
       url: base,
       inLanguage: locale
     },
     {
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
-      name: 'YorumAnalizi',
+      name: 'TrueReviews',
       applicationCategory: 'BusinessApplication',
       operatingSystem: 'Web',
       url: `${base}/${locale}`,
