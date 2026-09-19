@@ -43,7 +43,7 @@ sadece aşağıdaki 5-10 dakikalık işlemler sizde kaldı (API anahtarları ben
 ## 6) Vercel deploy
 1. Repo'yu GitHub'a push'layın → https://vercel.com → Import
 2. Environment Variables'a yukarıdaki anahtarları ekleyin
-3. `NEXT_PUBLIC_APP_URL` alanına `https://<projeniz>.vercel.app` yazın
+3. `APP_URL` alanına `https://<projeniz>.vercel.app` yazın (private env, Config olarak)
 4. Deploy. `vercel.json` + `next-sitemap` (sitemap/robots) hazır.
 
 ## Hızlı test (anahtarsız)

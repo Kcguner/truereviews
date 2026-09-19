@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { getSiteUrl } from '../lib/site';
 
 afterEach(() => {
-  delete process.env.NEXT_PUBLIC_APP_URL;
+  delete process.env.APP_URL;
 });
 
 describe('getSiteUrl', () => {
@@ -10,7 +10,7 @@ describe('getSiteUrl', () => {
     expect(getSiteUrl()).toBe('https://ornek.vercel.app');
   });
   it('sondaki slashleri temizler', () => {
-    process.env.NEXT_PUBLIC_APP_URL = 'https://ornek.com///';
+    process.env.APP_URL = 'https://ornek.com///';
     expect(getSiteUrl()).toBe('https://ornek.com');
   });
 });

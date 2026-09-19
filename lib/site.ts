@@ -1,4 +1,4 @@
-/** Merkezi site URL'si. Üretimde NEXT_PUBLIC_APP_URL set edilmeli. */
+/** Merkezi site URL'si. Sadece server-side kullanılır (private env). */
 export function getSiteUrl(): string {
-  return (process.env.NEXT_PUBLIC_APP_URL || 'https://ornek.vercel.app').replace(/\/+$/, '');
+  return (process.env.APP_URL || 'https://ornek.vercel.app').replace(/\/+$/, '');
 }
