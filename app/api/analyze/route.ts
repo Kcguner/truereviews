@@ -75,7 +75,16 @@ export async function POST(req: NextRequest) {
     }
 
     const maxReviews = Math.min(Number(process.env.MAX_REVIEWS || 20), 50);
-    const { reviews, businessName, mocked: apifyMocked } = await fetchReviews(placeUrl, maxReviews);
+    // Kullanıcının dili Apify'a aktarılır (yorum arayüz/çeviri dili için);
+    // actor tanımadığı kodu varsayılana düşürür, analiz dili zaten Gemma'da üretilir.
+    const apifyLanguage = ['tr', 'en', 'de', 'ar', 'ru', 'fr', 'es', 'nl'].includes(locale)
+      ? locale
+      : 'en';
+    const { reviews, businessName, mocked: apifyMocked } = await fetchReviews(
+      placeUrl,
+      maxReviews,
+      apifyLanguage
+    );
     if (reviews.length === 0) {
       return NextResponse.json(
         { error: 'no_reviews', message: 'Bu işletme için yorum bulunamadı.' },

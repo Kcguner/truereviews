@@ -44,7 +44,8 @@ export function mockBusinessName(placeUrl: string): string {
 
 export async function fetchReviews(
   placeUrl: string,
-  maxReviews: number
+  maxReviews: number,
+  language = 'tr'
 ): Promise<{ reviews: ScrapedReview[]; businessName: string; mocked: boolean }> {
   const token = process.env.APIFY_API_TOKEN;
   const actorId = process.env.APIFY_ACTOR_ID || 'compass/google-maps-reviews-scraper';
@@ -67,7 +68,7 @@ export async function fetchReviews(
         startUrls: [{ url: placeUrl }],
         maxReviews,
         reviewsSort: 'newest',
-        language: 'tr'
+        language
       })
     }
   );
