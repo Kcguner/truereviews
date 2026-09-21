@@ -56,11 +56,37 @@ GÖREV: Yorumları analiz et ve SADECE şu JSON'u üret (başka metin yazma):
 Kurallar:
 - Yanıtı ${lang} dilinde üret.
 - Yorumlar hangi dilde olursa olsun analizi ${lang} dilinde yaz.
+- SADECE ham JSON döndür: yanıtın ilk karakteri { , son karakteri } olmalı.
+- \`\`\` gibi markdown fence KULLANMA; JSON'dan önce/sonra tek kelime bile açıklama YAZMA.
 - Skor: 1-2 yıldız ağırlığı düşük, 4-5 yıldız ağırlığı yüksek puana yansısın.
 - count değerleri gerçekçi tahmin olsun, toplam yorum sayısını aşmasın.`;
 }
 
-/** Alıntıyı kelime ortasından bölmeden kısaltır. */
+/** Model düz yazı/fence ile sarılmış JSON döndüğünde ham JSON'u ayıklar. */
+export function extractJson(text: string): unknown {
+  let t = (text || '').trim();
+  // ```json ... ``` fence'lerini sök
+  const fence = t.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fence) t = (fence[1] || '').trim();
+  // Baştaki/sondaki düz yazıyı at: ilk { ile son } arasını al
+  const start = t.indexOf('{');
+  const end = t.lastIndexOf('}');
+  if (start >= 0 && end > start) t = t.slice(start, end + 1);
+  return JSON.parse(t);
+}
+
+function isValidReport(r: unknown): r is AnalysisReport {
+  if (!r || typeof r !== 'object') return false;
+  const o = r as Record<string, unknown>;
+  return (
+    typeof o.score === 'number' &&
+    typeof o.summary === 'string' &&
+    Array.isArray(o.top_complaints) &&
+    Array.isArray(o.top_praises) &&
+    typeof o.action_suggestion === 'string'
+  );
+}
+ /** Alıntıyı kelime ortasından bölmeden kısaltır. */
 export function clipQuote(text: string, max = 120): string {
   const t = (text || '').trim();
   if (t.length <= max) return t;
@@ -150,7 +176,8 @@ export async function analyzeReviews(
       };
       const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text || '').join('') || '';
       try {
-        const parsed = JSON.parse(text) as AnalysisReport;
+        const parsed = extractJson(text) as AnalysisReport;
+        if (!isValidReport(parsed)) throw new Error('eksik alan');
         parsed.review_count = reviews.length;
         parsed.business_name = businessName;
         return { report: parsed, mocked: false };

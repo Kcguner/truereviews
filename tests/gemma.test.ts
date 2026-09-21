@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { GEMMA_MODEL_DEFAULT, analyzeReviews, buildPrompt, clipQuote } from '../lib/gemma';
+import { GEMMA_MODEL_DEFAULT, analyzeReviews, buildPrompt, clipQuote, extractJson } from '../lib/gemma';
 
 const REVIEWS = [
   { rating: 5, text: 'Harika yemekler, hızlı servis.' },
@@ -78,5 +78,26 @@ describe('gemma', () => {
       vi.fn(async () => ({ ok: false, status: 400, text: async () => 'bad key' }) as never)
     );
     await expect(analyzeReviews('X', REVIEWS as never, 'tr')).rejects.toThrow('Gemma hatası (400)');
+  });
+  it('extractJson fence ve düz yazıyı ayıklar', () => {
+    expect(extractJson('```json\n{"a":1}\n```')).toEqual({ a: 1 });
+    expect(extractJson('İşte analiz:\n{"a":2}\nUmarım yardımcı olur.')).toEqual({ a: 2 });
+    expect(() => extractJson('düz yazı, json yok')).toThrow();
+  });
+  it('fence sarılı geçerli JSON gerçek rapor sayılır', async () => {
+    process.env.GOOGLE_AI_API_KEY = 'test-key';
+    const payload =
+      '```json\n{"score":8.5,"summary":"Güzel mekan.","top_complaints":[],"top_praises":[],"action_suggestion":"Devam."}\n```';
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({
+        ok: true,
+        json: async () => ({ candidates: [{ content: { parts: [{ text: payload }] } }] })
+      }) as never)
+    );
+    const { report, mocked } = await analyzeReviews('X', REVIEWS as never, 'tr');
+    expect(mocked).toBe(false);
+    expect(report.score).toBe(8.5);
+    expect(report.business_name).toBe('X');
   });
 });
