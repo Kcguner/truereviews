@@ -83,16 +83,22 @@ function heuristicReport(
   // (aksi halde olumlu bir yorum "şikayet" altında görünür).
   const low = reviews.filter((r) => r.rating >= 1 && r.rating <= 2);
   const high = reviews.filter((r) => r.rating >= 4);
+  // Örnek alıntılarda metinli yorumlar önden: vitrine "Metinsiz puan"
+  // çıkmasın; hiç metin yoksa o zaman fallback yazılır.
+  const textFirst = (arr: ScrapedReview[]) => [
+    ...arr.filter((r) => r.text && r.text.trim()),
+    ...arr.filter((r) => !r.text || !r.text.trim())
+  ];
   void locale;
   return {
     score,
     summary: `${businessName}: ${reviews.length} yorumun ortalaması ${avg.toFixed(1)}/5. Bu özet puan ortalamasına dayanır; yapay zekâ destekli detaylı analiz yakında bu alanda olacak.`,
-    top_complaints: low.slice(0, 3).map((r) => ({
+    top_complaints: textFirst(low).slice(0, 3).map((r) => ({
       topic: 'Genel iyileştirme alanı',
       count: Math.max(1, Math.round(low.length / 3)),
       example: r.text ? clipQuote(r.text) : 'Metinsiz puan'
     })),
-    top_praises: high.slice(0, 2).map((r) => ({
+    top_praises: textFirst(high).slice(0, 2).map((r) => ({
       topic: 'Müşteri memnuniyeti',
       count: Math.max(1, Math.round(high.length / 2)),
       example: r.text ? clipQuote(r.text) : 'Metinsiz puan'

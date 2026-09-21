@@ -1722,6 +1722,32 @@ html:not(.dark) .action__k {
   }
 }
 @media print {
+  /* Baskıda her zaman açık tema + yüksek kontrast mürekkep:
+     dark mode'da yazdırınca beyaz-beyaz çıkmayı ve soluk gri metni engeller. */
+  :root,
+  html.dark {
+    color-scheme: light;
+    --paper: #fff;
+    --paper-hi: #fff;
+    --paper-lo: #fff;
+    --card: #fff;
+    --ink: #1f1c17;
+    --ink-2: #3f392f;
+    --ink-3: #5c5546;
+    --line: #d6c9af;
+    --line-2: #c3b394;
+    --track: #e4d9c2;
+    --moss: #4b7a45;
+    --moss-soft: #dee9d5;
+    --amber: #b97a12;
+    --amber-soft: #f5e3b8;
+    --clay: #ac452f;
+    --clay-soft: #f1dcd4;
+    --brand: #17463c;
+    --brand-soft: #dee9e2;
+    --sh: none;
+    --sh-sm: none;
+  }
   .site-head,
   .site-foot,
   .rpt__nav,

@@ -39,6 +39,19 @@ describe('gemma', () => {
     expect(report.business_name).toBe('X');
     expect(report.review_count).toBe(2);
   });
+  it('heuristic örneklerde metinli yorum önden gelir', async () => {
+    delete process.env.GOOGLE_AI_API_KEY;
+    const revs = [
+      { rating: 5, text: '' },
+      { rating: 5, text: 'Gerçek bir övgü metni.' },
+      { rating: 1, text: '' },
+      { rating: 1, text: 'Gerçek bir şikayet metni.' }
+    ] as never;
+    const { report, mocked } = await analyzeReviews('X', revs, 'tr');
+    expect(mocked).toBe(true);
+    expect(report.top_praises[0].example).toContain('Gerçek bir övgü');
+    expect(report.top_complaints[0].example).toContain('Gerçek bir şikayet');
+  });
   it('clipQuote kelime ortasından bölmez', () => {
     expect(clipQuote('kısa metin')).toBe('kısa metin');
     const long = 'Servis bilmiyorsanız Pastane olarak kalmaya devam edin lütfen teşekkürler';
