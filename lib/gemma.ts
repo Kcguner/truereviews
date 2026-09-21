@@ -89,31 +89,54 @@ export async function analyzeReviews(
 
   const model = process.env.GEMMA_MODEL || GEMMA_MODEL_DEFAULT;
   const prompt = buildPrompt(businessName, reviews, locale);
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`,
-    {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        generationConfig: { responseMimeType: 'application/json', temperature: 0.3 },
-        contents: [{ role: 'user', parts: [{ text: prompt }] }]
-      })
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const body = JSON.stringify({
+    generationConfig: { responseMimeType: 'application/json', temperature: 0.3 },
+    contents: [{ role: 'user', parts: [{ text: prompt }] }]
+  });
+
+  // 503/yoğunluk dalgaları geçicidir: bir kez kısa bekleyip tekrar dene.
+  // Hâlâ 5xx gelirse heuristic'e düş (kullanıcı rapor alır, mocked işaretlenir).
+  // 4xx ise config hatasıdır (anahtar/model) — yüksek sesle patlamalı.
+  let lastStatus = 0;
+  let lastText = '';
+  for (let attempt = 0; attempt < 2; attempt++) {
+    if (attempt > 0) await new Promise((r) => setTimeout(r, 2500));
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body
+      });
+    } catch {
+      lastStatus = 0;
+      continue;
     }
-  );
-  if (!res.ok) {
-    const t = await res.text().catch(() => '');
-    throw new Error(`Gemma hatası (${res.status}): ${t.slice(0, 300)}`);
+    if (res.ok) {
+      const data = (await res.json()) as {
+        candidates?: { content?: { parts?: { text?: string }[] } }[];
+      };
+      const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text || '').join('') || '';
+      try {
+        const parsed = JSON.parse(text) as AnalysisReport;
+        parsed.review_count = reviews.length;
+        parsed.business_name = businessName;
+        return { report: parsed, mocked: false };
+      } catch {
+        return { report: heuristicReport(businessName, reviews, locale), mocked: true };
+      }
+    }
+    lastStatus = res.status;
+    lastText = (await res.text().catch(() => '')).slice(0, 300);
+    if (res.status < 500) {
+      throw new Error(`Gemma hatası (${res.status}): ${lastText}`);
+    }
   }
-  const data = (await res.json()) as {
-    candidates?: { content?: { parts?: { text?: string }[] } }[];
-  };
-  const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text || '').join('') || '';
-  try {
-    const parsed = JSON.parse(text) as AnalysisReport;
-    parsed.review_count = reviews.length;
-    parsed.business_name = businessName;
-    return { report: parsed, mocked: false };
-  } catch {
-    return { report: heuristicReport(businessName, reviews, locale), mocked: true };
+  if (lastStatus !== 0 && lastStatus < 500) {
+    throw new Error(`Gemma hatası (${lastStatus}): ${lastText}`);
   }
+  // eslint-disable-next-line no-console
+  console.warn(`Gemma 5xx/ağ hatası sonrası heuristic fallback (status=${lastStatus})`);
+  return { report: heuristicReport(businessName, reviews, locale), mocked: true };
 }

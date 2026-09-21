@@ -1,10 +1,18 @@
-import { describe, expect, it } from 'vitest';
-import { GEMMA_MODEL_DEFAULT, buildPrompt } from '../lib/gemma';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { GEMMA_MODEL_DEFAULT, analyzeReviews, buildPrompt } from '../lib/gemma';
 
 const REVIEWS = [
   { rating: 5, text: 'Harika yemekler, hızlı servis.' },
   { rating: 2, text: 'Çok bekledik, ilgi zayıftı.' }
 ];
+
+const PREV_KEY = process.env.GOOGLE_AI_API_KEY;
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+  if (PREV_KEY === undefined) delete process.env.GOOGLE_AI_API_KEY;
+  else process.env.GOOGLE_AI_API_KEY = PREV_KEY;
+});
 
 describe('gemma', () => {
   it('varsayılan model sabit ve env ile ezilebilir olmalı', () => {
@@ -19,5 +27,24 @@ describe('gemma', () => {
   });
   it('istenen dil prompta yansır', () => {
     expect(buildPrompt('X', REVIEWS as never, 'en')).toContain('English');
+  });
+  it('kalıcı 5xx -> heuristic fallback (mocked), patlamaz', async () => {
+    process.env.GOOGLE_AI_API_KEY = 'test-key';
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({ ok: false, status: 503, text: async () => 'busy' }) as never)
+    );
+    const { report, mocked } = await analyzeReviews('X', REVIEWS as never, 'tr');
+    expect(mocked).toBe(true);
+    expect(report.business_name).toBe('X');
+    expect(report.review_count).toBe(2);
+  });
+  it('4xx -> config hatası olarak fırlar', async () => {
+    process.env.GOOGLE_AI_API_KEY = 'test-key';
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => ({ ok: false, status: 400, text: async () => 'bad key' }) as never)
+    );
+    await expect(analyzeReviews('X', REVIEWS as never, 'tr')).rejects.toThrow('Gemma hatası (400)');
   });
 });
