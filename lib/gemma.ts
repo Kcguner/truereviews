@@ -60,6 +60,15 @@ Kurallar:
 - count değerleri gerçekçi tahmin olsun, toplam yorum sayısını aşmasın.`;
 }
 
+/** Alıntıyı kelime ortasından bölmeden kısaltır. */
+export function clipQuote(text: string, max = 120): string {
+  const t = (text || '').trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > max * 0.5 ? cut.slice(0, lastSpace) : cut).trimEnd() + '…';
+}
+
 function heuristicReport(
   businessName: string,
   reviews: ScrapedReview[],
@@ -70,20 +79,23 @@ function heuristicReport(
     ? ratings.reduce((a, b) => a + b, 0) / ratings.length
     : 3;
   const score = Math.round(((avg / 5) * 10) * 10) / 10;
-  const low = reviews.filter((r) => (r.rating || 3) <= 3);
-  const high = reviews.filter((r) => (r.rating || 3) >= 4);
+  // 3★ ve puanı okunamayanlar nötrdür; konu örneklerine girmez
+  // (aksi halde olumlu bir yorum "şikayet" altında görünür).
+  const low = reviews.filter((r) => r.rating >= 1 && r.rating <= 2);
+  const high = reviews.filter((r) => r.rating >= 4);
+  void locale;
   return {
     score,
-    summary: `(${locale}) ${businessName}: ${reviews.length} yorumun ortalaması ${avg.toFixed(1)}/5. Mock/heuristic analiz — GOOGLE_AI_API_KEY eklendiğinde GEMMA_MODEL (${GEMMA_MODEL_DEFAULT}) ile gerçek analiz üretilir.`,
+    summary: `${businessName}: ${reviews.length} yorumun ortalaması ${avg.toFixed(1)}/5. Bu özet puan ortalamasına dayanır; yapay zekâ destekli detaylı analiz yakında bu alanda olacak.`,
     top_complaints: low.slice(0, 3).map((r) => ({
       topic: 'Genel iyileştirme alanı',
       count: Math.max(1, Math.round(low.length / 3)),
-      example: r.text ? r.text.slice(0, 120) : 'Metinsiz puan'
+      example: r.text ? clipQuote(r.text) : 'Metinsiz puan'
     })),
     top_praises: high.slice(0, 2).map((r) => ({
       topic: 'Müşteri memnuniyeti',
       count: Math.max(1, Math.round(high.length / 2)),
-      example: r.text ? r.text.slice(0, 120) : 'Metinsiz puan'
+      example: r.text ? clipQuote(r.text) : 'Metinsiz puan'
     })),
     action_suggestion:
       'En sık tekrar eden düşük puanlı temayı seçip 2 hafta içinde somut bir iyileştirme duyurun.',

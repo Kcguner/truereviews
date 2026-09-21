@@ -16,6 +16,12 @@ export default function ToneBar({
     return () => clearTimeout(id);
   }, [tone]);
 
+  const rows = [
+    { v: tone.pos, bg: 'var(--moss)', label: labels.pos },
+    { v: tone.neu, bg: 'var(--amber)', label: labels.neu },
+    { v: tone.neg, bg: 'var(--clay)', label: labels.neg }
+  ].filter((r) => r.v > 0);
+
   return (
     <>
       <div className="split">
@@ -24,18 +30,12 @@ export default function ToneBar({
         <i style={{ width: `${w.neg}%` }} />
       </div>
       <ul className="legend">
-        <li>
-          <span className="sw" style={{ background: 'var(--moss)' }} />
-          {labels.pos} <b>%{tone.pos}</b>
-        </li>
-        <li>
-          <span className="sw" style={{ background: 'var(--amber)' }} />
-          {labels.neu} <b>%{tone.neu}</b>
-        </li>
-        <li>
-          <span className="sw" style={{ background: 'var(--clay)' }} />
-          {labels.neg} <b>%{tone.neg}</b>
-        </li>
+        {rows.map((r) => (
+          <li key={r.label}>
+            <span className="sw" style={{ background: r.bg }} />
+            {r.label} <b>%{r.v}</b>
+          </li>
+        ))}
       </ul>
     </>
   );

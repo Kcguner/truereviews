@@ -150,40 +150,48 @@ export default function ReportView({
             <h3>{t('rpt.themes.h')}</h3>
             <span className="rule" />
           </div>
-          <div className="subh subh--pos">
-            <span className="sw" />
-            {t('rpt.praise')}
-            <span className="rule" />
-          </div>
-          <ul>
-            {full.top_praises.map((it, i) => (
-              <ThemeRow
-                key={i}
-                item={it}
-                max={maxCount}
-                kind="pos"
-                inreviewLabel={t('rpt.inreview')}
-                origLabel={t('rpt.orig')}
-              />
-            ))}
-          </ul>
-          <div className="subh subh--neg">
-            <span className="sw" />
-            {t('rpt.complaint')}
-            <span className="rule" />
-          </div>
-          <ul>
-            {full.top_complaints.map((it, i) => (
-              <ThemeRow
-                key={i}
-                item={it}
-                max={maxCount}
-                kind="neg"
-                inreviewLabel={t('rpt.inreview')}
-                origLabel={t('rpt.orig')}
-              />
-            ))}
-          </ul>
+          {full.top_praises.length > 0 && (
+            <>
+              <div className="subh subh--pos">
+                <span className="sw" />
+                {t('rpt.praise')}
+                <span className="rule" />
+              </div>
+              <ul>
+                {full.top_praises.map((it, i) => (
+                  <ThemeRow
+                    key={i}
+                    item={it}
+                    max={maxCount}
+                    kind="pos"
+                    inreviewLabel={t('rpt.inreview')}
+                    origLabel={t('rpt.orig')}
+                  />
+                ))}
+              </ul>
+            </>
+          )}
+          {full.top_complaints.length > 0 && (
+            <>
+              <div className="subh subh--neg">
+                <span className="sw" />
+                {t('rpt.complaint')}
+                <span className="rule" />
+              </div>
+              <ul>
+                {full.top_complaints.map((it, i) => (
+                  <ThemeRow
+                    key={i}
+                    item={it}
+                    max={maxCount}
+                    kind="neg"
+                    inreviewLabel={t('rpt.inreview')}
+                    origLabel={t('rpt.orig')}
+                  />
+                ))}
+              </ul>
+            </>
+          )}
         </section>
       )}
 

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { GEMMA_MODEL_DEFAULT, analyzeReviews, buildPrompt } from '../lib/gemma';
+import { GEMMA_MODEL_DEFAULT, analyzeReviews, buildPrompt, clipQuote } from '../lib/gemma';
 
 const REVIEWS = [
   { rating: 5, text: 'Harika yemekler, hızlı servis.' },
@@ -38,6 +38,14 @@ describe('gemma', () => {
     expect(mocked).toBe(true);
     expect(report.business_name).toBe('X');
     expect(report.review_count).toBe(2);
+  });
+  it('clipQuote kelime ortasından bölmez', () => {
+    expect(clipQuote('kısa metin')).toBe('kısa metin');
+    const long = 'Servis bilmiyorsanız Pastane olarak kalmaya devam edin lütfen teşekkürler';
+    const clipped = clipQuote(long, 30);
+    expect(clipped.endsWith('…')).toBe(true);
+    expect(clipped.length).toBeLessThanOrEqual(31);
+    expect(/\s$/.test(clipped.slice(0, -1))).toBe(false);
   });
   it('metinsiz yorumlar promptta dağılım notu olur, metin listesine girmez', () => {
     const mixed = [

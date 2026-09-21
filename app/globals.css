@@ -1728,7 +1728,8 @@ html:not(.dark) .action__k {
   .rpt__acts,
   .grain,
   .lockwall,
-  .nb-toast {
+  .nb-toast,
+  .action__tag {
     display: none !important;
   }
   .nb-body {
@@ -1737,5 +1738,20 @@ html:not(.dark) .action__k {
   .score,
   .action {
     box-shadow: none;
+  }
+  /* Yazıcı arka plan renklerini atlar; renkli çubuklar için zorla */
+  .split i,
+  .sw,
+  .float-score__bar i,
+  .load__fill {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  /* Yöntem kutusu ve tema kartları sayfa arasında bölünmesin */
+  .method,
+  .theme,
+  .theme__q,
+  .action {
+    break-inside: avoid;
   }
 }
