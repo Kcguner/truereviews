@@ -106,6 +106,7 @@ export async function POST(req: NextRequest) {
       tone
     };
 
+    const mocked = apifyMocked || gemmaMocked;
     const stored = await saveReport({
       place_url: placeUrl,
       place_key: placeKey,
@@ -114,7 +115,9 @@ export async function POST(req: NextRequest) {
       full_report: report,
       preview,
       locale,
-      mocked: apifyMocked || gemmaMocked
+      mocked,
+      // Mock sonuç önbelleğe girmez: aynı link bir dahaki sefere gerçeği dener.
+      indexPlace: !mocked
     });
 
     await logUsage(ip, placeKey);

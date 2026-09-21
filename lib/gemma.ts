@@ -155,6 +155,8 @@ export async function analyzeReviews(
         parsed.business_name = businessName;
         return { report: parsed, mocked: false };
       } catch {
+        // eslint-disable-next-line no-console
+        console.warn(`Gemma JSON parse fallback (model=${model}, ilk 200 karakter: ${text.slice(0, 200)})`);
         return { report: heuristicReport(businessName, reviews, locale), mocked: true };
       }
     }

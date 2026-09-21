@@ -38,6 +38,9 @@ export async function saveReport(input: {
   preview: PreviewData;
   locale: string;
   mocked: boolean;
+  /** false ise place->id eşleşmesi yazılmaz: mock sonuçlar 24s önbelleğe
+   *  girmez, aynı link bir sonraki seferde gerçek analizi tekrar dener. */
+  indexPlace?: boolean;
 }): Promise<StoredReport> {
   const redis = getRedis();
   const row: StoredReport = {
@@ -46,14 +49,15 @@ export async function saveReport(input: {
     email_unlocked: null,
     created_at: new Date().toISOString()
   };
+  const indexable = input.indexPlace !== false;
   if (!redis) {
     memStore.memReports.set(row.id, row);
-    memStore.memByPlace.set(`${input.place_key}::${input.locale}`, row);
+    if (indexable) memStore.memByPlace.set(`${input.place_key}::${input.locale}`, row);
     return row;
   }
   const ttl = CACHE_TTL_HOURS * 3600;
   await setWithTtl(keyReport(row.id), row, ttl);
-  await setWithTtl(keyPlace(input.place_key, input.locale), row.id, ttl);
+  if (indexable) await setWithTtl(keyPlace(input.place_key, input.locale), row.id, ttl);
   return row;
 }
 

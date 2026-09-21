@@ -61,6 +61,29 @@ describe('store (memory fallback)', () => {
     });
     await expect(consumeVerificationToken('yok-boyle-token')).resolves.toBeNull();
   });
+  it('indexPlace:false raporu id ile verir ama önbelleğe sokmaz', async () => {
+    const saved = await saveReport({
+      place_url: 'https://maps.test/mock',
+      place_key: 'test-place-mock',
+      business_name: 'Mock',
+      reviews: [],
+      full_report: {
+        score: 5,
+        summary: 's',
+        top_complaints: [],
+        top_praises: [],
+        action_suggestion: 'a',
+        review_count: 0,
+        business_name: 'Mock'
+      },
+      preview: { score: 5, teaser: 't', business_name: 'Mock', review_count: 0 },
+      locale: 'tr',
+      mocked: true,
+      indexPlace: false
+    });
+    await expect(getReportById(saved.id)).resolves.toMatchObject({ id: saved.id });
+    await expect(findCachedReport('test-place-mock', 'tr')).resolves.toBeNull();
+  });
   it('upsertLead e-posta servisi yokken patlamaz', async () => {
     await expect(upsertLead('lead@test.co', 'rep-1', 'tr', false)).resolves.toBeUndefined();
   });
