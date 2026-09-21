@@ -4,6 +4,7 @@ import { analyzeReviews } from '@/lib/gemma';
 import { findCachedReport, saveReport } from '@/lib/store';
 import { normalizePlaceUrl, isGoogleMapsUrl, type PreviewData, type ToneSplit } from '@/lib/types';
 import { checkQuota, logUsage } from '@/lib/quota';
+import { isAdminBypass } from '@/lib/admin';
 import { verifyTurnstile } from '@/lib/validation';
 import { locales } from '@/i18n.config';
 
@@ -30,6 +31,7 @@ export async function POST(req: NextRequest) {
       placeUrl?: string;
       locale?: string;
       turnstileToken?: string;
+      adminKey?: string;
     } | null;
     const placeUrl = (body?.placeUrl || '').trim();
     const locale = locales.includes(body?.locale as (typeof locales)[number])
@@ -44,6 +46,7 @@ export async function POST(req: NextRequest) {
     }
 
     const ip = clientIp(req);
+    const admin = isAdminBypass(body?.adminKey || req.headers.get('x-admin-key'));
     const turnstileOk = await verifyTurnstile(body?.turnstileToken || null, ip);
     if (!turnstileOk) {
       return NextResponse.json(
@@ -52,13 +55,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const quota = await checkQuota(ip);
-    if (!quota.ok) {
-      const msg =
-        quota.reason === 'daily_quota_exceeded'
-          ? 'Günlük analiz kotası doldu, yarın tekrar deneyin.'
-          : 'Çok sık denediniz, 1 saat sonra tekrar deneyin.';
-      return NextResponse.json({ error: quota.reason, message: msg }, { status: 429 });
+    if (!admin) {
+      const quota = await checkQuota(ip);
+      if (!quota.ok) {
+        const msg =
+          quota.reason === 'daily_quota_exceeded'
+            ? 'Günlük analiz kotası doldu, yarın tekrar deneyin.'
+            : 'Çok sık denediniz, 1 saat sonra tekrar deneyin.';
+        return NextResponse.json({ error: quota.reason, message: msg }, { status: 429 });
+      }
     }
 
     const placeKey = normalizePlaceUrl(placeUrl);
@@ -70,7 +75,8 @@ export async function POST(req: NextRequest) {
         reportId: cached.id,
         preview: cached.preview,
         cached: true,
-        mocked: (cached as unknown as { mocked?: boolean }).mocked ?? true
+        mocked: (cached as unknown as { mocked?: boolean }).mocked ?? true,
+        ...(admin ? { admin: true } : {})
       });
     }
 
@@ -120,14 +126,16 @@ export async function POST(req: NextRequest) {
       indexPlace: !mocked
     });
 
-    await logUsage(ip, placeKey);
+    // Admin testleri günlük kotayı tüketmez.
+    if (!admin) await logUsage(ip, placeKey);
 
     // GÜVENLİK: frontend'e SADECE önizleme + reportId döner, tam rapor asla dönmez.
     return NextResponse.json({
       reportId: stored.id,
       preview,
       cached: false,
-      mocked: apifyMocked || gemmaMocked
+      mocked,
+      ...(admin ? { admin: true } : {})
     });
   } catch (e) {
     console.error('analyze error', e);

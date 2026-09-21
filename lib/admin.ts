@@ -21,3 +21,14 @@ export function isAdminEmail(email: string): boolean {
   if (!norm) return false;
   return getAdminEmails().includes(norm);
 }
+
+/** Kota/limit muafiyeti için gizli anahtar (sadece test).
+ *  ADMIN_BYPASS_TOKEN tanımlıysa ve istekteki değerle birebir eşleşirse
+ *  /api/analyze'taki rate-limit + günlük kota uygulanmaz ve sayaç işletilmez.
+ *  Token server-only env'dedir, frontend'e gömülmez; bilen tarayıcısında
+ *  localStorage'da saklar. Kimseyle paylaşılmamalı. */
+export function isAdminBypass(provided: string | null | undefined): boolean {
+  const token = process.env.ADMIN_BYPASS_TOKEN || '';
+  if (!token) return false;
+  return !!provided && provided === token;
+}

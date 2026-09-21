@@ -24,6 +24,7 @@ function stageFor(elapsedMs: number): number {
   return Math.min(idx, STAGE_AT.length - 1);
 }
 const LAST_EMAIL_KEY = 'tr-last-email';
+const ADMIN_KEY_STORE = 'tr-admin-key';
 
 const ERROR_TR: Record<string, string> = {
   invalid_url: 'Geçerli bir Google Maps işletme linki yapıştırın (maps, goo.gl veya g.page linki).',
@@ -67,6 +68,13 @@ export default function NotebookForm() {
   const [sentEmail, setSentEmail] = useState('');
   const [mockMail, setMockMail] = useState(false);
   const [devUrl, setDevUrl] = useState('');
+  const [adminKey, setAdminKey] = useState(() => {
+    try {
+      return localStorage.getItem(ADMIN_KEY_STORE) || '';
+    } catch {
+      return '';
+    }
+  });
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => () => {
@@ -93,7 +101,12 @@ export default function NotebookForm() {
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ placeUrl: v, locale, turnstileToken: turnstile })
+        body: JSON.stringify({
+          placeUrl: v,
+          locale,
+          turnstileToken: turnstile,
+          ...(adminKey.trim() ? { adminKey: adminKey.trim() } : {})
+        })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(friendlyErr(data));
@@ -335,6 +348,32 @@ export default function NotebookForm() {
                 </button>
                 <span className="paste__hint">{t('input.hint')}</span>
               </div>
+              {/* Admin test anahtarı (ADMIN_BYPASS_TOKEN): bilen için kota/limit yok.
+                  Değer yalnızca bu tarayıcıda saklanır, sunucuya kodla gitmez. */}
+              <details className="paste__foot">
+                <summary className="linkish" style={{ cursor: 'pointer', fontSize: 12 }}>
+                  Test anahtarı{adminKey.trim() ? ' ●' : ''}
+                </summary>
+                <div className="input-row" style={{ marginTop: 8 }}>
+                  <input
+                    type="password"
+                    autoComplete="off"
+                    spellCheck={false}
+                    placeholder="ADMIN_BYPASS_TOKEN"
+                    aria-label="Test anahtarı"
+                    value={adminKey}
+                    onChange={(e) => {
+                      setAdminKey(e.target.value);
+                      try {
+                        if (e.target.value.trim()) localStorage.setItem(ADMIN_KEY_STORE, e.target.value.trim());
+                        else localStorage.removeItem(ADMIN_KEY_STORE);
+                      } catch {
+                        /* saklanamazsa sessiz geç */
+                      }
+                    }}
+                  />
+                </div>
+              </details>
             </form>
           </div>
 
