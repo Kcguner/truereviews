@@ -23,14 +23,27 @@ export function buildPrompt(
   locale: string
 ): string {
   const lang = LANGUAGE_NAMES[locale] || 'Türkçe';
-  const lines = reviews
+  const withText = reviews.filter((r) => r.text && r.text.trim());
+  const lines = withText
     .map((r, i) => `${i + 1}. [${r.rating}/5] ${r.text}`)
     .join('\n');
-  return `Sen bir müşteri yorum analistisin. Aşağıda "${businessName}" adlı işletmenin ${reviews.length} Google Maps yorumu var.
+  const emptyCount = reviews.length - withText.length;
+  const emptyDist = [5, 4, 3, 2, 1]
+    .map((s) => {
+      const n = reviews.filter((r) => (!r.text || !r.text.trim()) && (r.rating || 3) === s).length;
+      return n > 0 ? `${s}★×${n}` : null;
+    })
+    .filter(Boolean)
+    .join(', ');
+  const extraLine =
+    emptyCount > 0
+      ? `\nNOT: Ayrıca ${emptyCount} metinsiz (sadece puan) yorum var${emptyDist ? ` — dağılım: ${emptyDist}` : ''}. Skoru bunları da hesaba katarak ver.`
+      : '';
+  return `Sen bir müşteri yorum analistisin. Aşağıda "${businessName}" adlı işletmenin ${reviews.length} Google Maps yorumu var (${withText.length} metinli${emptyCount > 0 ? `, ${emptyCount} metinsiz` : ''}).
 
 YORUMLAR:
 ${lines}
-
+${extraLine}
 GÖREV: Yorumları analiz et ve SADECE şu JSON'u üret (başka metin yazma):
 {
   "score": <0-10 arası ondalıklı genel duygu skoru>,
@@ -65,12 +78,12 @@ function heuristicReport(
     top_complaints: low.slice(0, 3).map((r) => ({
       topic: 'Genel iyileştirme alanı',
       count: Math.max(1, Math.round(low.length / 3)),
-      example: r.text.slice(0, 120)
+      example: r.text ? r.text.slice(0, 120) : 'Metinsiz puan'
     })),
     top_praises: high.slice(0, 2).map((r) => ({
       topic: 'Müşteri memnuniyeti',
       count: Math.max(1, Math.round(high.length / 2)),
-      example: r.text.slice(0, 120)
+      example: r.text ? r.text.slice(0, 120) : 'Metinsiz puan'
     })),
     action_suggestion:
       'En sık tekrar eden düşük puanlı temayı seçip 2 hafta içinde somut bir iyileştirme duyurun.',

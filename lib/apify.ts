@@ -86,7 +86,13 @@ export async function fetchReviews(
       const text =
         (r.text as string) || (r.reviewText as string) || (r.comment as string) || '';
       const rating = Number(r.stars ?? r.rating ?? r.score ?? 0) || 0;
-      if (text) reviews.push({ text: String(text).slice(0, 2000), rating });
+      // Metinsiz (sadece puan) yorumlar da skora/tona katılır;
+      // metin analizi buildPrompt'ta metinlilerle sınırlanır.
+      reviews.push({
+        text: String(text).slice(0, 2000),
+        rating,
+        author: (r.author as string) || undefined
+      });
       if (reviews.length >= maxReviews) break;
     }
     if (reviews.length >= maxReviews) break;

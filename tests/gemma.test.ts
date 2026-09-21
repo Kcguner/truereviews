@@ -39,6 +39,17 @@ describe('gemma', () => {
     expect(report.business_name).toBe('X');
     expect(report.review_count).toBe(2);
   });
+  it('metinsiz yorumlar promptta dağılım notu olur, metin listesine girmez', () => {
+    const mixed = [
+      { rating: 5, text: 'Harika.' },
+      { rating: 1, text: '' },
+      { rating: 5, text: '   ' }
+    ] as never;
+    const p = buildPrompt('X', mixed, 'tr');
+    expect(p).toContain('3 Google Maps yorumu var (1 metinli, 2 metinsiz)');
+    expect(p).toContain('metinsiz (sadece puan)');
+    expect(p).toContain('Harika.');
+  });
   it('4xx -> config hatası olarak fırlar', async () => {
     process.env.GOOGLE_AI_API_KEY = 'test-key';
     vi.stubGlobal(
