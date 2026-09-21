@@ -5,10 +5,31 @@ import TurnstileWidget from '../TurnstileWidget';
 import ShopIllo from './ShopIllo';
 import ReportView from './ReportView';
 import { getFaqHeading, getFaqs } from '@/lib/faq';
-import type { NbPreview } from './types';
+import type { NbPreview, NbReport } from './types';
 
 const STAGE_KEYS = ['load.s1', 'load.s2', 'load.s3', 'load.s4', 'load.s5', 'load.s6'] as const;
 const MIN_LOAD_MS = 3600;
+const LAST_EMAIL_KEY = 'tr-last-email';
+
+const ERROR_TR: Record<string, string> = {
+  invalid_url: 'Geçerli bir Google Maps işletme linki yapıştırın (maps, goo.gl veya g.page linki).',
+  no_reviews: 'Bu işletme için yorum bulunamadı — başka bir işletme linki deneyin.',
+  not_found: 'Rapor bulunamadı — sayfayı yenileyip linki tekrar analiz edin.',
+  invalid_or_expired: 'Onay linki geçersiz veya süresi dolmuş.',
+  bot_check_failed: 'Bot doğrulaması başarısız, tekrar deneyin.',
+  rate_limited: 'Çok sık denediniz, 1 saat sonra tekrar deneyin.',
+  daily_quota_exceeded: 'Günlük analiz kotası doldu, yarın tekrar deneyin.',
+  invalid_email: 'Geçerli bir e-posta girin.',
+  disposable_email: 'Geçici e-posta adresleri kabul edilmiyor.',
+  server_error: 'Sunucuda hata oluştu, tekrar deneyin.'
+};
+
+function friendlyErr(data: { message?: string; error?: string } | null): string {
+  if (!data) return 'Hata';
+  if (data.message) return data.message;
+  if (data.error && ERROR_TR[data.error]) return ERROR_TR[data.error];
+  return data.error || 'Hata';
+}
 
 function looksLikeLink(v: string): boolean {
   const s = v.trim();
@@ -25,6 +46,8 @@ export default function NotebookForm() {
   const [stageIdx, setStageIdx] = useState(0);
   const [bizLabel, setBizLabel] = useState('');
   const [preview, setPreview] = useState<NbPreview | null>(null);
+  const [full, setFull] = useState<NbReport | null>(null);
+  const [unlocked, setUnlocked] = useState(false);
   const [reportId, setReportId] = useState('');
   const [mailSent, setMailSent] = useState(false);
   const [sentEmail, setSentEmail] = useState('');
@@ -59,13 +82,15 @@ export default function NotebookForm() {
         body: JSON.stringify({ placeUrl: v, locale, turnstileToken: turnstile })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || data.error || 'Hata');
+      if (!res.ok) throw new Error(friendlyErr(data));
       const elapsed = Date.now() - t0;
       if (elapsed < MIN_LOAD_MS) await new Promise((r) => setTimeout(r, MIN_LOAD_MS - elapsed));
       if (timer.current) clearInterval(timer.current);
       setStageIdx(6);
       setPreview(data.preview);
       setReportId(data.reportId);
+      setFull(null);
+      setUnlocked(false);
       setMailSent(false);
       setDevUrl('');
       setTimeout(() => {
@@ -87,7 +112,23 @@ export default function NotebookForm() {
         body: JSON.stringify({ reportId, email, locale, turnstileToken: turnstile })
       });
       const data = await res.json();
-      if (!res.ok) return data.message || data.error || 'Hata';
+      if (!res.ok) return friendlyErr(data);
+      try {
+        localStorage.setItem(LAST_EMAIL_KEY, email);
+      } catch {
+        /* saklanamazsa sessiz geç */
+      }
+      // Admin bypass: onay e-postası beklenmez, tam rapor hemen açılır.
+      if (data.adminBypass && data.report) {
+        setFull(data.report);
+        setUnlocked(true);
+        setSentEmail(email);
+        setMailSent(true);
+        setMockMail(false);
+        setDevUrl('');
+        window.scrollTo({ top: 0 });
+        return null;
+      }
       setSentEmail(email);
       setMailSent(true);
       setMockMail(Boolean(data.mockEmail));
@@ -103,6 +144,8 @@ export default function NotebookForm() {
     setUrl('');
     setLinkErr('');
     setPreview(null);
+    setFull(null);
+    setUnlocked(false);
     setReportId('');
     setMailSent(false);
     setDevUrl('');
@@ -181,8 +224,8 @@ export default function NotebookForm() {
       <section className="screen">
         <ReportView
           preview={preview}
-          report={null}
-          unlocked={false}
+          report={full}
+          unlocked={unlocked}
           email={sentEmail}
           mailSent={mailSent}
           isMockMail={mockMail}

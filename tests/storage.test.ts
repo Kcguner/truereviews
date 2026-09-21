@@ -49,13 +49,16 @@ describe('store (memory fallback)', () => {
     await markReportUnlocked(saved.id, 'a@b.co');
     await expect(getReportById(saved.id)).resolves.toMatchObject({ email_unlocked: 'a@b.co' });
   });
-  it('token tek kullanımlıktır', async () => {
+  it('token TTL içinde idempotenttir (çift tıklama/yenileme patlamaz)', async () => {
     const token = await createVerificationToken('rep-1', 'a@b.co');
     await expect(consumeVerificationToken(token)).resolves.toEqual({
       report_id: 'rep-1',
       email: 'a@b.co'
     });
-    await expect(consumeVerificationToken(token)).resolves.toBeNull();
+    await expect(consumeVerificationToken(token)).resolves.toEqual({
+      report_id: 'rep-1',
+      email: 'a@b.co'
+    });
     await expect(consumeVerificationToken('yok-boyle-token')).resolves.toBeNull();
   });
   it('upsertLead e-posta servisi yokken patlamaz', async () => {

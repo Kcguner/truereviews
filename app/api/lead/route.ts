@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getReportById, upsertLead, createVerificationToken } from '@/lib/store';
+import { getReportById, upsertLead, createVerificationToken, markReportUnlocked } from '@/lib/store';
 import { isValidEmailFormat, isDisposableEmail, verifyTurnstile } from '@/lib/validation';
+import { isAdminEmail } from '@/lib/admin';
 import { sendDoubleOptInEmail } from '@/lib/email';
 import { locales } from '@/i18n.config';
 
@@ -42,7 +43,26 @@ export async function POST(req: NextRequest) {
     }
 
     const report = await getReportById(reportId);
-    if (!report) return NextResponse.json({ error: 'not_found' }, { status: 404 });
+    if (!report)
+      return NextResponse.json(
+        { error: 'not_found', message: 'Rapor bulunamadı — sayfayı yenileyip linki tekrar analiz edin.' },
+        { status: 404 }
+      );
+
+    // Admin/test kolaylığı: ADMIN_EMAILS'teki adres onay e-postası beklemez,
+    // tam rapor yanıtta hemen döner (yeni Apify/Gemma çağrısı YOK).
+    if (isAdminEmail(email)) {
+      await markReportUnlocked(report.id, email);
+      await upsertLead(email, report.id, locale, true);
+      return NextResponse.json({
+        ok: true,
+        adminBypass: true,
+        report: (report as unknown as { full_report: unknown }).full_report,
+        businessName: report.business_name,
+        reviewCount:
+          (report.full_report as unknown as { review_count?: number }).review_count ?? report.reviews.length
+      });
+    }
 
     const token = await createVerificationToken(reportId, email);
     await upsertLead(email, reportId, locale, false);

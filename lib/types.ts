@@ -51,12 +51,16 @@ export function normalizePlaceUrl(url: string): string {
 
 export function isGoogleMapsUrl(url: string): boolean {
   try {
-    const u = new URL(url);
+    const u = new URL(url.trim());
     const host = u.hostname.toLowerCase();
+    // google.* (google.com, google.com.tr, maps.google.com, business.google.com…),
+    // goo.gl / maps.app.goo.gl kısaltmaları ve işletmelerin sık paylaştığı g.page kısaltmaları.
     return (
       host.includes('google.') ||
       host.includes('goo.gl') ||
-      host.includes('maps.app.goo.gl')
+      host.includes('maps.app.goo.gl') ||
+      host === 'g.page' ||
+      host.endsWith('.g.page')
     );
   } catch {
     return false;

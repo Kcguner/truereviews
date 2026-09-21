@@ -8,7 +8,7 @@ const REVIEWS = [
 
 describe('gemma', () => {
   it('varsayılan model sabit ve env ile ezilebilir olmalı', () => {
-    expect(GEMMA_MODEL_DEFAULT).toBe('gemma-3-27b-it');
+    expect(GEMMA_MODEL_DEFAULT).toBe('gemma-4-31b-it');
   });
   it('prompt beklenen JSON şemasını ister', () => {
     const p = buildPrompt('Örnek Lokanta', REVIEWS as never, 'tr');

@@ -2,7 +2,7 @@ import type { AnalysisReport } from './types';
 import type { ScrapedReview } from './apify';
 
 /** Varsayılan model. Üretimde GEMMA_MODEL ile AI Studio'daki gerçek id yazılmalı. */
-export const GEMMA_MODEL_DEFAULT = 'gemma-3-27b-it';
+export const GEMMA_MODEL_DEFAULT = 'gemma-4-31b-it';
 
 const LANGUAGE_NAMES: Record<string, string> = {
   tr: 'Türkçe',

@@ -119,15 +119,22 @@ export async function consumeVerificationToken(
     const map = (memStore as unknown as { tokens?: Map<string, { report_id: string; email: string; expires_at: string; used: boolean }> })
       .tokens;
     const row = map?.get(token);
-    if (!row || row.used || new Date(row.expires_at).getTime() < Date.now()) return null;
+    // Not: tek kullanımlık DEĞİL, TTL içinde idempotent — e-posta istemcisinin
+    // linki önizleme için tekrar çağırması / React StrictMode çift istek /
+    // sayfa yenileme "geçersiz link" hatasına düşmesin. Token 64-hex,
+    // tek rapora bağlı ve 48 saatlik; tekrar kullanımı double opt-in'i
+    // zayıflatmaz (e-posta zaten doğrulanmış sayılır).
+    if (!row || new Date(row.expires_at).getTime() < Date.now()) return null;
     row.used = true;
     return { report_id: row.report_id, email: row.email };
   }
   const key = keyToken(token);
   const row = await redis.get<TokenRow>(key);
-  if (!row || row.used) return null;
-  row.used = true;
-  const ttl = await redis.ttl(key);
-  await redis.set(key, JSON.stringify(row), { ex: ttl > 0 ? ttl : TOKEN_TTL_SECONDS });
+  if (!row) return null;
+  if (!row.used) {
+    row.used = true;
+    const ttl = await redis.ttl(key);
+    await redis.set(key, JSON.stringify(row), { ex: ttl > 0 ? ttl : TOKEN_TTL_SECONDS });
+  }
   return { report_id: row.report_id, email: row.email };
 }

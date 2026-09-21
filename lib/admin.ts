@@ -1,0 +1,23 @@
+/** Test/admin kolaylığı: double opt-in beklemeden raporu anında açan e-postalar.
+ *
+ * Kullanım (.env.local / Vercel env):
+ *   ADMIN_EMAILS=senin@mail.com,ekip@mail.com
+ *
+ * Bu listedeki bir adres /api/lead'e gönderildiğinde onay e-postası
+ * beklenmez; tam rapor yanıtta hemen döner. Normal kullanıcı akışı
+ * (double opt-in) değişmez. Üretimde listeyi küçük tutun.
+ */
+
+export function getAdminEmails(): string[] {
+  const raw = process.env.ADMIN_EMAILS || '';
+  return raw
+    .split(',')
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+export function isAdminEmail(email: string): boolean {
+  const norm = email.trim().toLowerCase();
+  if (!norm) return false;
+  return getAdminEmails().includes(norm);
+}

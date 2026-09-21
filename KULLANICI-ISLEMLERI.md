@@ -3,13 +3,13 @@
 Kodun %100'ü yazıldı ve mock modda çalışıyor. Gerçek servislere bağlanmak için
 sadece aşağıdaki 5-10 dakikalık işlemler sizde kaldı (API anahtarları bende yok):
 
-## 1) Supabase (zorunlu — gerçek veri için)
-1. https://supabase.com → yeni proje açın (free tier)
-2. SQL Editor → `supabase/schema.sql` dosyasının içeriğini yapıştırıp çalıştırın
-3. Settings → API → `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-   `SUPABASE_SERVICE_ROLE_KEY` değerlerini `.env.local` dosyasına yazın
-4. Not: bu anahtarlar girilene kadar sistem bellek-içi (in-memory) modda çalışır;
+## 1) Upstash Redis (zorunlu — gerçek veri için)
+1. https://console.upstash.com → yeni database açın (free tier)
+2. REST API sekmesindeki `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`
+   değerlerini `.env.local` dosyasına yazın
+3. Not: bu anahtarlar girilene kadar sistem bellek-içi (in-memory) modda çalışır;
    Vercel'de her deploy/instance veriyi unutur. Gerçek kullanım öncesi şart.
+   (Eski Supabase talimatı geçersizdir — kodda hiç SUPABASE geçmiyor.)
 
 ## 2) Apify (zorunlu — gerçek yorumlar için)
 1. https://console.apify.com → kayıt (kredi kartsız free plan, $5 kredi/ay)
@@ -42,9 +42,11 @@ sadece aşağıdaki 5-10 dakikalık işlemler sizde kaldı (API anahtarları ben
 
 ## 6) Vercel deploy
 1. Repo'yu GitHub'a push'layın → https://vercel.com → Import
-2. Environment Variables'a yukarıdaki anahtarları ekleyin
-3. `APP_URL` alanına `https://<projeniz>.vercel.app` yazın (private env, Config olarak)
+2. Environment Variables'a yukarıdaki anahtarları ekleyin (Production + Preview)
+3. `APP_URL` alanına `https://<projeniz>.vercel.app` yazın (private env, `NEXT_PUBLIC_`
+   prefix YOK — `NEXT_PUBLIC_APP_URL` diye bir değişken eklemeyin, kod bunu okumuyor)
 4. Deploy. `vercel.json` + `next-sitemap` (sitemap/robots) hazır.
+   Not: `NEXT_PUBLIC_*` değişirse Redeploy şart (build-time gömülür).
 
 ## Hızlı test (anahtarsız)
 ```powershell

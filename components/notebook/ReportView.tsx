@@ -41,7 +41,14 @@ export default function ReportView({
   const tRoot = useTranslations();
   const locale = useLocale();
   const router = useRouter();
-  const [mail, setMail] = useState('');
+  const [mail, setMail] = useState(() => {
+    if (unlocked) return '';
+    try {
+      return localStorage.getItem('tr-last-email') || '';
+    } catch {
+      return '';
+    }
+  });
   const [mailErr, setMailErr] = useState('');
   const [sending, setSending] = useState(false);
   const [agreed, setAgreed] = useState(false);
