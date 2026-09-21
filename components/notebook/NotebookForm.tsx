@@ -9,6 +9,20 @@ import type { NbPreview, NbReport } from './types';
 
 const STAGE_KEYS = ['load.s1', 'load.s2', 'load.s3', 'load.s4', 'load.s5', 'load.s6'] as const;
 const MIN_LOAD_MS = 3600;
+
+// Gerçek süreyle uyumlu sahne eşikleri (sn): Apify indirme en uzun adım,
+// Gemma analizi onun arkasından gelir. Son sahnede TAKILIR — bitişi
+// yalnızca API yanıtı tetikler, animasyon asla önden bitmez.
+const STAGE_AT = [0, 3, 14, 20, 25, 29];
+
+function stageFor(elapsedMs: number): number {
+  const s = elapsedMs / 1000;
+  let idx = 0;
+  for (let i = 0; i < STAGE_AT.length; i++) {
+    if (s >= STAGE_AT[i]) idx = i;
+  }
+  return Math.min(idx, STAGE_AT.length - 1);
+}
 const LAST_EMAIL_KEY = 'tr-last-email';
 
 const ERROR_TR: Record<string, string> = {
@@ -73,8 +87,8 @@ export default function NotebookForm() {
     }
     setScreen('loading');
     setStageIdx(0);
-    timer.current = setInterval(() => setStageIdx((i) => Math.min(i + 1, 5)), 700);
     const t0 = Date.now();
+    timer.current = setInterval(() => setStageIdx(stageFor(Date.now() - t0)), 500);
     try {
       const res = await fetch('/api/analyze', {
         method: 'POST',
