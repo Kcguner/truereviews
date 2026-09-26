@@ -2,7 +2,6 @@ import { Redis } from '@upstash/redis';
 import { warnProdOnce } from './env-guard';
 
 let cached: Redis | null = null;
-let warned = false;
 /** Bozuk istemci yapılandırmasında her istekte yeniden denemeyelim. */
 let clientBroken = false;
 
@@ -15,13 +14,12 @@ export function isRedisConfigured(): boolean {
 /** Upstash Redis yoksa null döner (çağıran memory fallback'e düşer). */
 export function getRedis(): Redis | null {
   if (!isRedisConfigured()) {
-    if (!warned) {
-      warned = true;
-      warnProdOnce(
-        'redis-missing',
-        'Upstash Redis bağlı değil — kota/önbellek in-memory çalışıyor. Vercel multi-instance ortamda limitler delinebilir ve restartta raporlar uçar; deploy öncesi Redis bağlayın.'
-      );
-    }
+    // Ayrı bir "bir kez uyar" bayrağı yok: `warnProdOnce` anahtarı kendisi
+    // tekilleştiriyor ve bu anahtar yalnızca burada kullanılıyor.
+    warnProdOnce(
+      'redis-missing',
+      'Upstash Redis bağlı değil — kota/önbellek in-memory çalışıyor. Vercel multi-instance ortamda limitler delinebilir ve restartta raporlar uçar; deploy öncesi Redis bağlayın.'
+    );
     return null;
   }
   if (cached) return cached;

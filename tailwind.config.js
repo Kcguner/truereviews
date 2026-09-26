@@ -5,8 +5,12 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
+        // `--font-sans` diye bir token YOK; gerçek gövde fontu `--font-body`
+        // (app/globals.css:47, next/font ile beslenir). Var olmayan bir
+        // değişken `font-sans` kullanımını sessizce tarayıcı varsayılanına
+        // düşürüyordu.
         sans: [
-          'var(--font-sans)',
+          'var(--font-body)',
           'ui-sans-serif',
           'system-ui',
           '-apple-system',

@@ -1,11 +1,10 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { bandColor } from './types';
 
 /** Yarım daire skor göstergesi (0-100). Animasyonlu yay + sayı. */
 export default function Gauge({ score, label }: { score: number; label: string }) {
   const [shown, setShown] = useState(0);
-  const numRef = useRef<HTMLDivElement>(null);
   const r = 92;
   const len = Math.PI * r;
 
@@ -63,7 +62,7 @@ export default function Gauge({ score, label }: { score: number; label: string }
         />
       </svg>
       <div className="gauge__val">
-        <div className="gauge__n" ref={numRef}>
+        <div className="gauge__n">
           {Math.round(shown)}
           <small>/100</small>
         </div>

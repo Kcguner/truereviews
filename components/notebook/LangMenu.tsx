@@ -8,6 +8,7 @@ export default function LangMenu({ current }: { current: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const close = (e: MouseEvent) => {
@@ -17,10 +18,29 @@ export default function LangMenu({ current }: { current: string }) {
     return () => document.removeEventListener('click', close);
   }, []);
 
+  // `role="menu"` sözleşmesi: menü açıkken klavyeyle çıkış yolu olmalı.
+  // Açılışta odağı ilk menü öğesine taşı, Escape'te kapatıp odağı açan
+  // düğmeye geri ver. Menü kapalıyken listener hiç bağlanmaz (layout'da her
+  // sayfada render ediliyor, global Escape yakalamak yanlış olurdu).
+  useEffect(() => {
+    if (!open) return;
+    ref.current
+      ?.querySelector<HTMLButtonElement>('[role="menuitem"]')
+      ?.focus({ preventScroll: true });
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setOpen(false);
+      btnRef.current?.focus();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
+
   return (
     <div className="lang" ref={ref} data-open={open}>
       <button
         type="button"
+        ref={btnRef}
         className="lang__btn"
         aria-expanded={open}
         aria-haspopup="menu"
