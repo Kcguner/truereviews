@@ -487,8 +487,12 @@ html.dark .lang__item[aria-current='true'] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  /* `flex: none` butonu `.head-right` flex satırında asla ezilip yassılamasın,
+     `padding: 0` ise UA/preflight button dolgusuna güvenmemek için. */
+  flex: none;
   width: 38px;
   height: 38px;
+  padding: 0;
   background: var(--paper-hi);
   border: 1.5px solid var(--ink);
   border-radius: 999px;
@@ -496,6 +500,14 @@ html.dark .lang__item[aria-current='true'] {
   box-shadow: 2px 2px 0 rgba(31, 28, 23, 0.18);
   transition: box-shadow 0.13s, transform 0.13s;
   color: var(--ink);
+}
+/* İkon güvenliği: `margin: 0` her utility sızıntısını (örn. globals'taki
+   `.block { margin-bottom: 42px }`) nötralize eder — `(0,1,1)` özgüllüğü
+   utility'leri yener, böylece ikon daireyi terk edemez. `display` bilerek
+   burada AYARLANMAZ: görünürlük `hidden` / `dark:*` utility'lerine aittir. */
+.theme-btn > svg {
+  flex: none;
+  margin: 0;
 }
 html.dark .theme-btn {
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.6);
@@ -1000,6 +1012,10 @@ html:not(.dark) .assure {
   margin-top: 16px;
 }
 
+/* ⚠️ `.block` Tailwind'in `block` display utility'siyle ÇAKIŞIR: bu kural
+   `@tailwind utilities`'ten sonra geldiği için utility'yi ezer. Bileşenlerde
+   `className="block"` Rapor bölümü için kullanılır; Tailwind `block`
+   utility'si hiçbir yerde kullanılmamalıdır. */
 .block {
   margin-bottom: 42px;
 }
