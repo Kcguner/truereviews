@@ -4,6 +4,15 @@ import { locales } from '@/i18n.config';
 import { getSiteUrl } from '@/lib/site';
 import { LEGAL_SLUGS, getContactEmail, getLegalDoc, getLegalMeta, isLegalSlug } from '@/lib/legal';
 import { getFaqHeading, getFaqs } from '@/lib/faq';
+import {
+  OG_IMAGE_SIZE,
+  ROBOTS_INDEX,
+  getAlternates,
+  getOgImageUrl,
+  getOgLocale,
+  getOgLocaleAlternates,
+  normalizeLocale
+} from '@/lib/seo';
 
 type Params = { locale: string; page: string };
 
@@ -14,14 +23,29 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   if (!isLegalSlug(params.page)) return {};
   const meta = getLegalMeta(params.page, params.locale);
-  const base = getSiteUrl();
-  const canonical = `${base}/${params.locale}/${params.page}`;
+  const ogImage = getOgImageUrl(params.locale);
+  const { canonical, languages } = getAlternates(params.locale, params.page);
   return {
     title: meta.title,
     description: meta.description,
-    alternates: { canonical },
-    openGraph: { type: 'article', title: meta.title, description: meta.description, url: canonical },
-    robots: { index: true, follow: true }
+    alternates: { canonical, languages },
+    openGraph: {
+      type: 'article',
+      siteName: 'TrueReviews',
+      locale: getOgLocale(params.locale),
+      alternateLocale: getOgLocaleAlternates(params.locale),
+      url: canonical,
+      title: meta.title,
+      description: meta.description,
+      images: [{ url: ogImage, width: OG_IMAGE_SIZE.width, height: OG_IMAGE_SIZE.height, alt: meta.title }]
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: meta.title,
+      description: meta.description,
+      images: [ogImage]
+    },
+    robots: ROBOTS_INDEX
   };
 }
 
@@ -34,27 +58,60 @@ function todayLabel(locale: string): string {
 }
 
 export default function LegalPage({ params }: { params: Params }) {
-  const { locale, page } = params;
-  if (!isLegalSlug(page) || !(locales as readonly string[]).includes(locale)) notFound();
+  const { locale: rawLocale, page } = params;
+  const locale = normalizeLocale(rawLocale);
+  if (!isLegalSlug(page) || !(locales as readonly string[]).includes(rawLocale)) notFound();
   const base = getSiteUrl();
+  const meta = getLegalMeta(page, locale);
   const { doc, fallbackNote } = getLegalDoc(page, locale);
+  const url = `${base}/${locale}/${page}`;
 
-  const breadcrumb = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'TrueReviews', item: `${base}/${locale}` },
-      { '@type': 'ListItem', position: 2, name: doc.title, item: `${base}/${locale}/${page}` }
-    ]
-  };
+  // BreadcrumbList + WebPage: legal sayfalar ana sayfaya bağlı alt sayfalardır.
+  const jsonLd: Record<string, unknown>[] = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: meta.title,
+      description: meta.description,
+      url,
+      inLanguage: locale,
+      isPartOf: { '@type': 'WebSite', name: 'TrueReviews', url: base }
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'TrueReviews', item: `${base}/${locale}` },
+        { '@type': 'ListItem', position: 2, name: doc.title, item: url }
+      ]
+    }
+  ];
+
+  // FAQPage yalnızca /sss sayfasında: JSON-LD sayfadaki görünür SSS ile birebir aynı
+  // olmalı, aksi halde Google rich result vermez.
+  if (page === 'sss') {
+    jsonLd.push({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      inLanguage: locale,
+      mainEntity: getFaqs(locale).map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a }
+      }))
+    });
+  }
 
   return (
     <section className="screen">
       <div className="wrap wrap--report rpt">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb).replace(/</g, '\\u003c') }}
-        />
+        {jsonLd.map((node, i) => (
+          <script
+            key={i}
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(node).replace(/</g, '\\u003c') }}
+          />
+        ))}
         <div className="rpt__nav">
           <a className="linkish" href={`/${locale}`}>
             ← TrueReviews

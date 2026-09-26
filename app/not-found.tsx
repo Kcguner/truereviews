@@ -1,3 +1,11 @@
+import type { Metadata } from 'next';
+
+// 404 asla dizine girmez: Next.js bu rotaya zaten otomatik `noindex` ekliyor,
+// bu yüzden burada `robots` tanımlanmıyor (iki meta etiketi basılmasın).
+export const metadata: Metadata = {
+  title: 'Sayfa bulunamadı / Page not found — TrueReviews'
+};
+
 export default function NotFound() {
   return (
     <html lang="tr">

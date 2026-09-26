@@ -3,9 +3,16 @@ import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { Fraunces, Karla, IBM_Plex_Mono } from 'next/font/google';
-import { locales, defaultLocale, rtlLocales, type Locale } from '@/i18n.config';
-import { getSiteUrl } from '@/lib/site';
+import { locales, rtlLocales, type Locale } from '@/i18n.config';
 import { LEGAL_SLUGS, getLegalName } from '@/lib/legal';
+import {
+  OG_IMAGE_SIZE,
+  getAlternates,
+  getHomeMeta,
+  getOgImageUrl,
+  getOgLocale,
+  getOgLocaleAlternates
+} from '@/lib/seo';
 import Analytics from '@/components/Analytics';
 import SeoJsonLd from '@/components/SeoJsonLd';
 import LangMenu from '@/components/notebook/LangMenu';
@@ -20,41 +27,13 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
-const META: Record<string, { title: string; description: string }> = {
-  tr: {
-    title: 'TrueReviews — Google yorumlarının dürüst özeti',
-    description: "Google Maps linkini yapıştır; yorumlarının tamamını okuyup sana bir sayfalık dürüst bir özet çıkaralım."
-  },
-  en: {
-    title: 'TrueReviews — An honest summary of your Google reviews',
-    description: 'Paste your Google Maps link; we read every review and hand you a one-page honest summary.'
-  },
-  de: {
-    title: 'TrueReviews — Ehrliche Zusammenfassung deiner Google-Bewertungen',
-    description: 'Füge deinen Google-Maps-Link ein; wir lesen alle Bewertungen und fassen sie ehrlich zusammen.'
-  },
-  ar: { title: 'TrueReviews — ملخص صادق لتقييمات Google', description: 'حلّل تقييمات خرائط Google.' },
-  ru: { title: 'TrueReviews — честная сводка отзывов Google', description: 'Анализируйте отзывы Google Maps.' },
-  fr: { title: 'TrueReviews — résumé honnête de vos avis Google', description: 'Analysez vos avis Google Maps.' },
-  es: { title: 'TrueReviews — resumen honesto de tus reseñas de Google', description: 'Analiza tus reseñas de Google Maps.' },
-  nl: { title: 'TrueReviews — eerlijke samenvatting van je Google-reviews', description: 'Analyseer je Google Maps-reviews.' },
-  fa: { title: 'TrueReviews — خلاصه صادقانه نظرات گوگل', description: 'نظرات گوگل‌مپس را تحلیل کنید.' },
-  az: { title: 'TrueReviews — Google rəylərinin dürüst xülasəsi', description: 'Google Maps rəylərinizi təhlil edin.' }
-};
-
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
-  const locale = (locales as readonly string[]).includes(params.locale) ? params.locale : defaultLocale;
-  const m = META[locale] || META.tr;
-  const base = getSiteUrl();
-  const canonical = `${base}/${locale}`;
-  const languages: Record<string, string> = {};
-  for (const l of locales) languages[l] = `${base}/${l}`;
-  languages['x-default'] = base;
-  const ogImage = `${base}/${locale}/opengraph-image`;
-  const keywords = KEYWORDS[locale] || KEYWORDS.en;
+  const { title, description, keywords } = getHomeMeta(params.locale);
+  const { canonical, languages } = getAlternates(params.locale);
+  const ogImage = getOgImageUrl(params.locale);
   return {
-    title: m.title,
-    description: m.description,
+    title,
+    description,
     keywords,
     authors: [{ name: 'TrueReviews' }],
     creator: 'TrueReviews',
@@ -64,25 +43,29 @@ export async function generateMetadata({ params }: { params: { locale: string } 
     openGraph: {
       type: 'website',
       siteName: 'TrueReviews',
-      locale: OG_LOCALE[locale] || OG_LOCALE.en,
+      locale: getOgLocale(params.locale),
+      alternateLocale: getOgLocaleAlternates(params.locale),
       url: canonical,
-      title: m.title,
-      description: m.description,
-      images: [{ url: ogImage, width: 1200, height: 630, alt: m.title }]
+      title,
+      description,
+      images: [{ url: ogImage, width: OG_IMAGE_SIZE.width, height: OG_IMAGE_SIZE.height, alt: title }]
     },
     twitter: {
       card: 'summary_large_image',
-      title: m.title,
-      description: m.description,
+      title,
+      description,
       images: [ogImage]
     },
-    robots: { index: true, follow: true },
+    // `robots` BİLEREK layout'ta değil: layout her sayfaya miras kalır, 404 sınırı
+    // da bu layout'un içinde render edilir ve `index, follow` ile `noindex` iki ayrı
+    // meta olarak basılırdı. Robots yönergesi gerçek içerik sayfalarının kendi
+    // `generateMetadata`'sinde (app/[locale]/page.tsx ve [page]/page.tsx) veriliyor.
     icons: {
       icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
       shortcut: '/icon.svg',
       apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }]
     },
-    manifest: `${base}/manifest.webmanifest`,
+    manifest: '/manifest.webmanifest',
     verification: {
       google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined
     }
@@ -93,32 +76,6 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   themeColor: '#17463c'
-};
-
-const KEYWORDS: Record<string, string[]> = {
-  tr: ['google yorum analizi', 'google maps yorum analizi', 'işletme yorum analizi', 'müşteri yorum özeti', 'yorum analizi'],
-  en: ['google review analysis', 'google maps review summary', 'business review insights', 'customer feedback summary'],
-  de: ['google bewertungsanalyse', 'google maps bewertungen zusammenfassung', 'kundenfeedback analyse'],
-  fr: ['analyse avis google', 'résumé avis google maps'],
-  es: ['análisis reseñas google', 'resumen reseñas google maps'],
-  nl: ['google review analyse', 'google maps reviews samenvatting'],
-  ar: ['تحليل تقييمات جوجل', 'ملخص تقييمات خرائط جوجل'],
-  ru: ['анализ отзывов google', 'сводка отзывов google maps'],
-  fa: ['تحلیل نظرات گوگل', 'خلاصه نظرات گوگل‌مپس'],
-  az: ['google rəy təhlili', 'google maps rəylər xülasəsi']
-};
-
-const OG_LOCALE: Record<string, string> = {
-  tr: 'tr_TR',
-  en: 'en_US',
-  de: 'de_DE',
-  ar: 'ar_AR',
-  ru: 'ru_RU',
-  fr: 'fr_FR',
-  es: 'es_ES',
-  nl: 'nl_NL',
-  fa: 'fa_IR',
-  az: 'az_AZ'
 };
 
 function BrandMark() {
@@ -145,7 +102,7 @@ export default async function LocaleLayout({
   const t = await getTranslations('nb');
   const locale = params.locale as Locale;
   const dir = rtlLocales.includes(locale) ? 'rtl' : 'ltr';
-  const m = META[locale] || META.tr;
+  const m = getHomeMeta(locale);
 
   return (
     <html

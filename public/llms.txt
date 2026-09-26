@@ -1,29 +1,62 @@
-# TrueReviews — AI / GEO rehberi
+# TrueReviews — AI / GEO guide
 
-> Google Maps yorumlarının dürüst özeti. İşletme linkini yapıştır;
-> son yorumlar okunup tek sayfalık özet çıkarılır: memnuniyet skoru (0-100),
-> en çok tekrar eden övgü ve şikayetler, ve bu hafta atılacak tek somut adım.
+> An honest, single-page summary of Google Maps reviews. The user pastes a
+> business link; the latest reviews are read and turned into one page: a
+> satisfaction score (0–100), the praise and complaints that keep recurring, and
+> one concrete action for the coming week.
+>
+> Türkçe: Google Maps yorumlarının dürüst, tek sayfalık özeti.
 
 - Site: https://get-truereviews.vercel.app
-- Önizleme ücretsiz, kayıt gerekmez. Tam rapor e-posta onayı ile açılır.
-- Diller: tr, en, de, ar, ru, fr, es, nl, fa, az (10 dil)
-- Yorumların içeriği değiştirilmez, silinmez, satın alınmaz.
+- Free preview, no sign-up. The full report unlocks after email confirmation.
+- No ads, no mass mail. Review content is never edited, deleted or bought.
+- 10 languages, each with its own URL, `hreflang` set and `canonical`.
 
-## Sayfalar
+## Languages and homepages
 
-- Türkçe ana sayfa: /tr
-- English: /en
-- Deutsch: /de
-- Diğer diller: /ar /ru /fr /es /nl /fa /az
+| Code | Language | Homepage |
+|---|---|---|
+| `tr` | Türkçe (default) | /tr |
+| `en` | English | /en |
+| `de` | Deutsch | /de |
+| `fr` | Français | /fr |
+| `es` | Español | /es |
+| `nl` | Nederlands | /nl |
+| `ru` | Русский | /ru |
+| `az` | Azərbaycanca | /az |
+| `ar` | العربية (RTL) | /ar |
+| `fa` | فارسی (RTL) | /fa |
 
-## Nasıl çalışır?
+The bare root `/` negotiates the visitor's language and redirects to the matching
+homepage; it is the `hreflang` `x-default`.
 
-1. Kullanıcı Google Maps işletme linkini forma yapıştırır.
-2. Son ~20 yorum indirilir ve tek tek okunur.
-3. Skor (0-100), ton dağılımı (övgü/nötr/şikayet) ve tekrar eden temalar çıkarılır.
-4. Tek somut haftalık öneri yazılır.
+## Legal and help pages
 
-## Alıntı politikası
+Available in all 10 languages at `/{locale}/{slug}`:
 
-- Alıntılar gerçek yorumlardan kısaltılmıştır.
-- Puan dağılımı ve tema sayımları raporda belirtilir.
+- `/sss` — Frequently asked questions
+- `/gizlilik` — Privacy policy
+- `/kvkk` — Privacy notice (KVKK / GDPR)
+- `/iletisim` — Contact
+
+## How it works
+
+1. The user pastes a Google Maps business link into the form.
+2. The latest ~20 reviews are fetched and read one by one.
+3. A score (0–100), the tone split (praise / neutral / complaint) and the
+   recurring themes are extracted.
+4. One concrete weekly recommendation is written, in the reader's language.
+
+## Report structure
+
+- Satisfaction score (0–100) and the rating histogram
+- Top praise themes, each with how many reviews mention it
+- Top complaint themes, with the same counts
+- One action item for the coming week
+- Short quotes from real reviews, trimmed at word boundaries
+
+## Quoting policy
+
+- Quotes are shortened excerpts of real reviews; content is never modified.
+- Rating distribution and theme counts are aggregate statistics.
+- A report is generated per business and cached for 24 hours.

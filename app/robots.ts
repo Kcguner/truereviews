@@ -11,10 +11,13 @@ export default function robots(): MetadataRoute.Robots {
         // API ve token'lı özel rapor sayfaları taranmamalı
         disallow: ['/api/', '/*/rapor']
       },
-      // Yapay zekâ / GEO botlarına açıkça izin
+      // Yapay zekâ / GEO botlarına açıkça izin. Dikkat: bir grup kendi user-agent'ıyla
+      // eşleştiğinde '*' grubunun kuralları UYGULANMAZ — bu yüzden disallow'ları
+      // burada da tekrarlamak zorundayız, aksi halde AI botları /api/'yi tarar.
       {
         userAgent: ['GPTBot', 'ClaudeBot', 'PerplexityBot', 'CCBot', 'Google-Extended', 'Bytespider'],
-        allow: '/'
+        allow: '/',
+        disallow: ['/api/', '/*/rapor']
       }
     ],
     sitemap: `${base}/sitemap.xml`

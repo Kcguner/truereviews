@@ -1,281 +1,317 @@
 # TrueReviews
 
-**Google Maps yorumlarının dürüst, tek sayfalık özeti — 10 dilde, kayıt ve ücret gerektirmez.**
+**An honest, single-page summary of Google Maps reviews — in 10 languages, no sign-up and no cost.**
 
-Kullanıcı Google Maps işletme linkini yapıştırır, sistem son yorumları okuyup bir
-memnuniyet skoru, tekrar eden övgü/şikayet konuları ve haftalık tek somut aksiyon
-önerisi üretir. Önizleme anında ve ücretsizdir; tam rapor e-posta onayı ile açılır.
-Hedef kitle, Google Maps'te gerçek bir vitrini olan küçük işletme sahipleri
-(restoran, kafe, otel, eczane, servis vb.) — dashboard veya kurulum gerektirmeyen,
-tek ekrana sığan dürüst bir özet.
+The user pastes a Google Maps business link, the system reads the latest reviews
+and produces a satisfaction score, the recurring praise/complaint themes, and one
+concrete weekly action item. The preview is instant and free; the full report
+unlocks after email confirmation. The target audience is small business owners
+who have a real storefront on Google Maps (restaurants, cafés, hotels, pharmacies,
+services, etc.) — an honest summary that fits on a single screen and requires no
+dashboard or setup.
 
 [![CI](https://github.com/Kcguner/truereviews/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Kcguner/truereviews/actions/workflows/ci.yml)
 [![Vitest](https://img.shields.io/badge/test-vitest%205.0.1-6E9F37?logo=vitest&logoColor=FFD34E)](https://vitest.dev)
 
-- Kaynak kod: [github.com/Kcguner/truereviews](https://github.com/Kcguner/truereviews)
-- Lisans: MIT
-- Maliyet: **0 TL** (aşağıdaki ücretsiz katmanların hepsiyle çalışır)
+- Source code: [github.com/Kcguner/truereviews](https://github.com/Kcguner/truereviews)
+- License: MIT
+- Cost: **$0** (runs entirely on the free tiers listed below)
 
-## İçindekiler
+## Table of Contents
 
 - [Demo](#-demo)
-- [Özellikler](#-özellikler)
-- [Mimari](#-mimari)
-- [Teknoloji](#-teknoloji)
-- [Çoklu dil](#-çoklu-dil)
-- [Güvenlik & KVKK](#-güvenlik--kvkk)
-- [Maliyet](#-maliyet)
-- [Kurulum](#-kurulum)
-- [Ortam değişkenleri](#-ortam-değişkenleri)
+- [Features](#-features)
+- [Architecture](#-architecture)
+- [Tech Stack](#-tech-stack)
+- [Multi-language](#-multi-language)
+- [Security & KVKK](#-security--kvkk)
+- [Cost](#-cost)
+- [Setup](#-setup)
+- [Environment Variables](#-environment-variables)
 - [Test & CI](#-test--ci)
 - [Deploy](#-deploy)
-- [Lisans](#-lisans)
-- [Notlar](#-notlar)
+- [License](#-license)
+- [Notes](#-notes)
 
 ## 🎬 Demo
 
 **https://get-truereviews.vercel.app**
 
-_Yayın adresi `.env.local` içindeki `APP_URL` değeriyle birebir aynıdır; canonical,
-Open Graph ve sitemap bu değişkenden üretilir._
+_The live address is exactly the `APP_URL` value in `.env.local`; canonical, Open
+Graph and sitemap are all generated from this variable._
 
-<!-- Görsel: rapor ekranının ekran görüntüsünü docs/screenshot.png olarak kaydet,
-     sonra aşağıdaki satırın yorumunu kaldır. -->
-<!-- ![TrueReviews rapor ekranı](docs/screenshot.png) -->
+<!-- Image: save a screenshot of the report screen as docs/screenshot.png,
+     then uncomment the line below. -->
+<!-- ![TrueReviews report screen](docs/screenshot.png) -->
 
-## ✨ Özellikler
+## ✨ Features
 
-- **Tek alan, tek tık:** Google Maps işletme linki (uzun `google.com/maps/place/…`,
-  `goo.gl`, `maps.app.goo.gl` ve `g.page` kısaltmaları) yapıştırılır; sunucu
-  linkin gerçekten bir işletme sayfası olduğunu doğrular. Yapıştırma butonu ve
-  "örnek işletmeyle dene" kısayolu dahil.
-- **Sunucuda kilitli önizleme (emailwall):** `/api/analyze` yanıtı yalnızca
-  `reportId` + önizleme alanlarını içerir. Tam rapor (temalar + aksiyon önerisi)
-  tarayıcıya **hiçbir koşulda gönderilmez**; CSS blur veya modal ile gizleme
-  kullanılmaz — veri sunucuda kalır.
-- **Gerçek yorum analizi:** Apify üzerindeki `compass/google-maps-reviews-scraper`
-  actor'ü çalıştırılır, en fazla `MAX_REVIEWS` yorum alınır.
-- **Dilinde üretilen rapor:** Gemma, okuduğu yorumların dilinden bağımsız olarak
-  analizi **hedef dilde** yazar. Ayrı bir çeviri katmanı yoktur.
-- **Sert JSON disiplini:** Prompt yalnızca JSON ister; modelin markdown fence veya
-  ön/son açıklama sarması `extractJson` ile soyulur, alan şekli `isValidReport`
-  ile doğrulanır. Geçersiz çıktı sessizce yutulmaz — heuristic rapora düşülür ve
-  `mocked: true` işaretlenir.
-- **Dayanıklı AI çağrısı:** `4xx` bir config hatasıdır ve yüksek sesle fırlatılır;
-  kalıcı `5xx` / ağ hatası bir kez kısa bekleyip yeniden denenir, hâlâ başarısızsa
-  kullanıcı yine de rapor alır.
-- **24 saatlik önbellek:** Aynı işletme + aynı dil için tekrar analizde Apify ve
-  Gemma'ya gidilmez. Mock sonuçlar önbelleğe *yazılmaz* — bir sonraki denemede
-  gerçek analiz tekrar denenebilir.
-- **İki kademeli quota:** IP başına saatlik + global günlük analiz sayacı, Redis
-  üzerinde TTL'li sayaçlarla tutulur; kota aşımında `429` döner.
-- **Çift onaylı (double opt-in) e-posta:** Tam rapor, e-postadaki onay linki
-  tıklanmadan açılmaz. Onay token'ı 48 saat geçerli.
-- **Token'ın kendisi rapor değildir:** `/[locale]/rapor?token=…` sayfası
-  `GET /api/verify` çağırır; tam rapor yalnızca orada, sunucuda doğrulanmış
-  olarak döner ve **yeni bir Apify/Gemma çağrısı yapılmaz**.
-- **Geçici e-posta engeli:** `disposable-email-domains` listesi ile
-  mailinator / 10minutemail gibi sağlayıcılar reddedilir; KVKK onayı e-posta
-  kilidinin önünde zorunlu bir adımdır.
-- **Bot koruması:** Cloudflare Turnstile; anahtar yoksa form çalışmaya devam eder,
-  üretimde ise bu sessiz düşüş `[PROD-GUARD]` loguyla yüksek sesle bildirilir.
-- **Tek sayfalık rapor görünümü:** Animasyonlu yarım daire skor göstergesi (0–100),
-  övgü/nötr/şikayet dağılım çubuğu, konu listesi (kaç yorumda geçtiği ve gerçek
-  yorum alıntısıyla) ve tek cümlelik aksiyon bloğu. Tarayıcının PDF dönüştürmesi
-  ile tek tuşla yazdırma.
-- **10 dil, tam i18n:** Arayüz, yasal sayfalar, SSS, meta etiketleri ve OG görseli
-  seçilen dile göre üretilir. Arapça ve Farsça için tam RTL.
-- **Yasal altyapı:** 10 dilde `sss`, `gizlilik`, `kvkk`, `iletisim` sayfaları;
-  zorunlu KVKK onay metni her dilde ayrı yazılmış.
-- **SEO / GEO:** Dile özel `canonical` + `hreflang` (x-default dahil), 10 dil için
-  ana sayfa ve 40 yasal sayfalık `sitemap.xml`, `/api/` ve `/*/rapor` dışlayan
-  `robots.txt`, `Organization` / `WebSite` / `SoftwareApplication` / `FAQPage`
-  JSON-LD, dinamik OG görseli ve `public/llms.txt`.
-- **Anahtar gerektirmeyen demo modu:** Tek bir API anahtarı olmadan gerçekçi mock
-  yorumlar + heuristic (ortalama tabanlı) analizle uçtan uca çalışır.
+- **One field, one click:** A Google Maps business link (long `google.com/maps/place/…`,
+  `goo.gl`, `maps.app.goo.gl` and `g.page` short links) is pasted in; the server
+  verifies that the link really is a business page. Includes a paste button and
+  a "try a sample business" shortcut.
+- **Server-locked preview (email wall):** The `/api/analyze` response contains
+  only a `reportId` plus preview fields. The full report (themes + action item)
+  is **never** sent to the browser under any condition; hiding it with CSS blur
+  or a modal is not used — the data stays on the server.
+- **Real review analysis:** The `compass/google-maps-reviews-scraper` actor on
+  Apify is run, and at most `MAX_REVIEWS` reviews are fetched.
+- **Report generated in the target language:** Gemma writes the analysis **in the
+  target language**, independently of the language the reviews were written in.
+  There is no separate translation layer.
+- **Strict JSON discipline:** The prompt asks for JSON only; any markdown fence or
+  leading/trailing explanation the model adds is stripped with `extractJson`, and
+  the field shape is validated with `isValidReport`. Invalid output is not
+  silently swallowed — it falls back to a heuristic report and is flagged
+  `mocked: true`.
+- **Resilient AI calls:** A `4xx` is treated as a configuration error and thrown
+  loudly; a persistent `5xx` / network error is retried once after a short wait,
+  and if it still fails the user gets a report anyway.
+- **24-hour cache:** For the same business + same language, a repeat analysis does
+  not hit Apify or Gemma. Mock results are *not* written to the cache — so a real
+  analysis can be retried on the next attempt.
+- **Two-tier quota:** An hourly per-IP counter plus a global daily analysis
+  counter, kept in Redis with TTLs; returns `429` when the quota is exceeded.
+- **Double opt-in email:** The full report does not open until the confirmation
+  link in the email is clicked. The confirmation token is valid for 48 hours.
+- **The token is not the report:** The `/[locale]/rapor?token=…` page calls
+  `GET /api/verify`; the full report is returned only there, server-side verified,
+  and **no new Apify/Gemma call is made**.
+- **Disposable email block:** Providers such as mailinator / 10minutemail are
+  rejected via the `disposable-email-domains` list; GDPR consent is a mandatory
+  step before the email lock.
+- **Bot protection:** Cloudflare Turnstile; without a key the form keeps working,
+  and in production this silent degradation is reported loudly via a
+  `[PROD-GUARD]` log.
+- **Single-page report view:** Animated semicircle score gauge (0–100),
+  praise/neutral/complaint distribution bar, theme list (with how many reviews
+  mention it and a real review quote) and a one-sentence action block. One-click
+  printing via the browser's PDF conversion.
+- **10 languages, full i18n:** The interface, legal pages, FAQ, meta tags and OG
+  image are generated in the selected language. Full RTL for Arabic and Persian.
+- **Legal infrastructure:** `faq`, `privacy`, `gdpr` and `contact` pages in 10
+  languages; the mandatory GDPR consent text is written separately for each
+  language.
+- **SEO / GEO, 10 languages:** All metadata is generated from a single source
+  ([`lib/seo.ts`](lib/seo.ts)) so the 10 locales cannot drift apart. Per-language
+  `canonical` + `hreflang` (including x-default) on the homepage **and** on all 40
+  legal pages, `og:locale` + `og:locale:alternate`, Twitter cards, a
+  `sitemap.xml` where every URL carries its own `alternates.languages` map, a
+  `robots.txt` that excludes `/api/` and `/*/rapor` (also for AI crawlers), a
+  per-locale dynamic OG image, and a multilingual `public/llms.txt`.
+  JSON-LD: `Organization` / `WebSite` / `WebPage` / `SoftwareApplication` /
+  `FAQPage` on the homepage, `WebPage` + `BreadcrumbList` + `FAQPage` on the
+  legal pages. Titles lead with the primary keyword and keep the brand at the end;
+  the description of every locale contains its own primary keyword (enforced by
+  `tests/seo.test.ts`).
+- **Demo mode with no keys:** Works end to end without a single API key, using
+  realistic mock reviews + heuristic (average-based) analysis.
 
-## 🏗️ Mimari
+## 🏗️ Architecture
 
 ```
-Kullanıcı
+User
   │
   ├─ GET /[locale]                     next-intl middleware · localePrefix: 'always'
-  │                                    (NEXT_LOCALE çerezi → Accept-Language → 'tr')
+  │                                    (NEXT_LOCALE cookie → Accept-Language → 'tr')
   │
   ├─ POST /api/analyze  { placeUrl, locale, turnstileToken }
   │    │
-  │    ├─ 1) URL doğrulama ............ google.* · goo.gl · maps.app.goo.gl · g.page
-  │    ├─ 2) Turnstile ................ secret varsa doğrular, yoksa pasif mod
-  │    ├─ 3) Kota .................... Redis: IP/saat (TTL 1h) + global/gün (TTL 24h)
-  │    ├─ 4) Önbellek ................. aynı işletme + dil, 24 saat → HIT ise 5-6 atlanır
-  │    ├─ 5) Apify ................... compass/google-maps-reviews-scraper → ≤ MAX_REVIEWS yorum
-  │    ├─ 6) Gemma (Google AI Studio)  dilinde JSON: score, summary,
+  │    ├─ 1) URL validation .......... google.* · goo.gl · maps.app.goo.gl · g.page
+  │    ├─ 2) Turnstile ................ verifies if secret is set, else passive mode
+  │    ├─ 3) Quota ................... Redis: IP/hour (TTL 1h) + global/day (TTL 24h)
+  │    ├─ 4) Cache ................... same business + locale, 24h → on HIT skip 5-6
+  │    ├─ 5) Apify ................... compass/google-maps-reviews-scraper → ≤ MAX_REVIEWS reviews
+  │    ├─ 6) Gemma (Google AI Studio)  JSON in the target language: score, summary,
   │    │                               top_complaints, top_praises, action_suggestion
-  │    │                               4xx → hata · 5xx/ağ → heuristic rapor
+  │    │                               4xx → error · 5xx/network → heuristic report
   │    └─ 7) Redis ................... ya:report:{uuid} + ya:place:{key}::{locale} (24h)
   │
-  └─ ◀── { reportId, preview }         TAM RAPOR YANITTA DÖNMEZ
+  └─ ◀── { reportId, preview }         THE FULL REPORT IS NOT RETURNED
 
-  ── emailwall: raporun kilidini aç ──────────────────────────────────────────
+  ── email wall: unlock the report ──────────────────────────────────────────
 
   ├─ POST /api/lead  { reportId, email }
-  │    ├─ format doğrulama + disposable-email-domain kontrolü
+  │    ├─ format validation + disposable-email-domain check
   │    ├─ Turnstile
-  │    ├─ 64-hex doğrulama token'ı (TTL 48 saat) + lead → verified: '0'
-  │    └─ Brevo /v3/smtp/email ....... onay linki: /[locale]/rapor?token=…
+  │    ├─ 64-hex verification token (TTL 48h) + lead → verified: '0'
+  │    └─ Brevo /v3/smtp/email ....... confirmation link: /[locale]/rapor?token=…
   │
-  ├─ kullanıcı onay linkine tıklar → GET /[locale]/rapor?token=…
+  ├─ user clicks the confirmation link → GET /[locale]/rapor?token=…
   │
   └─ GET /api/verify?token=…
-       ├─ token geçerliyse lead → verified: '1', rapor kilidi açılır
+       ├─ if the token is valid lead → verified: '1', the report is unlocked
        └─ ◀── { report, businessName, reviewCount, createdAt }
-              (Apify/Gemma'ya YENİ istek gitmez)
+              (no NEW request is sent to Apify/Gemma)
 ```
 
-### "2. hak" neden ikinci bir maliyet üretmiyor
+### Why the "second chance" does not create a second cost
 
-Kullanıcıya anlatılan "1. hak ücretsiz önizleme, 2. hak e-posta onayıyla tam rapor"
-modeli bir **kullanıcı deneyimi** kurgusudur, backend'de iki ayrı analiz değildir.
-`/api/analyze` raporu üretirken tam halini Redis'e yazar ve eline yalnızca
-`reportId` verir; `/api/lead` ve `/api/verify` ise **zaten var olan** bu kaydı
-açar. Bu yüzden:
+The "1st chance is a free preview, 2nd chance is the full report after email
+confirmation" model told to the user is a **user experience** construct; on the
+backend it is not two separate analyses. `/api/analyze` writes the full report to
+Redis while producing it and hands over only the `reportId`; `/api/lead` and
+`/api/verify` then unlock that **already existing** record. Therefore:
 
-- kullanıcı başına 1 Apify + 1 Gemma çağrısı olur, iki değil;
-- ikinci "hak"ın maliyeti sıfırdır — çünkü hiçbir dış servise gitmez;
-- 24 saatlik önbellek sayesinde aynı işletmeyi ikinci bir kullanıcı da analiz
-  ettirmek istediğinde dış servise tekrar gidilmez.
+- there is 1 Apify + 1 Gemma call per user, not two;
+- the second "chance" costs nothing — because it never calls an external service;
+- thanks to the 24-hour cache, when a second user wants to analyze the same
+  business, the external services are not hit again either.
 
-Bu ayrım, ücretsiz katmanlarla (Apify aylık kredi, AI Studio günlük kota)
-sürdürülebilir olmanın temelidir. Uygulama katmanı ise bunu ayrıca zorlar:
-`/api/analyze` sadece önizleme döner, `/api/verify` dışında hiçbir route tam raporu
-vermez, `robots.txt` de `/rapor` sayfalarını dizin dışı bırakır.
+This separation is the foundation of staying sustainable on free tiers (Apify's
+monthly credit, AI Studio's daily quota). The application layer enforces it as
+well: `/api/analyze` only returns the preview, no route other than
+`/api/verify` ever returns the full report, and `robots.txt` keeps `/rapor` pages
+out of the index.
 
-## 🛠️ Teknoloji
+## 🛠️ Tech Stack
 
-| Katman | Araç | Neden |
+| Layer | Tool | Why |
 |---|---|---|
-| Framework | **Next.js 14.2.35** (App Router) | Aynı projede SSR, route handler'lar ve statik üretim; ayrı backend yok |
-| React | **React 18.3.1** | App Router ve Server/Client Component ayrımı |
-| i18n | **next-intl 3.26.5** | Path-based locale routing (`/tr/…`), `NEXT_LOCALE` çerezi, sunucu tarafı mesaj yükleme |
-| Stil | **Tailwind CSS 3.4** | Utility katmanı + `globals.css` içinde token tabanlı özel tasarım sistemi (light/dark) |
-| Önbellek / Kota | **Upstash Redis** (`@upstash/redis`) | Serverless'ta kalıcı durum: rapor önbelleği, TTL'li kota sayaçları, doğrulama token'ları, lead'ler |
-| Yorum çekme | **Apify** (`compass/google-maps-reviews-scraper`) | Google Maps sayfa yapısı değişse bile üçüncü taraf bakımı; kredi kartı gerektirmeyen aylık kredi |
-| AI analiz | **Google AI Studio / Gemini API** (`gemma-4-31b-it`) | Ücretsiz kota, `responseMimeType: application/json` ile yapılandırılmış çıktı |
-| E-posta | **Brevo** (`/v3/smtp/email`) | Doğrulanmış göndericiyle double opt-in; günde 300 ücretsiz e-posta |
-| Bot koruması | **Cloudflare Turnstile** | reCAPTCHA'sız, gizlilik dostu; anahtar yoksa otomatik pasif mod |
-| Barındırma | **Vercel** (`vercel.json`, bölge `fra1`) | Next.js ile sıfır ayarla deploy, otomatik HTTPS, `fra1` ile Avrupa'ya sabit bölge |
-| Test | **Vitest 5.0.1** + Vite 8 | Hızlı, bağımlılıksız; `fetch` stub'ı ile AI/e-posta dal testleri |
-| Tip | **TypeScript 5.9** (`strict`) | Route handler ve rapor şeması için tip güvenliği |
+| Framework | **Next.js 14.2.35** (App Router) | SSR, route handlers and static output in one project; no separate backend |
+| React | **React 18.3.1** | App Router and the Server/Client Component split |
+| i18n | **next-intl 3.26.5** | Path-based locale routing (`/en/…`), `NEXT_LOCALE` cookie, server-side message loading |
+| Styling | **Tailwind CSS 3.4** | Utility layer + a token-based custom design system in `globals.css` (light/dark) |
+| Cache / Quota | **Upstash Redis** (`@upstash/redis`) | Persistent state on serverless: report cache, TTL quota counters, verification tokens, leads |
+| Review scraping | **Apify** (`compass/google-maps-reviews-scraper`) | Third-party maintenance even if the Google Maps page structure changes; monthly credit that requires no credit card |
+| AI analysis | **Google AI Studio / Gemini API** (`gemma-4-31b-it`) | Free quota, structured output via `responseMimeType: application/json` |
+| Email | **Brevo** (`/v3/smtp/email`) | Double opt-in with a verified sender; 300 free emails per day |
+| Bot protection | **Cloudflare Turnstile** | No reCAPTCHA, privacy friendly; automatically passive when no key is set |
+| Hosting | **Vercel** (`vercel.json`, region `fra1`) | Zero-config deploy with Next.js, automatic HTTPS, a fixed European region via `fra1` |
+| Testing | **Vitest 5.0.1** + Vite 8 | Fast, dependency-light; AI/email branch tests with a `fetch` stub |
+| Types | **TypeScript 5.9** (`strict`) | Type safety for route handlers and the report schema |
 
-## 🌍 Çoklu dil
+## 🌍 Multi-language
 
-Desteklenen 10 locale ([`i18n.config.ts`](i18n.config.ts)):
+The 10 supported locales ([`i18n.config.ts`](i18n.config.ts)):
 
-| Kod | Dil | Kod | Dil |
+| Code | Language | Code | Language |
 |---|---|---|---|
-| `tr` | Türkçe *(varsayılan)* | `fr` | Français |
+| `tr` | Türkçe *(default)* | `fr` | Français |
 | `en` | English | `es` | Español |
 | `de` | Deutsch | `nl` | Nederlands |
 | `ar` | العربية *(RTL)* | `fa` | فارسی *(RTL)* |
 | `ru` | Русский | `az` | Azərbaycanca |
 
-- **Path-based routing:** Her dil `/tr/`, `/en/`, `/ar/` … altında yaşar
-  (`localePrefix: 'always'`). `middleware.ts` istekleri `NEXT_LOCALE` çerezi →
-  `Accept-Language` → `tr` sırasıyla çözer; `app/[locale]/layout.tsx` listesinde
-  olmayan bir locale için `notFound()` döner.
-- **Arayüz metinleri:** `messages/{locale}.json` başına tek dosya, sunucu
-  bileşenlerinde `useTranslations`, istemci bileşenlerinde `NextIntlClientProvider`.
-- **Rapor içeriği:** Ayrı bir çeviri katmanı **yoktur**. `lib/gemma.ts` prompt'un
-  sonuna "yanıtı X dilinde üret" talimatını ekler; model yorumları hangi dilde
-  olursa olsun okuyup analiz sonucunu doğrudan hedef dilde üretir. Bu hem daha
-  hızlı, hem token olarak daha ucuzdur.
-- **Locale başına ayrı SEO:** `title`, `description`, `keywords`, `canonical`,
-  `hreflang` ve `og:locale` sözlükleri 10 dil için ayrı ayrı tanımlıdır.
-- **Kapsam farkı:** Yasal metinler `tr` / `en` / `de` için tam metindir; diğer
-  dillerde İngilizce içerik + kullanıcıya gösterilen bir çeviri notu devreye girer.
-  SSS, KVKK onay metni ve yasal sayfa meta verileri ise 10 dilin tamamında
-  tanımlıdır ve testlerle doğrulanır.
+- **Path-based routing:** Every language lives under `/tr/`, `/en/`, `/ar/` …
+  (`localePrefix: 'always'`). `middleware.ts` resolves requests in the order
+  `NEXT_LOCALE` cookie → `Accept-Language` → `tr`; `app/[locale]/layout.tsx`
+  returns `notFound()` for a locale that is not in the list.
+- **Interface text:** A single file per locale, `messages/{locale}.json`, with
+  `useTranslations` in server components and `NextIntlClientProvider` in client
+  components.
+- **Report content:** There is **no** separate translation layer. `lib/gemma.ts`
+  appends a "produce the response in language X" instruction to the prompt; the
+  model reads the reviews in whatever language they are written in and produces
+  the analysis directly in the target language. This is both faster and cheaper
+  in tokens.
+- **Per-locale SEO:** [`lib/seo.ts`](lib/seo.ts) is the single source for the
+  `title`, `description`, `keywords`, `og:locale`, currency and hreflang maps.
+  Every indexable page (homepage + legal) calls `getAlternates(locale, slug?)`,
+  which returns the canonical URL plus a map of all 10 locales of *that same
+  page* and `x-default` → the site root. `getOgLocaleAlternates()` produces the
+  nine `og:locale:alternate` values. Titles lead with the primary keyword
+  ("Google Yorum Analizi", "Analyse avis Google", …) and keep the brand at the
+  end; every description contains its own primary keyword. `tests/seo.test.ts`
+  locks all of this down per locale.
+- **`x-default` points at the site root:** the bare `/` negotiates the visitor's
+  language (`NEXT_LOCALE` → `Accept-Language` → `tr`) and redirects, so an
+  unmatched visitor still lands in a language they can read.
+- **Scope difference:** The legal texts are full text for `tr` / `en` / `de`; in
+  the other languages English content plus a translation note shown to the user
+  kicks in. The FAQ, the GDPR consent text and the legal page metadata, on the
+  other hand, are defined in all 10 languages and verified by tests.
 
-## 🔒 Güvenlik & KVKK
+## 🔒 Security & KVKK
 
-**Kötüye kullanım koruması**
+*KVKK is the Turkish data protection law (GDPR equivalent); it is the strictest
+regime the app is designed for.*
 
-- **Turnstile:** `/api/analyze` ve `/api/lead` uçları sunucu tarafında
-  `siteverify` çağrısı yapar. `TURNSTILE_SECRET_KEY` tanımlı değilse doğrulama
-  **pasif moda düşer** ve form çalışmaya devam eder; üretimde bu sessiz düşüş
-  `lib/env-guard.ts` üzerinden `[PROD-GUARD]` olarak loglanır, gizlenmez.
-- **Kota ve rate limit:** Redis'te iki sayaç tutulur — `RATE_LIMIT_PER_HOUR`
-  (varsayılan 2, IP başına) ve `DAILY_NEW_ANALYSIS_LIMIT` (varsayılan 12, global).
-  Sayaçlar ilk yazımda TTL alır (1 saat / 24 saat), böylece sayaç kendini temizler.
-  Kota aşımında `429` ve kullanıcı dostu Türkçe mesaj döner.
-- **Geçici e-posta engeli:** `disposable-email-domains` paketinin statik listesi
-  üzerinden domain eşleşmesi yapılır; liste `tests/validation.test.ts` içinde
-  gerçek örneklerle test edilir.
-- **Güvenlik başlıkları** ([`next.config.mjs`](next.config.mjs), tüm yollarda):
+**Abuse protection**
+
+- **Turnstile:** The `/api/analyze` and `/api/lead` endpoints perform a
+  server-side `siteverify` call. If `TURNSTILE_SECRET_KEY` is not defined,
+  verification **falls back to passive mode** and the form keeps working; in
+  production this silent degradation is logged as `[PROD-GUARD]` via
+  `lib/env-guard.ts` — it is not hidden.
+- **Quota and rate limit:** Two counters are kept in Redis —
+  `RATE_LIMIT_PER_HOUR` (default 2, per IP) and `DAILY_NEW_ANALYSIS_LIMIT`
+  (default 12, global). The counters get a TTL on first write (1 hour / 24 hours),
+  so they clean themselves up. When the quota is exceeded, `429` and a
+  user-friendly message are returned.
+- **Disposable email block:** Domain matching is done against the static list of
+  the `disposable-email-domains` package; the list is tested with real examples
+  in `tests/validation.test.ts`.
+- **Security headers** ([`next.config.mjs`](next.config.mjs), on all paths):
   `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`,
   `X-Frame-Options: SAMEORIGIN`,
   `Permissions-Policy: camera=(), microphone=(), geolocation=()`,
   `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`.
-  `poweredByHeader` kapatılmıştır.
-- **Sıkı çift onay:** Tam rapor için e-posta tek başına yeterli değildir; onay
-  linki tıklanmalıdır. Token 64 hexadecimal karakterden oluşur, tek bir rapora
-  bağlıdır ve 48 saat sonunda geçersizleşir.
+  `poweredByHeader` is disabled.
+- **Strict double opt-in:** For the full report, an email address alone is not
+  enough; the confirmation link must be clicked. The token consists of 64
+  hexadecimal characters, is bound to a single report and expires after 48 hours.
 
-**KVKK ve veri**
+**KVKK and data**
 
-- **Yorum içeriği değiştirilmez, silinmez, satın alınmaz.** Alıntılar gerçek
-  yorumlardan `clipQuote` ile kelime ortasından bölünmeden kısaltılır; puan
-  dağılımı ve tema sayımları toplu istatistiktir.
-- **Reklam yok, seri mail yok.** E-posta yalnızca double opt-in onayı ve isteğe
-  bağlı tek seferlik güncellemedir; KVKK metni ve ana sayfa SSS'ı bunu açıkça
-  belirtir.
-- **Çerez:** Takip çerezi kullanılmaz; tema tercihi yalnızca `localStorage`'da
-  saklanır. Analitik isteğe bağlıdır ve veri ayarı yoksa hiç render edilmez.
-- **KVKK onayı zorunlu:** E-posta formundaki onay kutusu işaretlenmeden kilit
-  açılmaz; onay metni her dilde ayrı yazılmıştır.
-- **Yasal sayfalar:** 10 dilde `/{locale}/gizlilik`, `/{locale}/kvkk`,
-  `/{locale}/sss` ve `/{locale}/iletisim`. Toplanan veriler, kullanım amacı,
-  saklama ve silme, üçüncü taraflar ve m. 11 kapsamındaki haklar açıkça yazılıdır.
+- **Review content is not modified, deleted or purchased.** Quotes are shortened
+  from real reviews with `clipQuote` without being cut mid-word; the rating
+  distribution and theme counts are aggregate statistics.
+- **No ads, no mass mail.** Email is only the double opt-in confirmation and an
+  optional one-off update; the KVKK text and the homepage FAQ state this
+  explicitly.
+- **Cookies:** No tracking cookie is used; the theme preference is stored only in
+  `localStorage`. Analytics is optional and is not rendered at all when no data
+  setting exists.
+- **KVKK consent is mandatory:** The report is not unlocked until the checkbox
+  in the email form is ticked; the consent text is written separately for every
+  language.
+- **Legal pages:** `/{locale}/gizlilik`, `/{locale}/kvkk`, `/{locale}/sss` and
+  `/{locale}/iletisim` in 10 languages. The data collected, the purpose of use,
+  retention and deletion, third parties and the rights under art. 11 are written
+  out explicitly.
 
-**Geliştirici kolaylığı (dev/test)**
+**Developer convenience (dev/test)**
 
-`ADMIN_EMAILS` (virgülle ayrılmış adres listesi) ve `ADMIN_BYPASS_TOKEN`
-(server-only, istek başlığı veya gövde ile gönderilen gizli test anahtarı) test
-akışlarını hızlandırmak için vardır: listelenen adresler onay e-postası beklemeden
-tam raporu görür, doğru anahtarı bilen istekler kota muafiyeti kazanır. Boş
-bırakıldığında **kapalıdır** ve normal kullanıcı akışı hiç değişmez. Bu değerler
-tarayıcıya gömülmez veya kodla paketlenmez; yalnızca tanımlı oldukları ortamda
-etkindir. Kullanıcıya dönük bir özellik değil, geliştirme/test içindir.
+`ADMIN_EMAILS` (a comma-separated list of addresses) and `ADMIN_BYPASS_TOKEN`
+(server-only, a hidden test key sent as a request header or in the body) exist to
+speed up test flows: the listed addresses see the full report without waiting for
+the confirmation email, and requests with the correct key get a quota exemption.
+When left empty they are **disabled** and the normal user flow is completely
+unchanged. These values are not embedded in the browser or bundled with the
+code; they are only effective in the environments where they are defined. This is
+not a user-facing feature, it is for development/testing.
 
-## 💰 Maliyet
+## 💰 Cost
 
-**Uygulamanın tamamı ücretsiz katmanlar üzerinde çalışır: toplam maliyet 0 TL.**
+**The entire application runs on free tiers: total cost $0.**
 
-| Servis | Ücretsiz katman | Bu projedeki karşılığı |
+| Service | Free tier | What it is used for here |
 |---|---|---|
-| Vercel | Hobby plan | Barındırma + route handler'lar |
-| Upstash Redis | Free database | Rapor önbelleği, kota, token, lead'ler |
-| Apify | Aylık **$5** kredi, kredi kartı gerekmez | ~20 yorum/analiz ile yüzlerce analiz/ay |
-| Google AI Studio | Günlük ücretsiz istek kotası | `MAX_REVIEWS` yorumdan tek Gemma çağrısı |
-| Brevo | Günde 300 e-posta | Yalnızca double opt-in onayı |
-| Cloudflare Turnstile | Ücretsiz | Bot koruması |
-| next-intl, Tailwind, Vitest, TypeScript | Açık kaynak paketler | Sunucu/Servis maliyeti yok |
+| Vercel | Hobby plan | Hosting + route handlers |
+| Upstash Redis | Free database | Report cache, quota, tokens, leads |
+| Apify | **$5** monthly credit, no credit card required | ~20 reviews per analysis → hundreds of analyses per month |
+| Google AI Studio | Daily free request quota | A single Gemma call from `MAX_REVIEWS` reviews |
+| Brevo | 300 emails per day | Only the double opt-in confirmation |
+| Cloudflare Turnstile | Free | Bot protection |
+| next-intl, Tailwind, Vitest, TypeScript | Open source packages | No server/service cost |
 
-Dürüst olmak gerekirse bu, "her zaman bedava kalacak" bir garanti değildir:
-sağlayıcıların ücretsiz koşulları değişebilir ve bir domain adı alınırsa yıllık
-gerçek bir maliyet oluşur. Taahhüt, mimarinin bu değişikliklerden bağımsız olarak
-ölçeklenebilir olmasıdır.
+To be honest, this is not a guarantee that it will "always stay free": the
+providers' free terms may change, and buying a domain name creates a real annual
+cost. The commitment is that the architecture scales independently of these
+changes.
 
-**Üretimde Redis zorunludur.** Upstash bağlı değilken kota, önbellek ve token'lar
-in-memory `Map`'lere düşer. Bu geliştirme için yeterlidir; Vercel ise çok
-instance'lı, kısa ömürlü bir ortamdır — her instance ve her deploy kendi
-sayaçlarını unutur, raporlar ve onay token'ları uçar, limitler delinir.
-`lib/redis.ts` bu durumu üretimde `[PROD-GUARD]` loguyla da bildirir.
+**Redis is mandatory in production.** Without an Upstash connection, the quota,
+cache and tokens fall back to in-memory `Map`s. That is enough for development;
+Vercel, however, is a multi-instance, short-lived environment — every instance and
+every deploy forgets its own counters, reports and confirmation tokens fly away,
+and the limits are breached. `lib/redis.ts` also reports this state in production
+via a `[PROD-GUARD]` log.
 
-## 🚀 Kurulum
+## 🚀 Setup
 
-**Tek bir API anahtarı olmadan uçtan uca çalışır:** gerçekçi mock yorumlar +
-heuristic (ortalama tabanlı) analiz. Kurulum iki komuttan ibaret.
+**Works end to end without a single API key:** realistic mock reviews +
+heuristic (average-based) analysis. Setup is two commands.
 
 <details open>
 <summary><b>Windows (PowerShell)</b></summary>
@@ -299,118 +335,138 @@ npm run dev
 
 </details>
 
-Ardından tarayıcıdan **`http://localhost:3000/tr`** adresini açın:
+Then open **`http://localhost:3000/en`** in your browser:
 
-1. Form alanına herhangi bir Google Maps işletme linki yapıştırın
-   (veya "Örnek bir işletmeyle dene" kısayolunu kullanın).
-2. Yorum yükleme sahneleri oynar; hızlı yanıtta bile en az 3,6 sn bekletilir
-   (yapay bir gecikme değil, hızlı kurulumda boş ekran görünümüne karşı bir
-   güvenlik payı) ve **önizleme** raporu ekrana gelir.
-3. E-posta girip KVKK onayını işaretleyin. Brevo anahtarı olmadığı için e-posta
-   gönderilmez; onay linki ekrandaki "geliştirici önizlemesi" kutusunda ve
-   terminalde `[MOCK-EMAIL]` satırı olarak görünür.
-4. O linke tıklayın — `/{locale}/rapor?token=…` açılır ve tam rapor görünür.
+1. Paste any Google Maps business link into the form field (or use the "Try a
+   sample business" shortcut).
+2. The review loading stages play out; even on a fast response at least 3.6 s is
+   waited out (not an artificial delay, but a safety margin against an empty
+   screen appearance on a fast setup) and the **preview** report appears.
+3. Enter an email address and tick the GDPR consent. Because there is no Brevo
+   key, no email is sent; the confirmation link appears in the "developer
+   preview" box on the screen and as a `[MOCK-EMAIL]` line in the terminal.
+4. Click that link — `/{locale}/rapor?token=…` opens and the full report is shown.
 
-Gerçek servislerle çalıştırmak için tek yapmanız gereken `.env.local` içindeki
-anahtarları doldurmak — şablon olarak [`.env.example`](.env.example) gelir.
-Tam liste ve her anahtarın eksiklikteki davranışı aşağıdaki tablodadır.
+To run with the real services all you have to do is fill in the keys in
+`.env.local` — [`.env.example`](.env.example) comes as a template. The full list
+and the behavior of each key when it is missing are in the table below.
 
-## 🔑 Ortam değişkenleri
+## 🔑 Environment Variables
 
-| Değişken | Zorunlu | Açıklama | Eksikse ne olur |
+| Variable | Required | Description | If missing |
 |---|---|---|---|
-| `UPSTASH_REDIS_REST_URL` | Üretimde evet | Upstash Redis REST endpoint | In-memory moda düşer: çok instance'lı ortamda sayaç kaybolur, rapor ve token'lar uçar |
-| `UPSTASH_REDIS_REST_TOKEN` | Üretimde evet | Upstash Redis REST token | Aynı şekilde in-memory fallback |
-| `APIFY_API_TOKEN` | Hayır | Apify API token | Gerçekçi **mock yorumlar** döner; Apify kredisi harcanmaz |
-| `APIFY_ACTOR_ID` | Hayır | Kullanılacak actor | `compass/google-maps-reviews-scraper` varsayılanı kullanılır |
-| `GOOGLE_AI_API_KEY` | Hayır | Google AI Studio anahtarı | **Heuristic analiz**: puan ortalamasına dayalı özet, konu sayıları ve tek cümlelik öneri |
-| `GEMMA_MODEL` | Hayır | AI Studio'daki gerçek model id'si | `gemma-4-31b-it` kullanılır. Yanlış id → API 404 → rapor üretilemez |
-| `BREVO_API_KEY` | Hayır | Brevo API anahtarı | **Mock e-posta modu**: onay linki loglanır ve API yanıtında `devPreviewUrl` olarak döner; double opt-in akışı yine zorunlu kalır |
-| `BREVO_FROM` | `BREVO_API_KEY` varsa evet | Doğrulanmış gönderici, örn. `TrueReviews <adres@domain>` | Anahtar varken istek **açıkça hata fırlatır** — sessiz gönderim yok. `ornek.com` / `example.com` placeholder'ı da reddedilir |
-| `ADMIN_EMAILS` | Hayır | Virgülle ayrılmış geliştirici e-postaları | Boşsa admin bypass kapalı, normal akış |
-| `ADMIN_BYPASS_TOKEN` | Hayır | Kota muafiyeti için server-only test anahtarı | Boşsa muafiyet yok; hiçbir istek muafiyet kazanamaz |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Hayır | Turnstile site key | Widget render edilmez |
-| `TURNSTILE_SECRET_KEY` | Hayır | Turnstile secret key | Doğrulama **pasif moda düşer** (form çalışır, koruma yok); prod'da `[PROD-GUARD]` ile loglanır |
-| `APP_URL` | Üretimde evet | Site kök URL'si (private env) | `https://get-truereviews.vercel.app` fallback'i (`lib/site.ts`) kullanılır — canonical, OG, sitemap ve JSON-LD bu adrese göre üretilir |
-| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Hayır | Search Console doğrulama token'ı | `verification.google` meta etiketi eklenmez |
-| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Hayır | Gizlilik dostu analitik alan adı | Analitik hiç render edilmez |
-| `NEXT_PUBLIC_PLAUSIBLE_SRC` | Hayır | Self-host Plausible script adresi | `https://plausible.io/js/script.js` kullanılır |
-| `NEXT_PUBLIC_CONTACT_EMAIL` | Hayır | İletişim sayfasında gösterilecek adres | İletişim sayfasında e-posta bloğu gösterilmez |
-| `DAILY_NEW_ANALYSIS_LIMIT` | Hayır | Global günlük analiz kotası | `12` |
-| `RATE_LIMIT_PER_HOUR` | Hayır | IP başına saatlik istek sayısı | `2` |
-| `CACHE_TTL_HOURS` | Hayır | Rapor önbelleği ve Redis TTL'i | `24` |
-| `MAX_REVIEWS` | Hayır | Çekilecek azami yorum sayısı (üst sınır 50) | `20` |
+| `UPSTASH_REDIS_REST_URL` | Yes in production | Upstash Redis REST endpoint | Falls back to in-memory mode: counters are lost in a multi-instance environment, reports and tokens fly away |
+| `UPSTASH_REDIS_REST_TOKEN` | Yes in production | Upstash Redis REST token | Same in-memory fallback |
+| `APIFY_API_TOKEN` | No | Apify API token | Realistic **mock reviews** are returned; no Apify credit is spent |
+| `APIFY_ACTOR_ID` | No | The actor to use | `compass/google-maps-reviews-scraper` is used by default |
+| `GOOGLE_AI_API_KEY` | No | Google AI Studio key | **Heuristic analysis**: a summary based on the average rating, theme counts and a one-sentence suggestion |
+| `GEMMA_MODEL` | No | The real model id in AI Studio | `gemma-4-31b-it` is used. A wrong id → API 404 → no report can be produced |
+| `BREVO_API_KEY` | No | Brevo API key | **Mock email mode**: the confirmation link is logged and returned as `devPreviewUrl` in the API response; the double opt-in flow is still enforced |
+| `BREVO_FROM` | Yes if `BREVO_API_KEY` is set | Verified sender, e.g. `TrueReviews <address@domain>` | When a key is present the request **throws an explicit error** — no silent sending. The `ornek.com` / `example.com` placeholders are also rejected |
+| `ADMIN_EMAILS` | No | Comma-separated developer emails | If empty, admin bypass is off, normal flow |
+| `ADMIN_BYPASS_TOKEN` | No | Server-only test key for the quota exemption | If empty there is no exemption; no request can obtain one |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | No | Turnstile site key | The widget is not rendered |
+| `TURNSTILE_SECRET_KEY` | No | Turnstile secret key | Verification **falls back to passive mode** (the form works, without protection); logged as `[PROD-GUARD]` in production |
+| `APP_URL` | Yes in production | Site root URL (private env) | The `https://get-truereviews.vercel.app` fallback (`lib/site.ts`) is used — canonical, OG, sitemap and JSON-LD are generated for that address |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | No | Search Console verification token | The `verification.google` meta tag is not added |
+| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | No | Privacy-friendly analytics domain | Analytics is not rendered at all |
+| `NEXT_PUBLIC_PLAUSIBLE_SRC` | No | Self-hosted Plausible script address | `https://plausible.io/js/script.js` is used |
+| `NEXT_PUBLIC_CONTACT_EMAIL` | No | The address shown on the contact page | The email block is not shown on the contact page |
+| `DAILY_NEW_ANALYSIS_LIMIT` | No | Global daily analysis quota | `12` |
+| `RATE_LIMIT_PER_HOUR` | No | Hourly request count per IP | `2` |
+| `CACHE_TTL_HOURS` | No | Report cache and Redis TTL | `24` |
+| `MAX_REVIEWS` | No | Maximum number of reviews to fetch (upper bound 50) | `20` |
 
 ## 🧪 Test & CI
 
 ```bash
-npm test            # vitest run  →  10 dosya, 40 test
-npx tsc --noEmit    # tip kontrolü
+npm test            # vitest run  →  11 files, 58 tests
+npx tsc --noEmit    # type check
 npm run build       # production build
 ```
 
-Testler dış servislere ihtiyaç duymadan, `fetch` stub'ı ve in-memory fallback
-üzerinden koşar; CI'da hiçbir secret yoktur.
+The tests run without any external services, via a `fetch` stub and the
+in-memory fallback; there are no secrets in CI.
 
-| Test dosyası | Kapsam |
+| Test file | Coverage |
 |---|---|
-| [`tests/gemma.test.ts`](tests/gemma.test.ts) | Varsayılan model sabiti, prompt şeması ve dil yansıması, metinsiz yorumların prompta dağılım olarak girmesi, `extractJson` fence/ayrık metin ayıklama, kalıcı 5xx → heuristic, `4xx` → hata, `clipQuote` kelime sınırı |
-| [`tests/validation.test.ts`](tests/validation.test.ts) | E-posta formatı (kabul/red), bilinen geçici domainler, Turnstile pasif mod |
-| [`tests/storage.test.ts`](tests/storage.test.ts) | Kota (saatlik limit), rapor kaydet/getir/önbellek, `indexPlace:false`, token üretimi ve TTL içi idempotanslık, `upsertLead` |
-| [`tests/admin.test.ts`](tests/admin.test.ts) | Admin e-posta listesi (normalizasyon), bypass anahtarı eşleşmesi ve boş değer |
-| [`tests/url.test.ts`](tests/url.test.ts) | Google Maps linki kabul/red (`google.*`, `goo.gl`, `g.page`) |
-| [`tests/legal.test.ts`](tests/legal.test.ts) | 10 dil × 4 yasal sayfa meta doğruluğu, slug doğrulama, KVKK onay metni kapsamı |
-| [`tests/faq.test.ts`](tests/faq.test.ts) | 10 dilde SSS kapsamı, bilinmeyen dilde İngilizce fallback'i, başlık varlığı |
-| [`tests/email.test.ts`](tests/email.test.ts) | Anahtar yoksa mock mod, anahtar varken geçersiz `BREVO_FROM` için açık hata |
-| [`tests/site.test.ts`](tests/site.test.ts) | `getSiteUrl` fallback'i ve sondaki slash temizliği |
-| [`tests/notebook.test.ts`](tests/notebook.test.ts) | 0–100 skor bant eşikleri ve bant renkleri |
+| [`tests/gemma.test.ts`](tests/gemma.test.ts) | Default model constant, prompt schema and language reflection, text-free reviews entering the prompt as a distribution, `extractJson` fence/stray-text extraction, persistent 5xx → heuristic, `4xx` → error, `clipQuote` word boundary |
+| [`tests/validation.test.ts`](tests/validation.test.ts) | Email format (accept/reject), known disposable domains, Turnstile passive mode |
+| [`tests/storage.test.ts`](tests/storage.test.ts) | Quota (hourly limit), report save/get/cache, `indexPlace:false`, token generation and idempotency within TTL, `upsertLead` |
+| [`tests/admin.test.ts`](tests/admin.test.ts) | Admin email list (normalization), bypass key matching and empty values |
+| [`tests/url.test.ts`](tests/url.test.ts) | Google Maps link accept/reject (`google.*`, `goo.gl`, `g.page`) |
+| [`tests/legal.test.ts`](tests/legal.test.ts) | 10 locales × 4 legal pages metadata correctness, slug validation, GDPR consent text coverage |
+| [`tests/faq.test.ts`](tests/faq.test.ts) | FAQ coverage in 10 languages, English fallback for an unknown language, heading presence |
+| [`tests/email.test.ts`](tests/email.test.ts) | Mock mode when no key, explicit error for an invalid `BREVO_FROM` when a key is present |
+| [`tests/site.test.ts`](tests/site.test.ts) | `getSiteUrl` fallback and trailing slash cleanup |
+| [`tests/notebook.test.ts`](tests/notebook.test.ts) | 0–100 score band thresholds and band colors |
+| [`tests/seo.test.ts`](tests/seo.test.ts) | Title/description length limits in 10 locales, primary keyword present in title **and** description, per-locale uniqueness, hreflang map (10 locales + x-default) for home and legal pages, `og:locale` BCP-47 format, `locale:alternate` completeness, currency map |
 
-**CI** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): `master` ve
-`main` push'larında ve tüm pull request'lerde çalışır. `ubuntu-latest` +
-Node 20 üzerinde sırasıyla `npm ci --legacy-peer-deps` → `npm test` →
-`npx tsc --noEmit` → `npm run build` adımlarını koşar. Durum rozeti README'nin
-üstündedir.
+**CI** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): runs on pushes to
+`master` and `main` and on all pull requests. On `ubuntu-latest` + Node 20 it runs
+the steps `npm ci --legacy-peer-deps` → `npm test` → `npx tsc --noEmit` →
+`npm run build` in order. The status badge is at the top of the README.
 
 ## 🚀 Deploy
 
-1. Repo'yu GitHub'a push'layın: **github.com/Kcguner/truereviews**
-2. [vercel.com](https://vercel.com) → **Add New → Project** → repo'yu içe aktarın.
-   Framework olarak Next.js algılanır, `vercel.json` (`framework: nextjs`,
-   `regions: ["fra1"]`) ve `next.config.mjs` baştan tanınır.
-3. **Environment Variables** bölümüne yukarıdaki anahtarları ekleyin.
-   Vercel'de env'leri **Production *ve* Preview** için ayrı ayrı tanımlayın;
-   aksi halde her preview deploy'da sessizce mock moda düşersiniz.
-4. `APP_URL` değerini gerçek domain ile yazın.
-5. Deploy. `sitemap.xml` ve `robots.txt`, Next.js'in metadata route'ları olan
-   [`app/sitemap.ts`](app/sitemap.ts) ve [`app/robots.ts`](app/robots.ts) üzerinden
-   otomatik üretilir; ayrıca bir `postbuild` adımı gerekmez.
+1. Push the repo to GitHub: **github.com/Kcguner/truereviews**
+2. [vercel.com](https://vercel.com) → **Add New → Project** → import the repo.
+   Next.js is detected as the framework, and `vercel.json` (`framework: nextjs`,
+   `regions: ["fra1"]`) and `next.config.mjs` are recognized automatically.
+3. Add the keys above under **Environment Variables**. On Vercel, define the envs
+   separately for **Production _and_ Preview**; otherwise every preview deploy
+   silently falls back to mock mode.
+4. Set `APP_URL` to the real domain.
+5. Deploy. `sitemap.xml` and `robots.txt` are generated automatically through the
+   Next.js metadata routes [`app/sitemap.ts`](app/sitemap.ts) and
+   [`app/robots.ts`](app/robots.ts); no extra `postbuild` step is needed.
 
-Dikkat edilmesi gerekenler:
+Things to watch out for:
 
-- **`APP_URL` private env'dir — `NEXT_PUBLIC_` prefix'i yoktur.** Kod
-  `NEXT_PUBLIC_APP_URL` okumaz; böyle bir değişken eklemek hiçbir işe yaramaz.
-  Site kök URL'si sunucu tarafında `lib/site.ts` üzerinden tek noktadan gelir.
-- **`NEXT_PUBLIC_*` değişiklikleri build-time'da gömülür.** Turnstile site key,
-  Google doğrulama token'ı, Plausible veya iletişim e-postasını değiştirdiyseniz
-  **Redeploy** gerekir; sadece env'i güncellemek yetmez.
-- Üretim öncesi mutlaka `UPSTASH_REDIS_REST_URL` ve `UPSTASH_REDIS_REST_TOKEN`
-  tanımlı olmalı. Ayrıca kotaların gerçekte sıkılaştırılması için
-  `TURNSTILE_SECRET_KEY` de eklenmelidir.
-- Domain değişirse `APP_URL` güncellenmeli; `sitemap`, `canonical`, `hreflang`
-  ve JSON-LD hepsi bu tek değerden üretiliyor.
+- **`APP_URL` is a private env — it has no `NEXT_PUBLIC_` prefix.** The code does
+  not read `NEXT_PUBLIC_APP_URL`; adding such a variable would do nothing. The
+  site root URL comes from a single place on the server side, `lib/site.ts`.
+- **`APP_URL` must be present at BUILD time, not just at runtime.** All 70 pages
+  plus `sitemap.xml`, `robots.txt` and `manifest.webmanifest` are prerendered
+  (`○ Static`), so every `canonical`, `hreflang` and `og:url` is baked into the
+  HTML during `next build`. Building without `APP_URL` bakes in the
+  `get-truereviews.vercel.app` fallback (or `localhost:3000` locally) and you
+  ship wrong absolute URLs. Vercel exposes env vars to the build by default;
+  elsewhere run `APP_URL=… npm run build`.
+- **`NEXT_PUBLIC_*` changes are embedded at build time.** If you changed the
+  Turnstile site key, the Google verification token, Plausible or the contact
+  email, you need a **Redeploy**; only updating the env is not enough.
+- `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` must be defined before
+  going to production. `TURNSTILE_SECRET_KEY` should also be added so that the
+  quotas are actually tightened.
+- If the domain changes, `APP_URL` must be updated **and the project rebuilt**;
+  `sitemap`, `canonical`, `hreflang` and JSON-LD are all generated from this
+  single value.
 
-## 📄 Lisans
+## 📄 License
 
-[MIT](https://opensource.org/licenses/MIT). Serbestçe kullanın, değiştirin ve
-dağıtın.
+[MIT](https://opensource.org/licenses/MIT). Use it freely, modify it and
+redistribute it.
 
-## 📚 Notlar
+## 📚 Notes
 
-- [`docs/proje-plani.md`](docs/proje-plani.md) — iş modeli, "2 hak" mantığının
-  gerekçesi, kota hesabı ve güvenlik mimarisinin tamamı. Maliyet iddialarının
-  dayandığı belge burasıdır.
-- [`docs/tasarim.txt`](docs/tasarim.txt) — arayüz ve görsel dil notları.
+- [`docs/proje-plani.md`](docs/proje-plani.md) — the full business model, the
+  rationale behind the "2 chances" logic, the quota calculation and the security
+  architecture. This is the document the cost claims are based on.
+- [`docs/tasarim.txt`](docs/tasarim.txt) — interface and visual language notes.
+- The OG image is a **route handler**
+  ([`app/[locale]/opengraph-image/route.tsx`](app/[locale]/opengraph-image/route.tsx)),
+  not file-based metadata. File-based `opengraph-image.tsx` overwrites the whole
+  `openGraph.images` value, so a static `export const alt` pushed the same
+  Turkish alt text into all 10 locales (and removing it dropped `alt` entirely).
+  As a route handler the image is only a URL; `alt` comes from
+  `getHomeMeta(locale).title` in the layout, so each locale gets its own.
+- `robots` is defined on the content pages (`app/[locale]/page.tsx`,
+  `app/[locale]/[page]/page.tsx`), **not** on `app/[locale]/layout.tsx`. A
+  layout's metadata is inherited by the 404 boundary too, which produced two
+  conflicting `<meta name="robots">` tags on error pages.
 
-Kod ile doküman arasında isimlendirme farkları olabilir: plan dokümanı
-yol boyunca özgün tasarım kararlarını anlatır, uygulama ise o kararların
-bugünkü hâlini içerir. Doğru davranışı belirleyen şey her zaman koddur.
+There may be naming differences between the code and the documents: the plan
+document describes the original design decisions along the way, while the
+implementation contains today's version of those decisions. The code is always
+what determines the correct behavior.
