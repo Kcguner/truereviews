@@ -2,7 +2,27 @@
   "name": "truereviews-app",
   "version": "1.0.0",
   "private": true,
-  "description": "Ücretsiz işletme yorum analiz aracı (lead magnet) — Google Maps + Apify + Gemma",
+  "license": "MIT",
+  "description": "Google Maps yorumlarını okuyup tek sayfalık özet çıkaran, 10 dilde çalışan ücretsiz lead-magnet (Next.js 14 + Apify + Gemma + Upstash Redis + Brevo)",
+  "homepage": "https://get-truereviews.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kcguner/truereviews.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Kcguner/truereviews/issues"
+  },
+  "keywords": [
+    "nextjs",
+    "lead-magnet",
+    "reviews",
+    "google-maps",
+    "gemma",
+    "gemini",
+    "i18n",
+    "upstash",
+    "vercel"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",

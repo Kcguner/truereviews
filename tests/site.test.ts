@@ -7,7 +7,7 @@ afterEach(() => {
 
 describe('getSiteUrl', () => {
   it('env yoksa fallback döner', () => {
-    expect(getSiteUrl()).toBe('https://ornek.vercel.app');
+    expect(getSiteUrl()).toBe('https://get-truereviews.vercel.app');
   });
   it('sondaki slashleri temizler', () => {
     process.env.APP_URL = 'https://ornek.com///';

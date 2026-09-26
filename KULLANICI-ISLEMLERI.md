@@ -20,8 +20,8 @@ sadece aşağıdaki 5-10 dakikalık işlemler sizde kaldı (API anahtarları ben
 ## 3) Google AI Studio (zorunlu — gerçek AI analizi için)
 1. https://aistudio.google.com/app/apikey → API key alın
 2. `GOOGLE_AI_API_KEY` olarak yazın
-3. `GEMMA_MODEL` varsayılanı `gemma-3-27b-it`. Plandaki "Gemma 4 31B" adı
-   AI Studio'da farklıysa listedeki gerçek model id'yi yazın.
+3. `GEMMA_MODEL` varsayılanı `gemma-4-31b-it` (`lib/gemma.ts`). AI Studio'daki
+   gerçek model id farklıysa buraya listenin gerçek id'sini yazın.
 4. Anahtar yokken heuristic (ortalama-bazlı) özet üretilir.
 
 ## 4) Brevo (double opt-in e-postası için — domainsiz sender)
@@ -45,7 +45,8 @@ sadece aşağıdaki 5-10 dakikalık işlemler sizde kaldı (API anahtarları ben
 2. Environment Variables'a yukarıdaki anahtarları ekleyin (Production + Preview)
 3. `APP_URL` alanına `https://<projeniz>.vercel.app` yazın (private env, `NEXT_PUBLIC_`
    prefix YOK — `NEXT_PUBLIC_APP_URL` diye bir değişken eklemeyin, kod bunu okumuyor)
-4. Deploy. `vercel.json` + `next-sitemap` (sitemap/robots) hazır.
+4. Deploy. `vercel.json` hazır; sitemap/robots `app/sitemap.ts` + `app/robots.ts`
+   metadata route'ları ile elle üretiliyor (harici paket gerekmiyor).
    Not: `NEXT_PUBLIC_*` değişirse Redeploy şart (build-time gömülür).
 
 ## Hızlı test (anahtarsız)

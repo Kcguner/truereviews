@@ -4,7 +4,7 @@
 > son yorumlar okunup tek sayfalık özet çıkarılır: memnuniyet skoru (0-100),
 > en çok tekrar eden övgü ve şikayetler, ve bu hafta atılacak tek somut adım.
 
-- Site: https://ornek.vercel.app (üretim URL'i ile değiştirin)
+- Site: https://get-truereviews.vercel.app
 - Önizleme ücretsiz, kayıt gerekmez. Tam rapor e-posta onayı ile açılır.
 - Diller: tr, en, de, ar, ru, fr, es, nl, fa, az (10 dil)
 - Yorumların içeriği değiştirilmez, silinmez, satın alınmaz.
