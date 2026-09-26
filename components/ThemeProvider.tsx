@@ -3,26 +3,26 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 
 type Theme = 'light' | 'dark';
 
-const ThemeCtx = createContext<{ theme: Theme; toggle: () => void }>({ theme: 'dark', toggle: () => {} });
+const ThemeCtx = createContext<{ theme: Theme; toggle: () => void }>({ theme: 'light', toggle: () => {} });
 
 export function useTheme() {
   return useContext(ThemeCtx);
 }
 
 /** Boyanmadan önce <html> class'ını ayarlayan betik (FOUC önler). Layout içinde body başına konur. */
-/** Kural: kayıtlı tercih varsa o; yoksa varsayılan DARK. */
+/** Kural: kayıtlı tercih varsa o; yoksa varsayılan LIGHT. */
 export function ThemeScript() {
   return (
     <script
       dangerouslySetInnerHTML={{
-        __html: `(function(){try{var t=localStorage.getItem('ya-theme');if(t!=='light'){document.documentElement.classList.add('dark')}}catch(e){document.documentElement.classList.add('dark')}})()`
+        __html: `(function(){try{var t=localStorage.getItem('ya-theme');if(t==='dark'){document.documentElement.classList.add('dark')}}catch(e){}})()`
       }}
     />
   );
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark');
+  const [theme, setTheme] = useState<Theme>('light');
 
   useEffect(() => {
     setTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
