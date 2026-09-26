@@ -31,14 +31,28 @@ export function normalizeRating(raw: unknown): number {
  * - REQUEST_TIMEOUT: tek bir REST isteği (run başlat / durum / dataset) kısa
  *   kalmalı; 15 sn bir REST çağrısı için bol.
  * - POLL_BUDGET: toplam bekleme. Google Maps yorum kazıyıcıları rutin olarak
- *   30-120 sn sürüyor; 120 sn pratik tavan. Deploy'un maxDuration'ı buna göre
- *   ayarlanmalı (120 sn + güvenlik payı).
+ *   30-120 sn sürüyor, ama bütçe `maxDuration`'ın ALTINDA kalmak zorunda:
+ *   bütçe dolunca kontrollü hata fırlatırız, `maxDuration` dolunca platform
+ *   fonksiyonu öldürüp kullanıcıya 504 verir. İkincisi daha kötüdür (Apify
+ *   kredisi harcanmış, hiçbir şey saklanmamış, JSON bile yok).
+ *   Aritmetik (`app/api/analyze/route.ts` ve `vercel.json`: 60 sn):
+ *     30 sn (Apify) + 8-15 sn (tipik Gemma) + ~1 sn (Redis yazma) = 39-46 sn,
+ *     yani 14+ sn güvenlik payı kalıyor.
+ *   Dürüstlük notu: Gemma'nın en kötü yolu iki deneme × 20 sn + 2,5 sn bekleme
+ *   = ~42,5 sn; 30 + 42,5 = 72,5 sn > 60 sn, yani ÇİFT zaman aşımı olan nadir
+ *   yolda platform yine de 504 verebilir. Bunu tamamen kapatmanın tek yolu
+ *   bütçeyi ~15 sn'ye indirmekti; o zaman kazıyıcıların çoğu (30-120 sn) zaman
+ *   aşımına uğrar ve ürün hiç çalışmaz. Seçim: "çoğu analiz bitsin, nadir çift
+ *   zaman-aşımı yolu 504 olsun". Yüksek başarı oranı isteniyorsa plan
+ *   yükseltilmeli ve `maxDuration` ile bu bütçe BİRLİKTE ~150/90 sn'ye
+ *   çıkarılmalıdır; tek başına birini yükseltmek diğerini ölü kod yapar.
  * - POLL_INTERVAL: 3 sn yeterli; actor'ı daha sık yoklamak kotaları yiyip
  *   hiçbir şey kazandırmıyor.
- * Bütçe APIFY_TIMEOUT_MS ile daraltılabilir (düşük maxDuration'lu deploy/CI).
+ * Bütçe APIFY_TIMEOUT_MS ile DAHA DA daraltılabilir (CI/kısa süreli deploy);
+ * değer yalnızca düşürülebilir, çünkü tavan bu sabittir.
  */
 const APIFY_REQUEST_TIMEOUT_MS = 15_000;
-const APIFY_POLL_BUDGET_MS = 120_000;
+const APIFY_POLL_BUDGET_MS = 30_000;
 const APIFY_POLL_INTERVAL_MS = 3_000;
 
 /** Pollde başarısız durumlar: tekrar denemeye değmez, açık hata verilir. */
@@ -131,12 +145,12 @@ function pollBudgetMs(): number {
  * (`GET /v2/actor-tasks/{taskId}`), sonuç `GET
  * /v2/actor-tasks/{taskId}/dataset/items?format=json` ile alınır. Her HTTP
  * isteği kısa (15 sn) ve timeout'lu; toplam bekleme bütçesi APIFY_TIMEOUT_MS
- * (varsayılan 120 sn) ile sınırlı. Bütçe dolarsa ya da actor FAILED/ABORTED/
+ * (varsayılan 30 sn) ile sınırlı. Bütçe dolarsa ya da actor FAILED/ABORTED/
  * TIMED-OUT olursa açık bir hata fırlatılır — kullanıcıya sahte/m mock veri
  * SIZDIRILMAZ (mock yalnızca APIFY_API_TOKEN yokken devreye girer).
  * Not: fonksiyon hâlâ poll döngüsü boyunca açık kalır; gerçekten bloke etmeyen
- * bir tasarım için kuyruk/webhook gerekir. Bütçe, deploy'un maxDuration'ına
- * göre ayarlanmalıdır.
+ * bir tasarım için kuyruk/webhook gerekir. Bütçe, deploy'un maxDuration'ının
+ * ALTINDA olacak şekilde ayarlanmalıdır (üstteki aritmetik).
  */
 async function collectItems(
   actorId: string,

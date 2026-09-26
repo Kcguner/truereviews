@@ -5,11 +5,16 @@ export interface ToneSplit {
 }
 
 export interface AnalysisReport {
-  score: number; // 0-10
+  /** 0-10. `lib/gemma.ts` her yolda `clampScore` ile sınırlar ve model
+   *  çıktısı aralık dışıysa raporu reddeder; buraya başka bir değer ulaşamaz. */
+  score: number;
   summary: string;
   top_complaints: { topic: string; count: number; example?: string }[];
   top_praises: { topic: string; count: number; example?: string }[];
   action_suggestion: string;
+  /** Kazanılan yorum sayısı (tam sayı, ≥ 0). Model çıktısından ALINMAZ:
+   *  `lib/gemma.ts` istekten doldurur, `/api/analyze` de `reviews.length`'i
+   *  yazar. Yani LLM'in uydurduğu bir sayıya güvenmek gerekmez. */
   review_count: number;
   business_name: string;
   rating_histogram?: ToneSplit;
@@ -34,6 +39,11 @@ export interface StoredReport {
   locale: string;
   created_at: string;
   email_unlocked: string | null;
+  /** Rapor gerçek mi, düşen bir yedek mi (Apify/Gemma yoksa mock)? Kalıcı
+   *  alandır: `lib/store.ts` yazarken doldurur, `mocked` bilgisi olmayan eski
+   *  satırlar `false` (bilinen rapor) sayılır. Eskiden bu alan TİPTE yoktu ve
+   *  route'un `?? true` varsayılanı gerçek bir raporu "mock" diye gösterebiliyordu. */
+  mocked: boolean;
 }
 
 // ---- In-memory fallback (Redis yokken / mock mod) ----
@@ -41,7 +51,10 @@ export interface StoredReport {
 const memReports = new Map<string, StoredReport>();
 const memByPlace = new Map<string, StoredReport>();
 const memLeads: Record<string, unknown>[] = [];
-const memUsage: { date: string; ip: string; place_key: string }[] = [];
+/** `lib/quota.ts`in saatlik/günlük analiz defteri. `ts` (epoch ms) zorunludur:
+ *  sayaç penceresi `date` değil zaman damgasıyla hesaplanır; alan olmadan
+ *  saatlik sınır yanlışlıkla "hiç kayıt yok" gibi görünürdü. */
+const memUsage: { date: string; ip: string; place_key: string; ts: number }[] = [];
 
 export const memStore = { memReports, memByPlace, memLeads, memUsage };
 

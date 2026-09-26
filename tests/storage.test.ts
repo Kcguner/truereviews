@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { checkQuota, logUsage } from '../lib/quota';
 import {
   consumeVerificationToken,
@@ -10,8 +10,41 @@ import {
   upsertLead
 } from '../lib/store';
 
-// Redis bağlı değilse memory fallback çalışır — CI'da env yok, bu yol test edilir.
-const IP = `9.9.9.${Math.floor(Math.random() * 200) + 10}`;
+// DİKKAT: Vitest `.env`/`.env.local` dosyalarını yükler. `UPSTASH_REDIS_REST_*`
+// tanımlıysa (`.env.example` bunları istediği için tanımlı olması OLASI) bu
+// testler GERÇEK Redis'e yazar: `ya:report:*` / `ya:token:*` anahtarları
+// kalıcı veri, `ya:q:*` sayaçları gerçek kotadan düşer ve `rate_limited`
+// iddiası ortamın kotasına göre değişir. Env'ler `beforeAll`'da SİLİNİR
+// (tests/quota.test.ts ile aynı yaklaşım) ve IP SABİTTİR: `Math.random()` bir
+// sonraki koşuda limit dolmuş bir IP'ye denk gelip testi kırıyordu.
+const ENV_KEYS = [
+  'UPSTASH_REDIS_REST_URL',
+  'UPSTASH_REDIS_REST_TOKEN',
+  'DAILY_NEW_ANALYSIS_LIMIT',
+  'DAILY_PER_IP_ANALYSIS_LIMIT',
+  'RATE_LIMIT_PER_HOUR',
+  'REQUEST_LIMIT_PER_HOUR',
+  'CACHE_TTL_HOURS'
+] as const;
+
+const savedEnv: Record<string, string | undefined> = {};
+
+/** RFC 5737 test ağı: gerçek bir IP değil, üstelik Redis'e gidilmiyor. */
+const IP = '203.0.113.9';
+
+beforeAll(() => {
+  for (const k of ENV_KEYS) {
+    savedEnv[k] = process.env[k];
+    delete process.env[k];
+  }
+});
+
+afterAll(() => {
+  for (const k of ENV_KEYS) {
+    if (savedEnv[k] === undefined) delete process.env[k];
+    else process.env[k] = savedEnv[k];
+  }
+});
 
 describe('quota (memory fallback)', () => {
   it('temiz IP kotayı geçer', async () => {

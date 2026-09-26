@@ -234,11 +234,21 @@ regime the app is designed for.*
   verification **falls back to passive mode** and the form keeps working; in
   production this silent degradation is logged as `[PROD-GUARD]` via
   `lib/env-guard.ts` — it is not hidden.
-- **Quota and rate limit:** Two counters are kept in Redis —
-  `RATE_LIMIT_PER_HOUR` (default 2, per IP) and `DAILY_NEW_ANALYSIS_LIMIT`
-  (default 12, global). The counters get a TTL on first write (1 hour / 24 hours),
-  so they clean themselves up. When the quota is exceeded, `429` and a
-  user-friendly message are returned.
+- **Quota and rate limit:** Four counters are kept in Redis —
+  `RATE_LIMIT_PER_HOUR` (default 2 analyses per IP per hour),
+  `DAILY_PER_IP_ANALYSIS_LIMIT` (default 4 per IP per day, so a single client
+  cannot consume the global budget) and `DAILY_NEW_ANALYSIS_LIMIT` (default 12,
+  global), plus `REQUEST_LIMIT_PER_HOUR` (default 60 requests per IP per hour,
+  which counts **cache hits too**). Check and consumption happen in a single
+  atomic Redis script, so parallel requests cannot slip past the limit. The
+  request counter is shared by `/api/analyze` and `/api/verify`; both return
+  `429` and a user-friendly message. The counters get a TTL on first write
+  (1 hour / 24 hours), so they clean themselves up.
+- **Report throttling (`/api/verify`):** The route that hands out the full
+  report is the one worth brute-forcing, so it now takes the same per-IP
+  request slot as `/api/analyze` (after the token presence/format check, with
+  an `x-admin-key` bypass). A malformed token is rejected without touching
+  Redis at all.
 - **Disposable email block:** Domain matching is done against the static list of
   the `disposable-email-domains` package; the list is tested with real examples
   in `tests/validation.test.ts`.
@@ -251,6 +261,15 @@ regime the app is designed for.*
 - **Strict double opt-in:** For the full report, an email address alone is not
   enough; the confirmation link must be clicked. The token consists of 64
   hexadecimal characters, is bound to a single report and expires after 48 hours.
+  The link is built from `APP_URL` only — the `Origin` header is never trusted,
+  so a confirmation link cannot be pointed at an attacker's domain.
+- **Lead retention:** Lead records (email, report id, locale) are written with a
+  **180-day TTL**, which is the number the privacy and KVKK pages promise. The
+  report row itself falls away with the cache TTL (`CACHE_TTL_HOURS`), the
+  verification token after 48 hours. `deleteLeadByEmail()` in `lib/store.ts`
+  implements the erasure request (it clears the lead hash, the lead index and
+  the report's `email_unlocked` field); wiring it to an authenticated endpoint
+  is still open work.
 
 **KVKK and data**
 
@@ -273,14 +292,24 @@ regime the app is designed for.*
 
 **Developer convenience (dev/test)**
 
-`ADMIN_EMAILS` (a comma-separated list of addresses) and `ADMIN_BYPASS_TOKEN`
-(server-only, a hidden test key sent as a request header or in the body) exist to
-speed up test flows: the listed addresses see the full report without waiting for
-the confirmation email, and requests with the correct key get a quota exemption.
-When left empty they are **disabled** and the normal user flow is completely
-unchanged. These values are not embedded in the browser or bundled with the
-code; they are only effective in the environments where they are defined. This is
-not a user-facing feature, it is for development/testing.
+`ADMIN_BYPASS_TOKEN` (server-only, a hidden test key sent as a request header
+or in the body) exists to speed up test flows: requests with the correct key
+skip the rate limit and the daily quota in `/api/analyze`, skip the request
+limit in `/api/verify`, and receive the full report from `/api/lead` without
+waiting for the confirmation email. It is compared in constant time
+(`timingSafeEqual`). When left empty it is **disabled** and the normal user
+flow is completely unchanged. The value is not embedded in the browser or
+bundled with the code; it is only effective in the environments where it is
+defined. This is not a user-facing feature, it is for development/testing.
+
+**`ADMIN_EMAILS` grants nothing.** Authorization is the secret above and
+nothing else. The old behaviour — "if the submitted address is in the list,
+return the report immediately" — meant anyone could read any report simply by
+putting a listed address in the body, so it was removed: `/api/lead` no longer
+looks at the address at all, and without the key the request always goes
+through the confirmation email. `ADMIN_EMAILS` remains only as an
+env-list/normalization helper exercised by `tests/admin.test.ts`; it can stay
+empty.
 
 ## 💰 Cost
 
@@ -359,12 +388,13 @@ and the behavior of each key when it is missing are in the table below.
 | `UPSTASH_REDIS_REST_TOKEN` | Yes in production | Upstash Redis REST token | Same in-memory fallback |
 | `APIFY_API_TOKEN` | No | Apify API token | Realistic **mock reviews** are returned; no Apify credit is spent |
 | `APIFY_ACTOR_ID` | No | The actor to use | `compass/google-maps-reviews-scraper` is used by default |
+| `APIFY_TIMEOUT_MS` | No | Total wait budget for the Apify actor, in ms. **Must stay below the function's `maxDuration` (60 s)**; the code's own cap is 30000, so this can only narrow it | `30000`. A larger value is clamped to the cap — raising it above `maxDuration` would make the budget dead code and turn slow actors into a 504 with the Apify credit already spent |
 | `GOOGLE_AI_API_KEY` | No | Google AI Studio key | **Heuristic analysis**: a summary based on the average rating, theme counts and a one-sentence suggestion |
 | `GEMMA_MODEL` | No | The real model id in AI Studio | `gemma-4-31b-it` is used. A wrong id → API 404 → no report can be produced |
 | `BREVO_API_KEY` | No | Brevo API key | **Mock email mode**: the confirmation link is logged and returned as `devPreviewUrl` in the API response; the double opt-in flow is still enforced |
 | `BREVO_FROM` | Yes if `BREVO_API_KEY` is set | Verified sender, e.g. `TrueReviews <address@domain>` | When a key is present the request **throws an explicit error** — no silent sending. The `ornek.com` / `example.com` placeholders are also rejected |
-| `ADMIN_EMAILS` | No | Comma-separated developer emails | If empty, admin bypass is off, normal flow |
-| `ADMIN_BYPASS_TOKEN` | No | Server-only test key for the quota exemption | If empty there is no exemption; no request can obtain one |
+| `ADMIN_EMAILS` | No | **Grants nothing.** Only an env-list/normalization helper; no code path uses it for authorization | Nothing — the normal double opt-in flow applies |
+| `ADMIN_BYPASS_TOKEN` | No | Server-only test key: quota + request-limit exemption, and immediate full report from `/api/lead` | If empty there is no exemption; no request can obtain one |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | No | Turnstile site key | The widget is not rendered |
 | `TURNSTILE_SECRET_KEY` | No | Turnstile secret key | Verification **falls back to passive mode** (the form works, without protection); logged as `[PROD-GUARD]` in production |
 | `APP_URL` | Yes in production | Site root URL (private env) | The `https://get-truereviews.vercel.app` fallback (`lib/site.ts`) is used — canonical, OG, sitemap and JSON-LD are generated for that address |
@@ -373,14 +403,16 @@ and the behavior of each key when it is missing are in the table below.
 | `NEXT_PUBLIC_PLAUSIBLE_SRC` | No | Self-hosted Plausible script address | `https://plausible.io/js/script.js` is used |
 | `NEXT_PUBLIC_CONTACT_EMAIL` | No | The address shown on the contact page | The email block is not shown on the contact page |
 | `DAILY_NEW_ANALYSIS_LIMIT` | No | Global daily analysis quota | `12` |
-| `RATE_LIMIT_PER_HOUR` | No | Hourly request count per IP | `2` |
-| `CACHE_TTL_HOURS` | No | Report cache and Redis TTL | `24` |
+| `DAILY_PER_IP_ANALYSIS_LIMIT` | No | Daily analysis quota per IP, so one client cannot eat the global budget | `4` |
+| `RATE_LIMIT_PER_HOUR` | No | Hourly **analysis** count per IP (paid Apify + Gemma calls) | `2` |
+| `REQUEST_LIMIT_PER_HOUR` | No | Hourly **request** count per IP, cache hits included; shared by `/api/analyze` and `/api/verify` | `60` |
+| `CACHE_TTL_HOURS` | No | Report cache and Redis TTL; also the report's retention period | `24` (1 h floor, 720 h = 30 days ceiling; leads are 180 days, fixed) |
 | `MAX_REVIEWS` | No | Maximum number of reviews to fetch (upper bound 50) | `20` |
 
 ## 🧪 Test & CI
 
 ```bash
-npm test            # vitest run  →  11 files, 58 tests
+npm test            # vitest run  →  13 files, 156 tests
 npx tsc --noEmit    # type check
 npm run build       # production build
 ```
@@ -392,7 +424,8 @@ in-memory fallback; there are no secrets in CI.
 |---|---|
 | [`tests/gemma.test.ts`](tests/gemma.test.ts) | Default model constant, prompt schema and language reflection, text-free reviews entering the prompt as a distribution, `extractJson` fence/stray-text extraction, persistent 5xx → heuristic, `4xx` → error, `clipQuote` word boundary |
 | [`tests/validation.test.ts`](tests/validation.test.ts) | Email format (accept/reject), known disposable domains, Turnstile passive mode |
-| [`tests/storage.test.ts`](tests/storage.test.ts) | Quota (hourly limit), report save/get/cache, `indexPlace:false`, token generation and idempotency within TTL, `upsertLead` |
+| [`tests/storage.test.ts`](tests/storage.test.ts) | Quota (hourly limit), report save/get/cache, `indexPlace:false`, token generation and idempotency within TTL, `upsertLead`. The Redis env vars are deleted in `beforeAll`, so this always exercises the memory fallback and can never write to a real database |
+| [`tests/quota.test.ts`](tests/quota.test.ts) | `envInt` rejecting broken limits, global + per-IP daily and hourly quotas, atomicity under concurrent reservations, the request ceiling, canonical cache keys and the legacy-key migration, cache TTL validation, teaser, Redis-failure fallback, the KVKK deletion path, and the `/api/verify` throttle (429 shape, admin bypass, malformed token) |
 | [`tests/admin.test.ts`](tests/admin.test.ts) | Admin email list (normalization), bypass key matching and empty values |
 | [`tests/url.test.ts`](tests/url.test.ts) | Google Maps link accept/reject (`google.*`, `goo.gl`, `g.page`) |
 | [`tests/legal.test.ts`](tests/legal.test.ts) | 10 locales × 4 legal pages metadata correctness, slug validation, GDPR consent text coverage |
@@ -412,7 +445,8 @@ the steps `npm ci --legacy-peer-deps` → `npm test` → `npx tsc --noEmit` →
 1. Push the repo to GitHub: **github.com/Kcguner/truereviews**
 2. [vercel.com](https://vercel.com) → **Add New → Project** → import the repo.
    Next.js is detected as the framework, and `vercel.json` (`framework: nextjs`,
-   `regions: ["fra1"]`) and `next.config.mjs` are recognized automatically.
+   `regions: ["fra1"]`, `functions.app/api/analyze/route.ts.maxDuration: 60`) and
+   `next.config.mjs` are recognized automatically.
 3. Add the keys above under **Environment Variables**. On Vercel, define the envs
    separately for **Production _and_ Preview**; otherwise every preview deploy
    silently falls back to mock mode.
@@ -436,6 +470,19 @@ Things to watch out for:
 - **`NEXT_PUBLIC_*` changes are embedded at build time.** If you changed the
   Turnstile site key, the Google verification token, Plausible or the contact
   email, you need a **Redeploy**; only updating the env is not enough.
+- **`maxDuration` (60 s) and the Apify budget (30 s) are one system.** The
+  analysis route declares `maxDuration = 60` in
+  [`app/api/analyze/route.ts`](app/api/analyze/route.ts) and again in
+  `vercel.json`; the poll budget in `lib/apify.ts` is deliberately **half** of
+  it: 30 s Apify + 8-15 s Gemma + ~1 s Redis write = 39-46 s, so the code
+  always hits its own budget first and returns a proper JSON error instead of
+  being killed by the platform. A 504 after a 60 s platform kill is the worse
+  outcome: the Apify credit is already spent and nothing was stored. To raise
+  the ceiling you must raise **both** numbers together (a larger
+  `APIFY_TIMEOUT_MS` is clamped by the code's 30 s cap anyway). Google's Maps
+  scrapers routinely need 30-120 s, so a materially higher success rate needs a
+  longer `maxDuration` plus a matching budget — and the arithmetic above shows
+  why the two must move in the same commit.
 - `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` must be defined before
   going to production. `TURNSTILE_SECRET_KEY` should also be added so that the
   quotas are actually tightened.

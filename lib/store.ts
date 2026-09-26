@@ -42,15 +42,6 @@ const LEAD_TTL_SECONDS = LEAD_RETENTION_DAYS * 86400;
 
 type TokenRow = { report_id: string; email: string; used: boolean };
 
-/**
- * `mocked` alanı `StoredReport`ta beyan EDİLMİYOR (`lib/types.ts`, bu turun
- * kapsamı dışında). `...input` yayılması yüzünden alan çalışma zamanında
- * zaten satırda duruyordu; burada TİPİ bu dosyada tanımlayıp route'un
- * `(cached as unknown as {mocked?: boolean}).mocked ?? true` cast'ini (gerçek
- * raporu "mock" diye gösteren varsayılan) kaldırıyoruz.
- */
-export type StoredReportWithMeta = StoredReport & { mocked: boolean };
-
 /** `ex` ASLA 0/NaN/negatif olamaz — Upstash falsy `ex`'te EX göndermediği için
  *  anahtar sonsuza dek yaşardı. */
 function safeTtl(ttlSeconds: number): number {
@@ -90,9 +81,12 @@ function remainingTtlSeconds(createdAt: string): number {
   return CACHE_TTL_SECONDS - ageS;
 }
 
-/** `mocked` alanını normalize eder: satırda yoksa false (bilinen rapor). */
-function withMocked(row: StoredReport): StoredReportWithMeta {
-  return { ...row, mocked: (row as StoredReport & { mocked?: unknown }).mocked === true };
+/** `mocked` alanını normalize eder: alanı taşımayan ESKİ satırlarda (Redis'te
+ *  `mocked` yazılmadan saklanmış raporlar) bilinen rapor varsayılır → `false`.
+ *  `?? true` DEĞİL: gerçek bir raporu "mock" diye göstermek, kullanıcının
+ *  hangi veriyi gördüğünü bilmediği anlamına gelir. */
+function withMocked(row: StoredReport): StoredReport {
+  return { ...row, mocked: row.mocked === true };
 }
 
 // ---------------------------------------------------------------------------
@@ -182,8 +176,8 @@ export function canonicalPlaceKey(placeUrl: string): string {
 async function readByPlace(
   placeKey: string,
   locale: string
-): Promise<StoredReportWithMeta | null> {
-  return safeRedis<StoredReportWithMeta | null>(
+): Promise<StoredReport | null> {
+  return safeRedis<StoredReport | null>(
     'store.findCachedReport',
     async (redis) => {
       const id = await redis.get<string>(keyPlace(placeKey, locale));
@@ -202,7 +196,7 @@ async function readByPlace(
 async function reindexPlace(
   placeKey: string,
   locale: string,
-  row: StoredReportWithMeta
+  row: StoredReport
 ): Promise<void> {
   const memKey = `${placeKey}::${locale}`;
   if (!memStore.memByPlace.has(memKey)) memStore.memByPlace.set(memKey, row);
@@ -217,7 +211,7 @@ export async function findCachedReport(
   placeKey: string,
   locale: string,
   legacyPlaceKey?: string
-): Promise<StoredReportWithMeta | null> {
+): Promise<StoredReport | null> {
   const hit = await readByPlace(placeKey, locale);
   if (hit) return hit && isFresh(hit.created_at) ? hit : null;
   if (!legacyPlaceKey || legacyPlaceKey === placeKey) return null;
@@ -240,11 +234,12 @@ export async function saveReport(input: {
   /** false ise place->id eşleşmesi yazılmaz: mock sonuçlar 24s önbelleğe
    *  girmez, aynı link bir sonraki seferde gerçek analizi tekrar dener. */
   indexPlace?: boolean;
-}): Promise<StoredReportWithMeta> {
-  // `mocked`/`indexPlace` StoredReport'ta beyan edilmiyor: yaymak yerine
-  // ayrıştırıp yalnızca kalıcı alanları satıra koyuyoruz.
+}): Promise<StoredReport> {
+  // `indexPlace` kalıcı bir alan DEĞİL (yalnızca "önbelleğe yazılsın mı"
+  // kararı), `mocked` ise artık `StoredReport`ın beyan edilmiş alanı: ikisini
+  // de yaymadan ayrıştırıp satırı açıkça kuruyoruz.
   const { mocked, indexPlace, ...persist } = input;
-  const row: StoredReportWithMeta = {
+  const row: StoredReport = {
     id: randomUUID(),
     ...persist,
     mocked: mocked === true,

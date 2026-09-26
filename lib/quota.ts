@@ -294,13 +294,12 @@ function cutAtWord(text: string, maxChars: number): string {
 // ---------------------------------------------------------------------------
 
 /**
- * `lib/types.ts`teki `memUsage` bildirimi `ts` alanını içermiyor (düzeltilecek
- * alan — bkz. rapor). Burada TEK seferlik genişletilmiş bir görünüm alınır;
- * `as unknown as` artık her çağrıda tekrarlanmaz ve dizinin KİMLİĞİ korunur,
- * yani diğer modüllerin gördüğü `memStore.memUsage` ile aynı dizidir.
+ * Bellek yolunda kullanılan analiz defteri `memStore.memUsage`ın KENDİSİDİR
+ * (yeni dizi DEĞİL — kimlik korunur, yani `lib/types.ts`in yazdığı satırlar
+ * buradan da görünür). Satır tipi artık `lib/types.ts`te beyan edildiği için
+ * `as unknown as` genişletmesine gerek yoktur.
  */
-type MemUsageRow = { date: string; ip: string; place_key: string; ts: number };
-const memUsage = memStore.memUsage as unknown as MemUsageRow[];
+const memUsage: { date: string; ip: string; place_key: string; ts: number }[] = memStore.memUsage;
 
 /**
  * Saatlik istek defteri. Analiz kayıtlarından AYRI tutulur: istek sayısı

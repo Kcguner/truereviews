@@ -1,4 +1,16 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { NextRequest } from 'next/server';
+
+// `/api/verify` route'u `@/lib/...` ile import ediyor; vitest bu projede
+// (tsconfig `paths` okunmadığı için) alias'ı çözemiyor. Aşağıdaki `vi.mock`
+// çağrıları SADECE alias'lı specifier'ı taklit eder ve fabrikaları GERÇEK
+// modülü göreli yoldan yükler — yani testler sahte bağımlılıkla değil, gerçek
+// kota/mağaza/ admin koduyla çalışır. ÖNEMLİ: route'un kullandığı modülle
+// AYNI ÖRNEĞİ paylaşmak için testler de `@/lib/store` specifier'ını kullanır
+// (`vi.resetModules()` sonrası ayrı bir örnek, ayrı bir bellek deposu demek).
+vi.mock('@/lib/quota', async () => await import('../lib/quota'));
+vi.mock('@/lib/store', async () => await import('../lib/store'));
+vi.mock('@/lib/admin', async () => await import('../lib/admin'));
 
 // DİKKAT: Vitest `.env`/`.env.local` dosyalarını yükler. `UPSTASH_REDIS_REST_*`
 // tanımlıysa bu testler GERÇEK Redis'e yazar (tests/storage.test.ts'in bilinen
@@ -12,7 +24,8 @@ const ENV_KEYS = [
   'DAILY_PER_IP_ANALYSIS_LIMIT',
   'RATE_LIMIT_PER_HOUR',
   'REQUEST_LIMIT_PER_HOUR',
-  'CACHE_TTL_HOURS'
+  'CACHE_TTL_HOURS',
+  'ADMIN_BYPASS_TOKEN'
 ] as const;
 
 const savedEnv: Record<string, string | undefined> = {};
@@ -24,6 +37,12 @@ const IP_HIT = '203.0.113.40';
 const IP_OTHER = '203.0.113.41';
 const IP_REDIS_DOWN = '203.0.113.50';
 const IP_BROKEN_URL = '203.0.113.51';
+/** /api/verify testleri: her senaryo kendi IP'sini kullanır (sayaç paylaşımı). */
+const IP_VERIFY_THROTTLE = '203.0.113.72';
+const IP_VERIFY_ADMIN = '203.0.113.73';
+const IP_VERIFY_FORMAT = '203.0.113.74';
+const IP_VERIFY_OTHER = '203.0.113.75';
+const IP_VERIFY_HAPPY = '203.0.113.76';
 /** Farklı, sabit IP'ler (global kotayı tek IP'ye bağlamamak için). */
 const spareIp = (i: number) => `198.51.100.${i}`;
 
@@ -384,5 +403,97 @@ describe('KVKK silme yolu', () => {
     // Tekrar çağırmak hata vermez (idempotent silme talebi).
     await expect(store.deleteLeadByEmail('sil@gmail.com')).resolves.toBe(false);
     await expect(store.deleteLeadByEmail('')).resolves.toBe(false);
+  });
+});
+
+describe('/api/verify: tam rapor yolu throttle ediliyor', () => {
+  /** `NextRequest`'in kullandığı yüzey: `url` + `headers.get`. */
+  function verifyReq(token: string | null, ip: string, adminKey?: string): NextRequest {
+    const headers: Record<string, string> = { 'x-forwarded-for': ip };
+    if (adminKey) headers['x-admin-key'] = adminKey;
+    return {
+      url: `https://ornek.com/api/verify${token === null ? '' : `?token=${token}`}`,
+      headers: { get: (k: string) => headers[k.toLowerCase()] ?? null }
+    } as unknown as NextRequest;
+  }
+
+  /** 64-hex: `createVerificationToken` iki `randomUUID`'in tiresizidir. */
+  const hexToken = 'a1b2c3d4'.repeat(8);
+
+  it('saatlik istek tavanı dolunca 429 döner (şekil /api/analyze ile aynı)', async () => {
+    process.env.REQUEST_LIMIT_PER_HOUR = '3';
+    process.env.RATE_LIMIT_PER_HOUR = '99';
+    const { GET } = await import('../app/api/verify/route');
+    const ip = IP_VERIFY_THROTTLE;
+
+    // Tavan dolana kadar istek geçer: token geçersiz ama THROTTLE değil, 400.
+    for (let i = 0; i < 3; i += 1) {
+      expect((await GET(verifyReq(hexToken, ip))).status).toBe(400);
+    }
+    const blocked = await GET(verifyReq(hexToken, ip));
+    expect(blocked.status).toBe(429);
+    await expect(blocked.json()).resolves.toEqual({
+      error: 'rate_limited',
+      message: 'Çok sık denediniz, 1 saat sonra tekrar deneyin.'
+    });
+    // Tavanı dolduran IP, başka bir IP'yi etkilemez.
+    expect((await GET(verifyReq(hexToken, IP_VERIFY_OTHER))).status).toBe(400);
+  });
+
+  it('admin anahtarı tavanı atlar ve muafiyet sayacını da işletmez', async () => {
+    process.env.REQUEST_LIMIT_PER_HOUR = '2';
+    process.env.RATE_LIMIT_PER_HOUR = '99';
+    process.env.ADMIN_BYPASS_TOKEN = 'gizli-anahtar-verify';
+    const { GET } = await import('../app/api/verify/route');
+    const ip = IP_VERIFY_ADMIN;
+
+    for (let i = 0; i < 5; i += 1) {
+      expect((await GET(verifyReq(hexToken, ip, 'gizli-anahtar-verify'))).status).toBe(400);
+    }
+    // Aynı IP, anahtarsız: muafiyet sayacı TÜKETİLMEDİĞİ için hâlâ yerinde.
+    expect((await GET(verifyReq(hexToken, ip))).status).toBe(400);
+    expect((await GET(verifyReq(hexToken, ip))).status).toBe(400);
+    expect((await GET(verifyReq(hexToken, ip))).status).toBe(429);
+  });
+
+  it('biçimsiz token ve eksik token kotayı harcamaz', async () => {
+    process.env.REQUEST_LIMIT_PER_HOUR = '1';
+    process.env.RATE_LIMIT_PER_HOUR = '99';
+    const { GET } = await import('../app/api/verify/route');
+    const ip = IP_VERIFY_FORMAT;
+
+    // 64-hex olmayan token: Redis'e hiç gidilmez, kota düşülmez.
+    for (let i = 0; i < 5; i += 1) {
+      const res = await GET(verifyReq('kisa-token', ip));
+      expect(res.status).toBe(400);
+      await expect(res.json()).resolves.toMatchObject({ error: 'invalid_or_expired' });
+    }
+    // `token` parametresi yok: 400, sayaç yine dokunulmaz.
+    expect((await GET(verifyReq(null, ip))).status).toBe(400);
+    // Sayaç hâlâ boş: geçerli biçimli bir token kotaya takılmaz.
+    expect((await GET(verifyReq(hexToken, ip))).status).toBe(400);
+  });
+
+  it('geçerli token tam raporu açar (mocked=false "mock" gibi görünmez)', async () => {
+    process.env.REQUEST_LIMIT_PER_HOUR = '99';
+    const { GET } = await import('../app/api/verify/route');
+    const store = await import('@/lib/store');
+    const saved = await store.saveReport(reportInput('verify-acilis'));
+    const token = await store.createVerificationToken(saved.id, 'verify@test.co');
+
+    const res = await GET(verifyReq(token, IP_VERIFY_HAPPY));
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      ok: boolean;
+      email: string;
+      report: { score: number };
+      reviewCount: number;
+    };
+    expect(body.ok).toBe(true);
+    expect(body.email).toBe('verify@test.co');
+    expect(body.report.score).toBe(7);
+    expect(body.reviewCount).toBe(1);
+    // `mocked: false` idi ve `?? true` gibi bir varsayılanla bozulmadı.
+    expect((await store.findCachedReport('verify-acilis', 'tr'))?.mocked).toBe(false);
   });
 });
