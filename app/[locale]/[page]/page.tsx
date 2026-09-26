@@ -16,15 +16,65 @@ import {
 
 type Params = { locale: string; page: string };
 
+/**
+ * ISR — 24 SAATTE BİR YENİDEN ÜRETİM.
+ *
+ * Bu sayfa `generateStaticParams` ile build'de üretilir; `revalidate`
+ * tanımlanmazsa `todayLabel()` içindeki `new Date()` DERLEME anında bir kez
+ * çalışır ve donup kalır — üretimde eylül yapılmış bir "Gizlilik Politikası"
+ * süresiz "Eylül 2026" başlığı basardı. 86400 ile sayfa en geç günde bir
+ * yeniden üretilir, yani tarih en fazla bir gün eski olur.
+ *
+ * Neden istemci tarafı (b) değil: tarih sunucu HTML'ine girmez; JS kapalıyken
+ * ve ilk boyamada görünmez, üstelik mount sonrası değişen metin hydration
+ * mismatch üretir (bu dosya sunucu bileşeni; düzeltmek için ayrı bir client
+ * bileşen + mount bayrağı gerekir ki o zaman SSR'de tarih yine kaybolur).
+ * Neden tarihi tamamen kaldırmak (c) değil: KVKK/GDPR metinlerinde "son
+ * güncelleme" tarihi hukuki bir bilgilendirmedir; bir günlük bayatlama bu
+ * bilgiyi yanlış yapmaz, yalnızca geciktirir. Yanlış tarih ise (dondurulmuş
+ * derleme tarihi) doğrudan yanıltıcıdır.
+ *
+ * Not: `components/notebook/ReportView.tsx` aynı `todayLabel` kopyasını kendi
+ * içinde taşıyor (o dosya rapor sayfası, client bileşeni — orada tarih zaten
+ * tarayıcıda hesaplandığı için sorun yok). Tek kaynak istenirse
+ * `lib/site.ts` gibi ortak bir modüle taşınmalı.
+ */
+export const revalidate = 86400;
+
+/**
+ * Çevirisi olmayan yasal sayfalar için robots yönergesi.
+ *
+ * `getLegalDoc` gövdeyi İngilizceye düşürdüğünde (fr, es, nl, ar, ru, fa, az)
+ * sayfa İngilizce metni kendi canonical adresiyle `index, follow` olarak
+ * yayımlıyordu: aynı içeriğin 7 kendi-kendine-canonical kopyası (duplicate
+ * content) ve "10 dildeyiz" iddiasının içi boş. Bu yüzden düşen çeviriler
+ * `noindex, follow` alır — `follow` korunur, çünkü sayfadaki bağlantılar
+ * (footer/dil menüsü) hâlâ takip edilsin; sadece sayfanın kendi dizin değeri
+ * düşer. Canonical ve hreflang çıktısı DEĞİŞMEZ: `noindex`'li bir sayfa
+ * hreflang kümesinin meşru üyesi olabilir, Google küme içinden dil seçer.
+ */
+const ROBOTS_FALLBACK = {
+  index: false,
+  follow: true,
+  googleBot: {
+    index: false,
+    follow: true,
+    'max-image-preview': 'large',
+    'max-snippet': -1,
+    'max-video-preview': -1
+  }
+} as const;
+
 export function generateStaticParams() {
   return locales.flatMap((locale) => LEGAL_SLUGS.map((page) => ({ locale, page })));
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   if (!isLegalSlug(params.page)) return {};
-  const meta = getLegalMeta(params.page, params.locale);
-  const ogImage = getOgImageUrl(params.locale);
-  const { canonical, languages } = getAlternates(params.locale, params.page);
+  const locale = normalizeLocale(params.locale);
+  const meta = getLegalMeta(params.page, locale);
+  const ogImage = getOgImageUrl(locale);
+  const { canonical, languages } = getAlternates(locale, params.page);
   return {
     title: meta.title,
     description: meta.description,
@@ -32,8 +82,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     openGraph: {
       type: 'article',
       siteName: 'TrueReviews',
-      locale: getOgLocale(params.locale),
-      alternateLocale: getOgLocaleAlternates(params.locale),
+      locale: getOgLocale(locale),
+      alternateLocale: getOgLocaleAlternates(locale),
       url: canonical,
       title: meta.title,
       description: meta.description,
@@ -45,7 +95,11 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       description: meta.description,
       images: [ogImage]
     },
-    robots: ROBOTS_INDEX
+    // `fallback` yalnızca İÇERİK dilini bilir; URL dili her zaman 10 dilde
+    // yayımlanıyor, bu yüzden karar `generateMetadata`'de (yani `<head>`'de)
+    // veriliyor — `robots.txt` seviyesinde değil, çünkü o zaman tüm diller
+    // tek blokta taranır.
+    robots: getLegalDoc(params.page, locale).fallback ? ROBOTS_FALLBACK : ROBOTS_INDEX
   };
 }
 

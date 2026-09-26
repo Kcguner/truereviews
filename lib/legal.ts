@@ -1,11 +1,24 @@
-import type { Locale } from '@/i18n.config';
-import { getFaqHeading } from './faq';
-
 export type LegalSlug = 'sss' | 'gizlilik' | 'kvkk' | 'iletisim';
 export const LEGAL_SLUGS: LegalSlug[] = ['sss', 'gizlilik', 'kvkk', 'iletisim'];
 
 export type LegalSection = { h: string; p: string[] };
 export type LegalDoc = { title: string; intro: string; sections: LegalSection[] };
+
+export type LegalDocResult = {
+  doc: LegalDoc;
+  /** Ekranda gösterilen "henüz çevrilmedi" notu; çeviri varsa boş string. */
+  fallbackNote: string;
+  /**
+   * Gövde İngilizceye düştü mü?
+   *
+   * `fallbackNote` bunu zaten ima eder ama o bir GÖRSEL metindir: bir dil
+   * (`messages/*.json` gibi) notu boş bırakırsa sinyal kaybolur. Dizin politikası
+   * yalnızca görsel nota bakmamalı — bu bayrak "bu sayfa gerçekten o dilde
+   * yazılmış mı" sorusunun tek makul cevabıdır (bkz.
+   * app/[locale]/[page]/page.tsx → `robots`).
+   */
+  fallback: boolean;
+};
 
 const PAGE_NAMES: Record<LegalSlug, Record<string, string>> = {
   sss: {
@@ -89,11 +102,6 @@ export function getLegalMeta(slug: LegalSlug, locale: string): { title: string; 
 
 export function getLegalName(slug: LegalSlug, locale: string): string {
   return PAGE_NAMES[slug][locale] || PAGE_NAMES[slug].en;
-}
-
-/** SSS başlığı footer'da da kullanılır (tek kaynak). */
-export function getSssHeading(locale: string): string {
-  return getFaqHeading(locale);
 }
 
 // ── İçerikler: tr/en/de tam metin, diğer diller İngilizce + not ──
@@ -228,15 +236,21 @@ const FALLBACK_NOTE: Record<string, string> = {
   az: 'Bu səhifə hələ Azərbaycan dilinə tərcümə olunmayıb — aşağıda ingilis versiyası.'
 };
 
-export function getLegalDoc(slug: LegalSlug, locale: string): { doc: LegalDoc; fallbackNote: string } {
+export function getLegalDoc(slug: LegalSlug, locale: string): LegalDocResult {
   const bySlug = DOCS[slug];
   if (bySlug) {
-    const doc = bySlug[locale] || bySlug.en;
-    if (doc) return { doc, fallbackNote: bySlug[locale] ? '' : FALLBACK_NOTE[locale] || '' };
+    const localized = bySlug[locale];
+    const doc = localized || bySlug.en;
+    if (doc) return { doc, fallbackNote: localized ? '' : FALLBACK_NOTE[locale] || '', fallback: !localized };
   }
-  // sss: içerik FAQ verisinden sayfada üretilir
+  // sss: içerik FAQ verisinden sayfada üretilir. `FAQS` 10 dilin tamamında
+  // tanımlı olduğu için bu yol hiçbir dilde çeviri düşmez → `fallback: false`.
   const meta = getLegalMeta(slug, locale);
-  return { doc: { title: meta.title.replace(' — TrueReviews', ''), intro: meta.description, sections: [] }, fallbackNote: '' };
+  return {
+    doc: { title: meta.title.replace(' — TrueReviews', ''), intro: meta.description, sections: [] },
+    fallbackNote: '',
+    fallback: false
+  };
 }
 
 // ── E-posta kilidindeki KVKK onayı ──
