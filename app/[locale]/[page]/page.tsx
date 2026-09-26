@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { locales } from '@/i18n.config';
-import { getSiteUrl } from '@/lib/site';
-import { LEGAL_SLUGS, getContactEmail, getLegalDoc, getLegalMeta, isLegalSlug } from '@/lib/legal';
+import { getContactEmail, getSiteUrl } from '@/lib/site';
+import { LEGAL_SLUGS, getLegalDoc, getLegalMeta, isLegalSlug } from '@/lib/legal';
 import { getFaqHeading, getFaqs } from '@/lib/faq';
 import {
   OG_IMAGE_SIZE,

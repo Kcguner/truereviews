@@ -1,5 +1,5 @@
 import { locales } from '@/i18n.config';
-import { getSiteUrl } from '@/lib/site';
+import { SOCIAL_LINKS, getSiteUrl } from '@/lib/site';
 import { getFaqs } from '@/lib/faq';
 import { CURRENCY, getOgImageUrl, normalizeLocale } from '@/lib/seo';
 
@@ -28,7 +28,9 @@ export default function SeoJsonLd({
       '@type': 'Organization',
       name: 'TrueReviews',
       url: base,
-      logo: `${base}/icon.svg`
+      logo: `${base}/icon.svg`,
+      // Markayı sosyal profillerle eşleştirir — Google'da varlık (entity) tanıma.
+      sameAs: SOCIAL_LINKS.map((s) => s.href)
     },
     {
       '@context': 'https://schema.org',

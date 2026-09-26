@@ -1564,6 +1564,39 @@ html:not(.dark) .action__k {
   margin-top: 16px;
 }
 
+/* footer sosyal bağlantıları */
+.foot-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+}
+.foot-social a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px 5px 9px;
+  font-size: 13px;
+  line-height: 1;
+  text-decoration: none;
+  color: var(--ink-2);
+  border: 1.4px solid var(--line-2);
+  border-radius: 999px;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.foot-social a:hover {
+  color: var(--brand);
+  border-color: var(--brand);
+  background: var(--paper);
+}
+.foot-social__i {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+
 /* toast */
 .nb-toast {
   position: fixed;

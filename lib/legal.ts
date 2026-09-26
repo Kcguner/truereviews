@@ -300,10 +300,6 @@ export function getConsent(locale: string): ConsentText {
   return CONSENT[locale] || CONSENT.en;
 }
 
-export function getContactEmail(): string | null {
-  return process.env.NEXT_PUBLIC_CONTACT_EMAIL || null;
-}
-
 export function isLegalSlug(s: string): s is LegalSlug {
   return (LEGAL_SLUGS as string[]).includes(s);
 }

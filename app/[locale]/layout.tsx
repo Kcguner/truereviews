@@ -5,6 +5,7 @@ import { getMessages, getTranslations, unstable_setRequestLocale } from 'next-in
 import { Fraunces, Karla, IBM_Plex_Mono } from 'next/font/google';
 import { locales, rtlLocales, type Locale } from '@/i18n.config';
 import { LEGAL_SLUGS, getLegalName } from '@/lib/legal';
+import { SOCIAL_LINKS } from '@/lib/site';
 import {
   OG_IMAGE_SIZE,
   getAlternates,
@@ -14,6 +15,7 @@ import {
   getOgLocaleAlternates
 } from '@/lib/seo';
 import Analytics from '@/components/Analytics';
+import { SocialIcon } from '@/components/Icons';
 import SeoJsonLd from '@/components/SeoJsonLd';
 import LangMenu from '@/components/notebook/LangMenu';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -148,6 +150,22 @@ export default async function LocaleLayout({
                   <p style={{ fontSize: 14, color: 'var(--ink-2)', marginTop: 8, maxWidth: '38ch' }}>
                     {t('foot.tagline')}
                   </p>
+                  <ul className="foot-social">
+                    {SOCIAL_LINKS.map((s) => (
+                      <li key={s.key}>
+                        <a
+                          href={s.href}
+                          target="_blank"
+                          rel="me noopener noreferrer"
+                          title={s.label}
+                          aria-label={s.label}
+                        >
+                          <SocialIcon social={s.key} className="foot-social__i" />
+                          <span>{s.label}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
                   <p className="foot-mono">© 2026 · {t('foot.made')}</p>
                 </div>
                 <nav className="foot-links" aria-label="Alt bilgi">
