@@ -38,4 +38,21 @@ describe('admin bypass anahtarı', () => {
     expect(isAdminBypass('GİZLİ-ANAHTAR-123')).toBe(false);
     expect(isAdminBypass('yanlis')).toBe(false);
   });
+
+  // Regresyon: /api/lead yetkisini gövdedeki `email` üzerinden veriyordu;
+  // ADMIN_EMAILS'teki bir adresi bilmek, e-posta sahipliği doğrulanmadan
+  // double opt-in'i atlatmaya yetiyordu. Yetki ARTIK yalnızca anahtardan gelir.
+  it('ADMIN_EMAILS listesindeki bir e-posta tek başına muafiyet vermez', () => {
+    process.env.ADMIN_EMAILS = 'ben@mail.com';
+    process.env.ADMIN_BYPASS_TOKEN = 'gizli-anahtar-123';
+    expect(isAdminEmail('ben@mail.com')).toBe(true); // liste yardımcı olarak çalışır
+    expect(isAdminBypass('ben@mail.com')).toBe(false); // ama yetki kapısı açmaz
+    expect(isAdminBypass('gizli-anahtar-123')).toBe(true);
+  });
+
+  it('farklı uzunluklu anahtar timingSafeEqual ile patlatmaz', () => {
+    process.env.ADMIN_BYPASS_TOKEN = 'kisa';
+    expect(() => isAdminBypass('çok-uzun-bir-anahtar-değeri')).not.toThrow();
+    expect(isAdminBypass('çok-uzun-bir-anahtar-değeri')).toBe(false);
+  });
 });

@@ -1,19 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchReviews } from '@/lib/apify';
 import { analyzeReviews } from '@/lib/gemma';
-import { findCachedReport, saveReport } from '@/lib/store';
+import { canonicalPlaceKey, findCachedReport, saveReport } from '@/lib/store';
 import { normalizePlaceUrl, isGoogleMapsUrl, type PreviewData, type ToneSplit } from '@/lib/types';
-import { checkQuota, logUsage } from '@/lib/quota';
+import { buildTeaser, envInt, reserveAnalysis, reserveRequest, type QuotaResult } from '@/lib/quota';
 import { isAdminBypass } from '@/lib/admin';
 import { verifyTurnstile } from '@/lib/validation';
 import { locales } from '@/i18n.config';
 
+/**
+ * Vercel varsayılanı (10s) bu route için çok kısa: Apify `run-sync-get-dataset-items`
+ * tüm actor süresince (30-120s) bloklar, `analyzeReviews` retry ekler. Fonksiyon
+ * ortasında öldürülürse kullanıcı 504 + JSON'suz hata görür, Apify kredisi harcanmış
+ * olur ve hiçbir şey saklanmaz. Not: fetch zaman aşımları `lib/apify.ts` ve
+ * `lib/gemma.ts` içinde (o dosyalar başka bir turun sahibinde).
+ */
+export const maxDuration = 60;
+
 function clientIp(req: NextRequest): string {
-  return (
+  const raw =
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
     req.headers.get('x-real-ip') ||
-    'unknown'
-  );
+    '';
+  // Başlık istemciden gelir: sayaç anahtarına (`ya:q:pd:<ip>`) sokulacak
+  // karakterleri ayıklayıp uzunluğu sınırlarız.
+  const ip = raw.replace(/[^0-9a-fA-F.:_]/g, '').slice(0, 45);
+  return ip || 'unknown';
 }
 
 function toneSplit(ratings: number[]): ToneSplit {
@@ -23,6 +35,15 @@ function toneSplit(ratings: number[]): ToneSplit {
   const posPct = Math.round((pos / total) * 100);
   const negPct = Math.round((neg / total) * 100);
   return { pos: posPct, neu: Math.max(0, 100 - posPct - negPct), neg: negPct };
+}
+
+/** Kota reddini kullanıcı mesajına çevirir. `reason` değerleri API sözleşmesidir. */
+function quotaResponse(result: QuotaResult): NextResponse {
+  const message =
+    result.reason === 'daily_quota_exceeded'
+      ? 'Günlük analiz kotası doldu, yarın tekrar deneyin.'
+      : 'Çok sık denediniz, 1 saat sonra tekrar deneyin.';
+  return NextResponse.json({ error: result.reason, message }, { status: 429 });
 }
 
 export async function POST(req: NextRequest) {
@@ -55,32 +76,44 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // 1) İSTEK tavanı: cache HIT dahil HER istek sayılır. Önceden yalnızca
+    //    analiz sayacı vardı ve o yalnızca cache MISS'te artıyordu; yani bir
+    //    istemci tek bir cache'li linki sınırsız kez çalıştırabiliyor, üstelik
+    //    throttlendikten sonra da aynı linki çalıştırmaya devam edebiliyordu.
     if (!admin) {
-      const quota = await checkQuota(ip);
-      if (!quota.ok) {
-        const msg =
-          quota.reason === 'daily_quota_exceeded'
-            ? 'Günlük analiz kotası doldu, yarın tekrar deneyin.'
-            : 'Çok sık denediniz, 1 saat sonra tekrar deneyin.';
-        return NextResponse.json({ error: quota.reason, message: msg }, { status: 429 });
-      }
+      const request = await reserveRequest(ip);
+      if (!request.ok) return quotaResponse(request);
     }
 
-    const placeKey = normalizePlaceUrl(placeUrl);
+    // Sorgu dizesi (`?hl=tr`, `?utm_source=x`, …) önbellek anahtarına girmiyor:
+    // aynı işletme her yeni parametrede ücretli bir tur demekti.
+    const placeKey = canonicalPlaceKey(placeUrl);
+    const legacyPlaceKey = normalizePlaceUrl(placeUrl);
 
     // 24s cache: aynı link + dil için Apify/Gemma'ya tekrar gitme
-    const cached = await findCachedReport(placeKey, locale);
+    const cached = await findCachedReport(placeKey, locale, legacyPlaceKey);
     if (cached) {
       return NextResponse.json({
         reportId: cached.id,
         preview: cached.preview,
         cached: true,
-        mocked: (cached as unknown as { mocked?: boolean }).mocked ?? true,
+        // Not: `mocked` StoredReport tipinde beyan değil; store.ts `mocked`'ı
+        // tiplenmiş döndürüyor. `?? true` ile gerçek raporu "mock" göstermek artık
+        // mümkün değil.
+        mocked: cached.mocked,
         ...(admin ? { admin: true } : {})
       });
     }
 
-    const maxReviews = Math.min(Number(process.env.MAX_REVIEWS || 20), 50);
+    // 2) ANALİZ kotası: tek Lua'da kontrol + tüketim, ÜCRETLİ işe girmeden ÖNCE.
+    //    (Eski akış: kontrol → Apify → Gemma → artır. Aynı IP'den gelen paralel
+    //    istekler aynı sayacı okuyup hepsi geçiyordu.)
+    if (!admin) {
+      const analysis = await reserveAnalysis(ip, placeKey);
+      if (!analysis.ok) return quotaResponse(analysis);
+    }
+
+    const maxReviews = envInt('MAX_REVIEWS', 20, { max: 50 });
     // Kullanıcının dili Apify'a aktarılır (yorum arayüz/çeviri dili için);
     // actor tanımadığı kodu varsayılana düşürür, analiz dili zaten Gemma'da üretilir.
     const apifyLanguage = ['tr', 'en', 'de', 'ar', 'ru', 'fr', 'es', 'nl'].includes(locale)
@@ -106,7 +139,9 @@ export async function POST(req: NextRequest) {
 
     const preview: PreviewData = {
       score: report.score,
-      teaser: report.summary.split('.').slice(0, 1).join('.') + '.',
+      // İlk cümle + sert karakter bütçesi: noktayla bitmeyen özetler tüm
+      // özeti (e-posta duvarının deliği) olarak sızdırmasın.
+      teaser: buildTeaser(report.summary),
       business_name: businessName,
       review_count: reviews.length,
       tone
@@ -125,9 +160,6 @@ export async function POST(req: NextRequest) {
       // Mock sonuç önbelleğe girmez: aynı link bir dahaki sefere gerçeği dener.
       indexPlace: !mocked
     });
-
-    // Admin testleri günlük kotayı tüketmez.
-    if (!admin) await logUsage(ip, placeKey);
 
     // GÜVENLİK: frontend'e SADECE önizleme + reportId döner, tam rapor asla dönmez.
     return NextResponse.json({

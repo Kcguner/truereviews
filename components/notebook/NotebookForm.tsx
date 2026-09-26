@@ -57,7 +57,8 @@ export default function NotebookForm() {
   const [screen, setScreen] = useState<'intro' | 'loading' | 'preview'>('intro');
   const [url, setUrl] = useState('');
   const [linkErr, setLinkErr] = useState('');
-  const [turnstile, setTurnstile] = useState('');
+  // Yalnızca giriş ekranının widget'ı: sadece /api/analyze'a gider.
+  const [introTurnstile, setIntroTurnstile] = useState('');
   const [stageIdx, setStageIdx] = useState(0);
   const [bizLabel, setBizLabel] = useState('');
   const [preview, setPreview] = useState<NbPreview | null>(null);
@@ -68,17 +69,37 @@ export default function NotebookForm() {
   const [sentEmail, setSentEmail] = useState('');
   const [mockMail, setMockMail] = useState(false);
   const [devUrl, setDevUrl] = useState('');
-  const [adminKey, setAdminKey] = useState(() => {
-    try {
-      return localStorage.getItem(ADMIN_KEY_STORE) || '';
-    } catch {
-      return '';
-    }
-  });
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Sunucu render'ında localStorage'a DOKUNULMAZ: `useState` lazy initializer
+  // hem sunucuda hem istemcide çalışır, sunucu `''` basarken istemci ilk
+  // render'da kayıtlı anahtarı basar → hydration uyuşmazlığı (#418) ve
+  // "Test anahtarı ●" işareti için görünür titreme. Bu yüzden başlangıç her
+  // iki tarafta da `''`, gerçek değer mount sonrası efektte gelir.
+  const [adminKey, setAdminKey] = useState('');
 
-  useEffect(() => () => {
-    if (timer.current) clearInterval(timer.current);
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(ADMIN_KEY_STORE);
+      if (stored) setAdminKey(stored);
+    } catch {
+      /* saklanamazsa sessiz geç */
+    }
+  }, []);
+
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Sahne geçiş gecikmesi `await`'tan SONRA kuruluyor; ilk cleanup onu
+  // kapsamıyordu ve unmount sonrası `window.scrollTo` çalıştırıyordu.
+  const scrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // `startAnalysis` unmount sonrasında da devam edebiliyor; bu bayrak
+  // kalan adımları kesiyor.
+  const alive = useRef(true);
+
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+      if (timer.current) clearInterval(timer.current);
+      if (scrollTimer.current) clearTimeout(scrollTimer.current);
+    };
   }, []);
 
   async function startAnalysis(raw: string) {
@@ -96,6 +117,8 @@ export default function NotebookForm() {
     setScreen('loading');
     setStageIdx(0);
     const t0 = Date.now();
+    // Hızlı yeniden gönderimlerde önceki interval sızmasın.
+    if (timer.current) clearInterval(timer.current);
     timer.current = setInterval(() => setStageIdx(stageFor(Date.now() - t0)), 500);
     try {
       const res = await fetch('/api/analyze', {
@@ -104,7 +127,7 @@ export default function NotebookForm() {
         body: JSON.stringify({
           placeUrl: v,
           locale,
-          turnstileToken: turnstile,
+          turnstileToken: introTurnstile,
           ...(adminKey.trim() ? { adminKey: adminKey.trim() } : {})
         })
       });
@@ -112,6 +135,7 @@ export default function NotebookForm() {
       if (!res.ok) throw new Error(friendlyErr(data));
       const elapsed = Date.now() - t0;
       if (elapsed < MIN_LOAD_MS) await new Promise((r) => setTimeout(r, MIN_LOAD_MS - elapsed));
+      if (!alive.current) return;
       if (timer.current) clearInterval(timer.current);
       setStageIdx(6);
       setPreview(data.preview);
@@ -120,23 +144,32 @@ export default function NotebookForm() {
       setUnlocked(false);
       setMailSent(false);
       setDevUrl('');
-      setTimeout(() => {
+      scrollTimer.current = setTimeout(() => {
         setScreen('preview');
         window.scrollTo({ top: 0 });
       }, 450);
     } catch (e) {
       if (timer.current) clearInterval(timer.current);
+      if (!alive.current) return;
       setScreen('intro');
       setLinkErr(e instanceof Error ? e.message : 'Hata');
     }
   }
 
-  async function unlock(email: string): Promise<string | null> {
+  // turnstileToken kilit duvarındaki widget'tan gelir; giriş ekranının token'ı
+  // tek kullanımlık olduğu için burada yeniden kullanılamaz.
+  async function unlock(email: string, turnstileToken: string): Promise<string | null> {
     try {
       const res = await fetch('/api/lead', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ reportId, email, locale, turnstileToken: turnstile })
+        body: JSON.stringify({
+          reportId,
+          email,
+          locale,
+          turnstileToken,
+          adminKey: adminKey.trim() || undefined
+        })
       });
       const data = await res.json();
       if (!res.ok) return friendlyErr(data);
@@ -324,7 +357,7 @@ export default function NotebookForm() {
                 </p>
               )}
               <div className="paste__turnstile">
-                <TurnstileWidget onToken={setTurnstile} />
+                <TurnstileWidget onToken={setIntroTurnstile} />
               </div>
               <div className="paste__cta">
                 <button className="btn btn--primary btn--big btn--full" type="submit">

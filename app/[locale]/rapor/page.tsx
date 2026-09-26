@@ -1,5 +1,5 @@
 'use client';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import ReportView from '@/components/notebook/ReportView';
@@ -14,28 +14,71 @@ function ReportContent() {
   const [preview, setPreview] = useState<NbPreview | null>(null);
   const [report, setReport] = useState<NbReport | null>(null);
   const [email, setEmail] = useState('');
+  // `reactStrictMode: true` altında efekt mount sonrası iki kez koşar
+  // (unmount → mount). `abort` ilk isteği gerçekten DURDURMAZ — o istek
+  // sunucuya çoktan ulaştı ve `upsertLead` çalıştı; asıl koruma aynı token
+  // için ikinci isteği hiç açmamak. Ref StrictMode'un çift mount'unda da
+  // yaşar, gerçek gezinmede (yeni bileşen örneği) sıfırlanır.
+  const inflight = useRef<{
+    token: string;
+    ac: AbortController;
+    timer: ReturnType<typeof setTimeout> | null;
+  } | null>(null);
 
   useEffect(() => {
     if (!token) {
       setState('err');
       return;
     }
-    fetch(`/api/verify?token=${encodeURIComponent(token)}`)
-      .then(async (r) => {
-        const d = await r.json();
-        if (!r.ok) throw new Error(d.message || d.error);
-        setReport(d.report);
-        setEmail(d.email || '');
-        setPreview({
-          score: Number(d.report.score),
-          teaser: String(d.report.summary).split('.').slice(0, 1).join('.') + '.',
-          business_name: d.businessName || d.report.business_name,
-          review_count: d.reviewCount ?? d.report.review_count,
-          tone: d.report.rating_histogram
+
+    let entry = inflight.current;
+    if (!entry || entry.token !== token) {
+      // İlk (veya yeni token) koşu: isteği bir kez aç.
+      const ac = new AbortController();
+      entry = { token, ac, timer: null };
+      inflight.current = entry;
+
+      fetch(`/api/verify?token=${encodeURIComponent(token)}`, { signal: ac.signal })
+        .then(async (r) => {
+          const d = await r.json();
+          if (!r.ok) throw new Error(d.message || d.error);
+          setReport(d.report);
+          setEmail(d.email || '');
+          setPreview({
+            score: Number(d.report.score),
+            teaser: String(d.report.summary).split('.').slice(0, 1).join('.') + '.',
+            business_name: d.businessName || d.report.business_name,
+            review_count: d.reviewCount ?? d.report.review_count,
+            tone: d.report.rating_histogram
+          });
+          setState('ok');
+        })
+        .catch((e) => {
+          // Abort bir hata değil: bileşen uçtu ya da token değişti.
+          if (e instanceof DOMException && e.name === 'AbortError') return;
+          setState('err');
         });
-        setState('ok');
-      })
-      .catch(() => setState('err'));
+    } else if (entry.timer) {
+      // StrictMode'un ikinci koşuşu: istek zaten uçuşta, sadece bir sonraki
+      // macraya ertelenmiş iptali geri al.
+      clearTimeout(entry.timer);
+      entry.timer = null;
+    }
+
+    const current = entry;
+    return () => {
+      // Bileşenin GERÇEKTEN uçtuğu ile StrictMode'un sahte (unmount → mount)
+      // koşusunu cleanup tek başına ayırt edemiyor. Bu yüzden iptali bir
+      // sonraki macraya erteliyoruz: aynı token için efekt yeniden koşarsa
+      // (StrictMode) yukarıda bu zamanlayıcı iptal edilir ve istek yaşamaya
+      // devam eder; gerçek uçmada ise macera gelir ve istek iptal edilir.
+      // Her koşu cleanup döndürür — StrictMode'un ikinci koşusu da döndürüyor,
+      // yoksa gerçek uçmada iptal edilecek bir şey kalmazdı.
+      current.timer = setTimeout(() => {
+        current.timer = null;
+        current.ac.abort();
+      }, 0);
+    };
   }, [token]);
 
   if (state === 'loading') {

@@ -1,12 +1,15 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { getConsent } from '@/lib/legal';
+import TurnstileWidget from '../TurnstileWidget';
 import Gauge from './Gauge';
 import ToneBar from './ToneBar';
 import ThemeRow from './ThemeRow';
 import { bandOf, type NbPreview, type NbReport } from './types';
+
+const LAST_EMAIL_KEY = 'tr-last-email';
 
 function todayLabel(locale: string): string {
   try {
@@ -34,25 +37,44 @@ export default function ReportView({
   mailSent: boolean;
   isMockMail: boolean;
   devUrl?: string;
-  onUnlock: (email: string) => Promise<string | null>;
+  onUnlock: (email: string, turnstileToken: string) => Promise<string | null>;
   onReset: () => void;
 }) {
   const t = useTranslations('nb');
   const tRoot = useTranslations();
   const locale = useLocale();
   const router = useRouter();
-  const [mail, setMail] = useState(() => {
-    if (unlocked) return '';
-    try {
-      return localStorage.getItem('tr-last-email') || '';
-    } catch {
-      return '';
-    }
-  });
+  // Sunucu render'ında localStorage okunmaz: lazy initializer sunucuda `''`
+  // basarken istemci ilk render'da kayıtlı e-postayı basıyordu → `<input
+  // value>` uyuşmazlığı (hydration hatası + görünür titreme). Başlangıç her
+  // iki tarafta da `''`, gerçek değer mount sonrası efektte gelir.
+  const [mail, setMail] = useState('');
   const [mailErr, setMailErr] = useState('');
   const [sending, setSending] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  // Kilit duvarı kendi turnstile token'ını üretir: giriş ekranındaki token
+  // /api/analyze'da tüketildiği için tekrar kullanılamaz (tek kullanımlık).
+  const [lockToken, setLockToken] = useState('');
+  const [lockAttempt, setLockAttempt] = useState(0);
+
+  // Kilit duvarı açılır açılmaz son kullanılan e-postayı doldur (yalnızca
+  // istemcide, mount sonrası).
+  useEffect(() => {
+    if (unlocked) return;
+    try {
+      const stored = localStorage.getItem(LAST_EMAIL_KEY);
+      if (stored) setMail(stored);
+    } catch {
+      /* saklanamazsa sessiz geç */
+    }
+  }, [unlocked]);
+
   const consent = getConsent(locale);
+
+  // Site key yoksa widget null render eder, sunucu pasif modda çalışır:
+  // o durumda formu bekletmiyoruz.
+  const tokenRequired = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+  const tokenReady = !tokenRequired || lockToken !== '';
 
   const score100 = Math.round(preview.score * 10);
   const band = bandOf(score100);
@@ -72,6 +94,8 @@ export default function ReportView({
       setMailErr(consent.error);
       return;
     }
+    // Token henüz gelmediyse Enter ile gönderimi de engelle (buton zaten kapalı).
+    if (!tokenReady) return;
     const v = mail.trim();
     if (!/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(v)) {
       setMailErr(t('lock.err'));
@@ -79,9 +103,14 @@ export default function ReportView({
     }
     setMailErr('');
     setSending(true);
-    const err = await onUnlock(v);
+    const err = await onUnlock(v, lockToken);
     setSending(false);
-    if (err) setMailErr(err);
+    if (err) {
+      setMailErr(err);
+      // Kullanılan token bir daha kabul edilmez: yeni challenge başlat.
+      setLockToken('');
+      setLockAttempt((n) => n + 1);
+    }
   }
 
   return (
@@ -217,9 +246,16 @@ export default function ReportView({
                 aria-label={t('lock.ph')}
                 dir="ltr"
               />
-              <button className="btn btn--primary btn--big" type="submit" disabled={sending || !mail.trim()}>
+              <button
+                className="btn btn--primary btn--big"
+                type="submit"
+                disabled={sending || !mail.trim() || !tokenReady}
+              >
                 {t('lock.cta')}
               </button>
+              <div className="paste__turnstile">
+                <TurnstileWidget onToken={setLockToken} resetKey={lockAttempt} />
+              </div>
             </form>
             <label className="mailnote" style={{ display: 'flex', gap: 8, cursor: 'pointer', marginTop: 10 }}>
               <input
