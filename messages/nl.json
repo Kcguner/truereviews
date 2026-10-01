@@ -10,14 +10,14 @@
     "loading": "Rapport verifiëren..."
   },
   "mock": {
-    "emailNote": "E-mail niet gekoppeld — link hieronder:"
+    "emailNote": "E-mail niet gekoppeld — verificatielink hieronder (preview voor ontwikkelaars):"
   },
   "theme": {
     "toggle": "Thema wisselen"
   },
   "nb": {
     "brand": {
-      "sub": "lees · weegt · adviseert"
+      "sub": "lees · weeg · adviseer"
     },
     "head": {
       "note": "Voorbeeld is gratis"
@@ -46,7 +46,7 @@
     },
     "step3": {
       "t": "We vatten het samen",
-      "d": "Eén pagina: je score, de onderwerpen die terugkomen en één concrete stap voor deze week. Geen dashboard, geen grafische bombarst."
+      "d": "Eén pagina: je score, de onderwerpen die terugkomen en één concrete stap voor deze week. Geen dashboard, geen overdaad aan grafieken."
     },
     "gets": {
       "h": "Wat er in je rapport staat"
@@ -57,14 +57,14 @@
     },
     "get2": {
       "t": "Onderwerpen die terugkomen",
-      "d": "De meest herhaalde lof en klachten, met hoeveel recensies elk noemt."
+      "d": "De meest herhaalde lof en klachten, met in hoeveel recensies elk voorkomt."
     },
     "get3": {
       "t": "Eén concreet advies",
       "d": "We zullen niet zeggen dat je “alles moet repareren”. Alleen één stap die je deze week kunt zetten."
     },
     "assure": {
-      "text": "We bewerken je recensies niet, we verwijderen ze niet en we poetsen ze niet op. We lezen ze allemaal en vertellen het je zoals iemand het je recht voor de neus zou zeggen.",
+      "text": "We bewerken je recensies niet, we verwijderen ze niet en we poetsen ze niet op. We lezen ze allemaal en vertellen het je zoals iemand het je recht in het gezicht zou zeggen.",
       "sig": "TrueReviews · onafhankelijke analyse"
     },
     "float": {

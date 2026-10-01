@@ -4,7 +4,7 @@
     "summary": "Özet",
     "complaints": "En sık şikayet konuları",
     "praises": "En sık övgü konuları",
-    "action": "Öncelikli aksiyon önerisi",
+    "action": "Öncelikli adım önerisi",
     "verified": "E-postanız doğrulandı, raporunuz aşağıda.",
     "invalid": "Onay linki geçersiz veya süresi dolmuş.",
     "loading": "Rapor doğrulanıyor..."
@@ -24,7 +24,7 @@
     },
     "intro": {
       "eyebrow": "Önizleme ücretsiz · Kayıt gerekmez · ~40 saniye",
-      "h1a": "Müşterilerin senin",
+      "h1a": "Müşteriler senin",
       "h1b": "hakkında <hl>aslında</hl> ne diyor?",
       "lede": "Google Maps linkini yapıştır. Yorumlarının <strong>tamamını</strong> tek tek okuyalım; sana bir sayfalık dürüst bir özet çıkaralım: memnuniyet skorun, en çok tekrar eden övgü ve şikayetler, ve bu hafta atabileceğin <strong>tek somut adım</strong>."
     },
@@ -38,7 +38,7 @@
     },
     "step1": {
       "t": "Linkini yapıştır",
-      "d": "Google Haritalar'daki işletme sayfanın linki yeterli. Başka bir şey kurman, bağlaman gerekmiyor."
+      "d": "Google Haritalar'daki işletme sayfanın linki yeterli. Başka bir şey kurmana, bağlamana gerek yok."
     },
     "step2": {
       "t": "Biz okuyalım",
@@ -49,7 +49,7 @@
       "d": "Bir sayfa: skorun, en çok tekrar eden konular ve bu hafta atabileceğin tek somut adım. Dashboard yok, grafik yığını yok."
     },
     "gets": {
-      "h": "Raporunda ne var"
+      "h": "Raporunda ne var?"
     },
     "get1": {
       "t": "Memnuniyet skorun",
@@ -82,7 +82,7 @@
       "s6": "Raporun yazılıyor"
     },
     "rpt": {
-      "back": "← Yeni bir işletme analiz et",
+      "back": "← Başka bir işletme analiz et",
       "stamp": {
         "prev": "Önizleme",
         "full": "Tam rapor"

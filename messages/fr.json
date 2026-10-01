@@ -10,7 +10,7 @@
     "loading": "Vérification du rapport..."
   },
   "mock": {
-    "emailNote": "Service e-mail non connecté — lien ci-dessous :"
+    "emailNote": "Service e-mail non connecté — lien de confirmation ci-dessous (aperçu développeur) :"
   },
   "theme": {
     "toggle": "Changer de thème"
@@ -24,7 +24,7 @@
     },
     "intro": {
       "eyebrow": "Aperçu gratuit · Sans inscription · ~40 secondes",
-      "h1a": "Analyse des avis Google :",
+      "h1a": "Ce que vos clients",
       "h1b": "que disent vraiment <hl>vos clients</hl> ?",
       "lede": "Collez le lien de votre établissement sur Google Maps. Nous lisons <strong>chacun</strong> de vos avis et vous remettons un résumé honnête d’une page : votre score de satisfaction, les thèmes qui reviennent sans cesse, et <strong>l’unique pas concret</strong> que vous pouvez faire cette semaine."
     },
@@ -142,7 +142,7 @@
       },
       "c": {
         "t": "Moyen",
-        "d": "Pas mal, mais un seul thème fait plummet votre score. Touchez-le et la différence se voit vite."
+        "d": "Pas mal, mais un seul thème fait chuter votre score. Touchez-le et la différence se voit vite."
       },
       "d": {
         "t": "En difficulté",

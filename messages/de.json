@@ -10,14 +10,14 @@
     "loading": "Bericht wird verifiziert..."
   },
   "mock": {
-    "emailNote": "E-Mail-Dienst nicht verbunden — Bestätigungslink unten:"
+    "emailNote": "E-Mail-Dienst nicht verbunden — Bestätigungslink unten (Entwicklervorschau):"
   },
   "theme": {
-    "toggle": "Theme wechseln"
+    "toggle": "Design wechseln"
   },
   "nb": {
     "brand": {
-      "sub": "lesen · wägen · raten"
+      "sub": "lesen · abwägen · empfehlen"
     },
     "head": {
       "note": "Vorschau kostenlos"
@@ -110,7 +110,7 @@
       "new": "Anderen Betrieb analysieren"
     },
     "lock": {
-      "h": "Dein Bericht ist fertig — öffnen wir den Rest.",
+      "h": "Dein Bericht ist fertig — schalten wir den Rest frei.",
       "p": "Der Wert und die Tonverteilung stehen oben. Die wiederkehrenden Themen und der konkrete Vorschlag sind im vollständigen Bericht. Hinterlasse deine E-Mail und wir schalten alles frei.",
       "ph": "du@meinbetrieb.de",
       "cta": "Vollständigen Bericht freischalten",
@@ -129,12 +129,12 @@
     },
     "foot": {
       "tagline": "Eine ehrliche Zusammenfassung deiner Bewertungen — für kleine Betriebe.",
-      "made": "In Istanbul gemacht"
+      "made": "In Istanbul erstellt"
     },
     "band": {
       "a": {
         "t": "Sehr gut",
-        "d": "Deine Kunden stehen hinter dir. Auf diesem Niveau geht es darum, das Funktionierende nicht zu beschädigen und Zufriedenheit in neue Kunden zu verwandeln."
+        "d": "Deine Kunden stehen hinter dir. Auf diesem Niveau geht es darum, das gut Laufende nicht zu gefährden und Zufriedenheit in neue Kunden umzuwandeln."
       },
       "b": {
         "t": "Gut",
@@ -145,7 +145,7 @@
         "d": "Nicht schlecht, aber ein einziges Thema drückt deinen Wert nach unten. Fass das an und der Unterschied zeigt sich schnell."
       },
       "d": {
-        "t": "Unter Druck",
+        "t": "Kritisch",
         "d": "Hier staut sich ein Problem. Die gute Nachricht: Das häufigste Thema ist sehr klar, du weißt also genau, wo du anfangen musst."
       }
     }

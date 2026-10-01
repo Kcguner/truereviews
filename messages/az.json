@@ -10,23 +10,23 @@
     "loading": "Hesabat yoxlanılır..."
   },
   "mock": {
-    "emailNote": "E-poçt xidməti bağlı deyil — link aşağıda:"
+    "emailNote": "E-poçt xidməti bağlı deyil — təsdiq linki aşağıda (tərtibatçı önizləməsi):"
   },
   "theme": {
     "toggle": "Temanı dəyiş"
   },
   "nb": {
     "brand": {
-      "sub": "oxuyuruq · çəkiyirik · məsləhət veririk"
+      "sub": "oxu · çək · tövsiyə et"
     },
     "head": {
       "note": "Önizləmə pulsuzdur"
     },
     "intro": {
       "eyebrow": "Pulsuz önizləmə · Qeydiyyatsız · ~40 saniyə",
-      "h1a": "Google rəy analizi:",
-      "h1b": "müştəriləriniz həqiqətən <hl>nə</hl> deyir?",
-      "lede": "Google Maps-dəki biznes linkinizi yapışdırın. Rəylərinizin <strong>hər birini</strong> oxuyur və sizə bir səhifəlik dürüst xülasə təqdim edirik: məmnuniyet balınız, daim təkrarlanan mövzular və bu həftə atacağınız <strong>bir konkret addım</strong>."
+      "h1a": "Müştəriləriniz sizin",
+      "h1b": "haqqınızda <hl>əslində</hl> nə deyir?",
+      "lede": "Google Maps-dəki biznes linkinizi yapışdırın. Rəylərinizin <strong>hər birini</strong> oxuyur və sizə bir səhifəlik dürüst xülasə təqdim edirik: məmnuniyyət balınız, daim təkrarlanan mövzular və bu həftə atacağınız <strong>bir konkret addım</strong>."
     },
     "input": {
       "label": "Google Maps biznes linki",
@@ -45,15 +45,15 @@
       "d": "Son rəylərinizi çəkir, hər birini oxuyur və tərif, şikayətlər və təkrarlanan mövzuları bir-birindən ayırırıq."
     },
     "step3": {
-      "t": "Biz yekun veririk",
+      "t": "Sizə xülasə veririk",
       "d": "Bir səhifə: balınız, təkrarlanan mövzular və bu həftə üçün bir konkret addım. Dashboard yoxdur, qrafik yığını yoxdur."
     },
     "gets": {
       "h": "Hesabatınızda nə var"
     },
     "get1": {
-      "t": "Məmnuniyet balınız",
-      "d": "100-dən bir rəqəm, üstəlik ton paylanması."
+      "t": "Məmnuniyyət balınız",
+      "d": "0–100 arası tək rəqəm və ton paylanması."
     },
     "get2": {
       "t": "Təkrarlanan mövzular",
@@ -64,12 +64,12 @@
       "d": "Sizə “hər şeyi düzəlt” deməyəcəyik. Sadəcə bu həftə atacağınız bir addım."
     },
     "assure": {
-      "text": "Rəylərinizi redaktə etmirik, silmirik, gözələşdirmirikik. Hamısını oxuyuruq və bir adamın üstünüzdə söylədiyi kimi deyirik.",
+      "text": "Rəylərinizi redaktə etmirik, silmirik, gözəlləşdirmirik. Hamısını oxuyuruq və üzünüzə deyiləcək kimi deyirik.",
       "sig": "TrueReviews · müstəqil analiz"
     },
     "float": {
       "cap": "Nümunə nəticə",
-      "note": "“Nahar saatlarında gözləmək” 31 rəydə keçir."
+      "note": "“Nahar vaxtı gözləmə” 31 rəydə qeyd olunur."
     },
     "load": {
       "reading": "Rəyləriniz oxunur…",
@@ -77,8 +77,8 @@
       "s1": "Biznesiniz axtarılır",
       "s2": "Rəylər yüklənir",
       "s3": "Hər biri oxunur",
-      "s4": "Tərif şikayətlərdən ayrılır",
-      "s5": "Məmnuniyet balınız hesablanır",
+      "s4": "Təriflər şikayətlərdən ayrılır",
+      "s5": "Məmnuniyyət balınız hesablanır",
       "s6": "Hesabatınız yazılır"
     },
     "rpt": {
@@ -91,7 +91,7 @@
       "scope": "Son {r} rəy",
       "score": {
         "h": "Ümumi müştəri məmnuniyyəti",
-        "cap": "Məmnuniyet balı"
+        "cap": "Məmnuniyyət balı"
       },
       "tone": {
         "h": "Rəylərinizin tonu",
@@ -100,19 +100,19 @@
         "neg": "Şikayət"
       },
       "themes": {
-        "h": "Daim təkrarlanan mövzular"
+        "h": "Ən çox təkrarlanan mövzular"
       },
       "praise": "Təriflər",
       "complaint": "Şikayətlər",
       "inreview": "rəy buna toxunur",
       "orig": "Orijinal rəy",
-      "pdf": "PDF yüklə",
+      "pdf": "PDF endir",
       "new": "Başqa bir biznesi analiz et"
     },
     "lock": {
       "h": "Hesabatınız hazırdır — qalanını da açaq.",
       "p": "Bal və ton paylanması yuxarıdadır. Təkrarlanan mövzular və konkret təklif tam hesabatdadır. E-poçtunuzu yazın, hamısını açaq.",
-      "ph": "siz@mobusiness.az",
+      "ph": "siz@biznesiniz.az",
       "cta": "Tam hesabatı aç",
       "note": "Reklam yoxdur, kütləvi e-poçt yoxdur. Sadəcə bu hesabat və istəsəniz ayda bir yeniləmə.",
       "err": "Zəhmət olmasa düzgün e-poçt ünvanı daxil edin.",
@@ -125,7 +125,7 @@
     },
     "method": {
       "h": "Bu hesabatı necə hazırlayırıq",
-      "t": "Bal rəy sayı, qiymət bölgüsü və təkrarlanan mövzuların çəkisi əsasında hesablanır. Rəyləri heç vaxt redaktə etmirik, silmirik və ya almırıq. Sitatlar həqiqi rəylərdən qısaltılıb."
+      "t": "Bal; rəy sayı, bal paylanması və təkrarlanan mövzuların çəkisi əsasında hesablanır. Rəyləri heç vaxt redaktə etmirik, silmirik və ya almırıq. Sitatlar həqiqi rəylərdən qısaltılıb."
     },
     "foot": {
       "tagline": "Kiçik bizneslər üçün rəylərinizdən dürüst xülasə.",
@@ -134,7 +134,7 @@
     "band": {
       "a": {
         "t": "Çox yaxşı",
-        "d": "Müştəriləriniz sizi qəbul edib. Bu səviyyədə işləyən şeyi pozmamaq və məmnuniyyəti yeni müştəriyə çevirməkdir."
+        "d": "Müştəriləriniz sizi sahiblənir. Bu səviyyədə işləyən şeyi pozmamaq və məmnuniyyəti yeni müştəriyə çevirməkdir."
       },
       "b": {
         "t": "Yaxşı",
@@ -145,7 +145,7 @@
         "d": "Pis deyil, lakin tək bir mövzu balınızı aşağı çəkir. Ona toxunun, fərq tez görünəcək."
       },
       "d": {
-        "t": "Çətinlikdə",
+        "t": "Çətinlik çəkir",
         "d": "Burada problem yığılır. Xoş xəbər: ən çox təkrarlanan mövzu çox aydındır, yəni haradan başlayacağınızı dəqiq bilirsiniz."
       }
     }

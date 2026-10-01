@@ -10,21 +10,21 @@
     "loading": "Verificando informe..."
   },
   "mock": {
-    "emailNote": "Correo no conectado — enlace abajo:"
+    "emailNote": "Servicio de correo no conectado — enlace de confirmación abajo (vista previa de desarrollo):"
   },
   "theme": {
     "toggle": "Cambiar tema"
   },
   "nb": {
     "brand": {
-      "sub": "lee · compara · asesora"
+      "sub": "lee · sopesa · recomienda"
     },
     "head": {
       "note": "La vista previa es gratuita"
     },
     "intro": {
       "eyebrow": "Vista previa gratis · Sin registro · ~40 segundos",
-      "h1a": "Análisis de reseñas de Google:",
+      "h1a": "Lo que tus clientes",
       "h1b": "¿qué dicen <hl>realmente</hl> tus clientes?",
       "lede": "Pega el enlace de tu negocio en Google Maps. Leemos <strong>una por una</strong> todas tus reseñas y te damos un resumen honesto de una sola página: tu índice de satisfacción, los temas que se repiten una y otra vez y el <strong>único paso concreto</strong> que puedes dar esta semana."
     },
@@ -46,14 +46,14 @@
     },
     "step3": {
       "t": "Las resumimos",
-      "d": "Una página: tu puntuación, los temas que se repiten y un paso concreto para esta semana. Sin panel de control y sin saturación de gráficos."
+      "d": "Una página: tu índice, los temas que se repiten y un paso concreto para esta semana. Sin panel de control y sin saturación de gráficos."
     },
     "gets": {
       "h": "Qué incluye tu informe"
     },
     "get1": {
       "t": "Tu índice de satisfacción",
-      "d": "Un número sobre 100, más el reparto por tono."
+      "d": "Un único número de 0 a 100, más el reparto por tono."
     },
     "get2": {
       "t": "Temas que se repiten",
@@ -111,7 +111,7 @@
     },
     "lock": {
       "h": "Tu informe está listo — abramos el resto.",
-      "p": "La puntuación y el reparto por tono están arriba. Los temas que se repiten y la sugerencia concreta están en el informe completo. Deja tu correo y desbloqueamos todo.",
+      "p": "El índice y el reparto por tono están arriba. Los temas que se repiten y la sugerencia concreta están en el informe completo. Deja tu correo y desbloqueamos todo.",
       "ph": "tu@minegocio.com",
       "cta": "Desbloquear el informe completo",
       "note": "Sin anuncios y sin correo masivo. Solo este informe y, si quieres, una actualización al mes.",
@@ -125,7 +125,7 @@
     },
     "method": {
       "h": "Cómo creamos este informe",
-      "t": "La puntuación se calcula a partir del volumen de reseñas, la distribución de las valoraciones y el peso de los temas que se repiten. Nunca editamos, borramos ni compramos reseñas. Las citas están recortadas de reseñas reales."
+      "t": "El índice se calcula a partir del volumen de reseñas, la distribución de las valoraciones y el peso de los temas que se repiten. Nunca editamos, borramos ni compramos reseñas. Las citas están recortadas de reseñas reales."
     },
     "foot": {
       "tagline": "Un resumen honesto de tus reseñas, hecho para pequeños negocios.",
@@ -141,11 +141,11 @@
         "d": "Hay una base sólida. Dos pequeños retoques lo subirán de forma visible — en el informe completo verás de qué tema se trata."
       },
       "c": {
-        "t": "Normal",
-        "d": "No está mal, pero un único tema está hundiendo tu puntuación. Tócalo y la diferencia se nota enseguida."
+        "t": "Regular",
+        "d": "No está mal, pero un único tema está hundiendo tu índice. Tócalo y la diferencia se nota enseguida."
       },
       "d": {
-        "t": "Le cuesta",
+        "t": "En dificultades",
         "d": "Aquí se está acumulando un problema. La buena noticia: el tema más repetido está muy claro, así que sabes exactamente por dónde empezar."
       }
     }
