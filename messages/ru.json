@@ -17,136 +17,136 @@
   },
   "nb": {
     "brand": {
-      "sub": "read · weigh · advise"
+      "sub": "читаем · взвешиваем · советуем"
     },
     "head": {
-      "note": "Preview is free"
+      "note": "Предпросмотр бесплатно"
     },
     "intro": {
-      "eyebrow": "Free preview · No sign-up · ~40 seconds",
-      "h1a": "What are your customers",
-      "h1b": "<hl>really</hl> saying about you?",
-      "lede": "Paste your Google Maps link. We read <strong>every single one</strong> of your reviews and hand you a one-page honest summary: your satisfaction score, the topics that keep coming up, and the <strong>one concrete step</strong> you can take this week."
+      "eyebrow": "Бесплатный предпросмотр · Без регистрации · ~40 секунд",
+      "h1a": "Анализ отзывов из Google:",
+      "h1b": "что на самом деле говорят <hl>ваши клиенты</hl>?",
+      "lede": "Вставьте ссылку на ваш бизнес в Google Maps. Мы прочитаем <strong>каждый</strong> отзыв и дадим честную сводку на одну страницу: ваш индекс удовлетворённости, темы, которые повторяются снова и снова, и <strong>один конкретный шаг</strong>, который можно сделать уже на этой неделе."
     },
     "input": {
-      "label": "Google Maps business link",
-      "paste": "Paste from clipboard",
-      "cta": "Prepare my report",
-      "demo": "Try it with a sample business →",
-      "hint": "Open your business on Google Maps, hit “Share”, copy the link and paste it here.",
-      "err": "That doesn't look like a Google Maps link. Open your business on Google Maps, tap “Share”, copy the link and paste it here."
+      "label": "Ссылка на ваш бизнес в Google Maps",
+      "paste": "Вставить из буфера обмена",
+      "cta": "Подготовить мой отчёт",
+      "demo": "Попробовать на примере бизнеса →",
+      "hint": "Откройте ваш бизнес в Google Maps, нажмите «Поделиться», скопируйте ссылку и вставьте её здесь.",
+      "err": "Это не похоже на ссылку Google Maps. Откройте ваш бизнес в Google Maps, нажмите «Поделиться», скопируйте ссылку и вставьте её здесь."
     },
     "step1": {
-      "t": "Paste your link",
-      "d": "The link to your Google Maps business page is all we need. Nothing to install, nothing to connect."
+      "t": "Вставьте ссылку",
+      "d": "Нам нужна только ссылка на страницу вашего бизнеса в Google Maps. Ничего не нужно устанавливать и ничего подключать."
     },
     "step2": {
-      "t": "We read them",
-      "d": "We pull down your recent reviews, read every one and separate the praise, the complaints and the recurring topics."
+      "t": "Мы их читаем",
+      "d": "Мы забираем ваши последние отзывы, читаем каждый из них и отделяем похвалу от жалоб и повторяющихся тем."
     },
     "step3": {
-      "t": "We sum it up",
-      "d": "One page: your score, the topics that repeat, and one concrete step for this week. No dashboard, no chart overload."
+      "t": "Мы подводим итог",
+      "d": "Одна страница: ваш балл, повторяющиеся темы и один конкретный шаг на эту неделю. Никаких дашбордов и перегруза графиками."
     },
     "gets": {
-      "h": "What's in your report"
+      "h": "Что будет в вашем отчёте"
     },
     "get1": {
-      "t": "Your satisfaction score",
-      "d": "One number out of 100, plus the tone split."
+      "t": "Индекс удовлетворённости",
+      "d": "Одно число из 100, плюс распределение по тону."
     },
     "get2": {
-      "t": "Recurring topics",
-      "d": "The most repeated praise and complaints, with how many reviews mention each."
+      "t": "Повторяющиеся темы",
+      "d": "Самая частая похвала и самые частые жалобы — и сколько отзывов упоминает каждую из них."
     },
     "get3": {
-      "t": "One concrete suggestion",
-      "d": "We won't tell you to “fix everything”. Just one step you can take this week."
+      "t": "Одно конкретное предложение",
+      "d": "Мы не скажем вам «исправить всё». Только один шаг, который можно сделать на этой неделе."
     },
     "assure": {
-      "text": "We don't edit your reviews, we don't delete them, we don't polish them. We read all of them and tell you the way someone would say it to your face.",
-      "sig": "TrueReviews · independent analysis"
+      "text": "Мы не правим ваши отзывы, не удаляем их и не причёсываем. Мы читаем их все и говорим так, как сказал бы вам человек в лицо.",
+      "sig": "TrueReviews · независимый анализ"
     },
     "float": {
-      "cap": "Sample output",
-      "note": "“Waiting during lunch hours” appears in 31 reviews."
+      "cap": "Пример результата",
+      "note": "«Ожидание в обеденные часы» встречается в 31 отзыве."
     },
     "load": {
-      "reading": "Reading your reviews…",
-      "foot": "Your reviews stay exactly as they are; we only read and summarise them. We don't ask for an email for this preview.",
-      "s1": "Finding your business",
-      "s2": "Downloading reviews",
-      "s3": "Reading every single one",
-      "s4": "Separating praise from complaints",
-      "s5": "Calculating your satisfaction score",
-      "s6": "Writing your report"
+      "reading": "Читаем ваши отзывы…",
+      "foot": "Ваши отзывы остаются ровно такими, какие есть; мы только читаем и суммируем их. Для этого предпросмотра email не нужен.",
+      "s1": "Ищем ваш бизнес",
+      "s2": "Загружаем отзывы",
+      "s3": "Читаем каждый из них",
+      "s4": "Отделяем похвалу от жалоб",
+      "s5": "Считаем индекс удовлетворённости",
+      "s6": "Пишем ваш отчёт"
     },
     "rpt": {
-      "back": "← Analyse another business",
+      "back": "← Проанализировать другой бизнес",
       "stamp": {
-        "prev": "Preview",
-        "full": "Full report"
+        "prev": "Предпросмотр",
+        "full": "Полный отчёт"
       },
-      "date": "Report date",
-      "scope": "Last {r} reviews",
+      "date": "Дата отчёта",
+      "scope": "{r, plural, one {Последний # отзыв} few {Последние # отзыва} many {Последние # отзывов} other {Последние # отзыва}}",
       "score": {
-        "h": "Overall customer satisfaction",
-        "cap": "Satisfaction score"
+        "h": "Общая удовлетворённость клиентов",
+        "cap": "Индекс удовлетворённости"
       },
       "tone": {
-        "h": "The tone of your reviews",
-        "pos": "Praise",
-        "neu": "Neutral",
-        "neg": "Complaint"
+        "h": "Тон ваших отзывов",
+        "pos": "Похвала",
+        "neu": "Нейтральный",
+        "neg": "Жалоба"
       },
       "themes": {
-        "h": "The topics that keep coming up"
+        "h": "Темы, которые повторяются снова и снова"
       },
-      "praise": "Praise",
-      "complaint": "Complaints",
-      "inreview": "reviews mention this",
-      "orig": "Original review",
-      "pdf": "Download PDF",
-      "new": "Analyse another business"
+      "praise": "Похвала",
+      "complaint": "Жалобы",
+      "inreview": "отзывов упоминают это",
+      "orig": "Оригинальный отзыв",
+      "pdf": "Скачать PDF",
+      "new": "Проанализировать другой бизнес"
     },
     "lock": {
-      "h": "Your report is ready — let's open the rest.",
-      "p": "The score and tone split are above. The recurring topics and the concrete suggestion live in the full report. Leave your email and we'll unlock everything.",
-      "ph": "you@mybusiness.com",
-      "cta": "Unlock the full report",
-      "note": "No ads, no bulk mail. Just this report and, if you want, one update a month.",
-      "err": "Please enter a valid email address.",
-      "done": "Unlocked",
-      "donet": "Your full report is open below. A copy is on its way to {e}.",
-      "donetMock": "Your full report is open below. (No copy was emailed because the email service is not connected.)"
+      "h": "Ваш отчёт готов — давайте откроем остальное.",
+      "p": "Балл и распределение по тону — выше. Повторяющиеся темы и конкретное предложение — в полном отчёте. Оставьте email, и мы откроем всё.",
+      "ph": "vy@moybiznes.ru",
+      "cta": "Открыть полный отчёт",
+      "note": "Без рекламы и массовых рассылок. Только этот отчёт и, если хотите, одно обновление в месяц.",
+      "err": "Введите корректный адрес электронной почты.",
+      "done": "Открыто",
+      "donet": "Ваш полный отчёт открыт ниже. Копия уже отправляется на {e}.",
+      "donetMock": "Ваш полный отчёт открыт ниже. (Копия не отправлена, так как почтовый сервис не подключён.)"
     },
     "act": {
-      "k": "The one step to take this week"
+      "k": "Единственный шаг на эту неделю"
     },
     "method": {
-      "h": "How we build this report",
-      "t": "The score is calculated from review volume, rating distribution and the weight of recurring topics. We never edit, delete or buy reviews. Quotes are shortened from real reviews."
+      "h": "Как мы собираем этот отчёт",
+      "t": "Балл рассчитывается по объёму отзывов, распределению оценок и весу повторяющихся тем. Мы никогда не правим, не удаляем и не покупаем отзывы. Цитаты сокращены из реальных отзывов."
     },
     "foot": {
-      "tagline": "An honest summary of your reviews, made for small businesses.",
-      "made": "Made in Istanbul"
+      "tagline": "Честная сводка по вашим отзывам — для малого бизнеса.",
+      "made": "Сделано в Стамбуле"
     },
     "band": {
       "a": {
-        "t": "Very good",
-        "d": "Your customers have taken ownership of you. At this level the job is to not break what's working and to turn satisfaction into new customers."
+        "t": "Очень хорошо",
+        "d": "Ваши клиенты приняли вас как своего. На этом уровне задача — не сломать то, что работает, и превратить удовлетворённость в новых клиентов."
       },
       "b": {
-        "t": "Good",
-        "d": "There's a solid foundation here. Two small touches will move this visibly upward — you'll see which topic in the full report."
+        "t": "Хорошо",
+        "d": "Здесь прочная основа. Два небольших штриха заметно поднимут результат — в полном отчёте вы увидите, о какой теме речь."
       },
       "c": {
-        "t": "Average",
-        "d": "Not bad, but one single topic is dragging your score down. Touch that and the difference shows fast."
+        "t": "Средне",
+        "d": "Неплохо, но одна конкретная тема тянет ваш балл вниз. Подправьте её — и разница станет заметна сразу."
       },
       "d": {
-        "t": "Struggling",
-        "d": "There's a problem piling up here. The good news: the most repeated topic is very clear, so you know exactly where to start."
+        "t": "Трудности",
+        "d": "Здесь накапливается проблема. Хорошая новость: самая частая тема совершенно очевидна, поэтому вы точно знаете, с чего начать."
       }
     }
   }

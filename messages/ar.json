@@ -17,136 +17,136 @@
   },
   "nb": {
     "brand": {
-      "sub": "read · weigh · advise"
+      "sub": "نقرأ · نزن · نساعد"
     },
     "head": {
-      "note": "Preview is free"
+      "note": "المعاينة مجانية"
     },
     "intro": {
-      "eyebrow": "Free preview · No sign-up · ~40 seconds",
-      "h1a": "What are your customers",
-      "h1b": "<hl>really</hl> saying about you?",
-      "lede": "Paste your Google Maps link. We read <strong>every single one</strong> of your reviews and hand you a one-page honest summary: your satisfaction score, the topics that keep coming up, and the <strong>one concrete step</strong> you can take this week."
+      "eyebrow": "معاينة مجانية · بدون تسجيل · ~40 ثانية",
+      "h1a": "تحليل تقييمات Google:",
+      "h1b": "ماذا يقول <hl>عملاؤك</hl> فعلاً؟",
+      "lede": "الصق رابط نشاطك على Google Maps. نقرأ <strong>كل</strong> تقييم من تقييماتك ونسلّمك ملخصاً صادقاً في صفحة واحدة: درجة رضا عملائك، والموضوعات التي تتكرر باستمرار، و<strong>الخطوة العملية الواحدة</strong> التي يمكنك اتخاذها هذا الأسبوع."
     },
     "input": {
-      "label": "Google Maps business link",
-      "paste": "Paste from clipboard",
-      "cta": "Prepare my report",
-      "demo": "Try it with a sample business →",
-      "hint": "Open your business on Google Maps, hit “Share”, copy the link and paste it here.",
-      "err": "That doesn't look like a Google Maps link. Open your business on Google Maps, tap “Share”, copy the link and paste it here."
+      "label": "رابط نشاطك على Google Maps",
+      "paste": "لصق من الحافظة",
+      "cta": "جهّز تقريري",
+      "demo": "جرّبه بنشاط تجريبي →",
+      "hint": "افتح نشاطك على Google Maps، اضغط «مشاركة»، انسخ الرابط والصقه هنا.",
+      "err": "يبدو أن هذا ليس رابط Google Maps. افتح نشاطك على Google Maps، اضغط «مشاركة»، انسخ الرابط والصقه هنا."
     },
     "step1": {
-      "t": "Paste your link",
-      "d": "The link to your Google Maps business page is all we need. Nothing to install, nothing to connect."
+      "t": "الصق رابطك",
+      "d": "كل ما نحتاجه هو رابط صفحة نشاطك على Google Maps. لا شيء لتثبيته ولا شيء لربطه."
     },
     "step2": {
-      "t": "We read them",
-      "d": "We pull down your recent reviews, read every one and separate the praise, the complaints and the recurring topics."
+      "t": "نقرأها",
+      "d": "نجلب أحدث تقييماتك، ونقرأ كل واحد منها، ونفصل الثناء عن الشكاوى والموضوعات المتكررة."
     },
     "step3": {
-      "t": "We sum it up",
-      "d": "One page: your score, the topics that repeat, and one concrete step for this week. No dashboard, no chart overload."
+      "t": "نلخّصها",
+      "d": "صفحة واحدة: درجتك، والموضوعات المتكررة، وخطوة عملية واحدة لهذا الأسبوع. بلا لوحة تحكم، وبلا فوضى من الرسوم البيانية."
     },
     "gets": {
-      "h": "What's in your report"
+      "h": "ماذا يتضمن تقريرك"
     },
     "get1": {
-      "t": "Your satisfaction score",
-      "d": "One number out of 100, plus the tone split."
+      "t": "درجة رضا العملاء",
+      "d": "رقم واحد من 100، إضافةً إلى توزيع النبرة."
     },
     "get2": {
-      "t": "Recurring topics",
-      "d": "The most repeated praise and complaints, with how many reviews mention each."
+      "t": "موضوعات متكررة",
+      "d": "أكثر الثناء والشكاوى تكراراً، مع عدد التقييمات التي يذكر كل منها."
     },
     "get3": {
-      "t": "One concrete suggestion",
-      "d": "We won't tell you to “fix everything”. Just one step you can take this week."
+      "t": "اقتراح عملي واحد",
+      "d": "لن نخبرك بأن عليك «إصلاح كل شيء». خطوة واحدة فقط يمكنك اتخاذها هذا الأسبوع."
     },
     "assure": {
-      "text": "We don't edit your reviews, we don't delete them, we don't polish them. We read all of them and tell you the way someone would say it to your face.",
-      "sig": "TrueReviews · independent analysis"
+      "text": "لا نحرّر تقييماتك، ولا نحذفها، ولا نجمّلها. نقرأها كلها ونخبرك بالطريقة التي يقولها بها شخص أمامك مباشرة.",
+      "sig": "TrueReviews · تحليل مستقل"
     },
     "float": {
-      "cap": "Sample output",
-      "note": "“Waiting during lunch hours” appears in 31 reviews."
+      "cap": "نموذج للمخرجات",
+      "note": "«الانتظار خلال ساعات الغداء» يظهر في 31 تقييماً."
     },
     "load": {
-      "reading": "Reading your reviews…",
-      "foot": "Your reviews stay exactly as they are; we only read and summarise them. We don't ask for an email for this preview.",
-      "s1": "Finding your business",
-      "s2": "Downloading reviews",
-      "s3": "Reading every single one",
-      "s4": "Separating praise from complaints",
-      "s5": "Calculating your satisfaction score",
-      "s6": "Writing your report"
+      "reading": "نقرأ تقييماتك…",
+      "foot": "تبقى تقييماتك كما هي تماماً؛ نحن نقرأها ونلخّصها فقط. لا نطلب بريداً إلكترونياً لهذه المعاينة.",
+      "s1": "نبحث عن نشاطك",
+      "s2": "ننزّل التقييمات",
+      "s3": "نقرأ كل تقييم",
+      "s4": "نفصل الثناء عن الشكاوى",
+      "s5": "نحسب درجة رضا عملائك",
+      "s6": "نكتب تقريرك"
     },
     "rpt": {
-      "back": "← Analyse another business",
+      "back": "← تحليل نشاط آخر",
       "stamp": {
-        "prev": "Preview",
-        "full": "Full report"
+        "prev": "معاينة",
+        "full": "التقرير الكامل"
       },
-      "date": "Report date",
-      "scope": "Last {r} reviews",
+      "date": "تاريخ التقرير",
+      "scope": "آخر {r} تقييم",
       "score": {
-        "h": "Overall customer satisfaction",
-        "cap": "Satisfaction score"
+        "h": "الرضا العام للعملاء",
+        "cap": "درجة الرضا"
       },
       "tone": {
-        "h": "The tone of your reviews",
-        "pos": "Praise",
-        "neu": "Neutral",
-        "neg": "Complaint"
+        "h": "نبرة تقييماتك",
+        "pos": "ثناء",
+        "neu": "محايد",
+        "neg": "شكوى"
       },
       "themes": {
-        "h": "The topics that keep coming up"
+        "h": "الموضوعات التي تتكرر باستمرار"
       },
-      "praise": "Praise",
-      "complaint": "Complaints",
-      "inreview": "reviews mention this",
-      "orig": "Original review",
-      "pdf": "Download PDF",
-      "new": "Analyse another business"
+      "praise": "الثناء",
+      "complaint": "الشكاوى",
+      "inreview": "تقييماً يذكر هذا",
+      "orig": "التقييم الأصلي",
+      "pdf": "تنزيل PDF",
+      "new": "تحليل نشاط آخر"
     },
     "lock": {
-      "h": "Your report is ready — let's open the rest.",
-      "p": "The score and tone split are above. The recurring topics and the concrete suggestion live in the full report. Leave your email and we'll unlock everything.",
-      "ph": "you@mybusiness.com",
-      "cta": "Unlock the full report",
-      "note": "No ads, no bulk mail. Just this report and, if you want, one update a month.",
-      "err": "Please enter a valid email address.",
-      "done": "Unlocked",
-      "donet": "Your full report is open below. A copy is on its way to {e}.",
-      "donetMock": "Your full report is open below. (No copy was emailed because the email service is not connected.)"
+      "h": "تقريرك جاهز — لنفتح الباقي.",
+      "p": "الدرجة وتوزيع النبرة أعلاه. أما الموضوعات المتكررة والاقتراح العملي فهما في التقرير الكامل. اترك بريدك الإلكتروني وسنفتح كل شيء.",
+      "ph": "name@mybusiness.com",
+      "cta": "افتح التقرير الكامل",
+      "note": "بلا إعلانات، وبلا رسائل جماعية. هذا التقرير فقط، وإذا رغبت تحديثاً واحداً شهرياً.",
+      "err": "يرجى إدخال بريد إلكتروني صالح.",
+      "done": "تم الفتح",
+      "donet": "تقريرك الكامل مفتوح أدناه. نسخة في طريقها إلى {e}.",
+      "donetMock": "تقريرك الكامل مفتوح أدناه. (لم تُرسل نسخة لأن خدمة البريد غير متصلة.)"
     },
     "act": {
-      "k": "The one step to take this week"
+      "k": "الخطوة الوحيدة لهذا الأسبوع"
     },
     "method": {
-      "h": "How we build this report",
-      "t": "The score is calculated from review volume, rating distribution and the weight of recurring topics. We never edit, delete or buy reviews. Quotes are shortened from real reviews."
+      "h": "كيف نبني هذا التقرير",
+      "t": "تُحتسب الدرجة من حجم التقييمات وتوزيع النجوم وأوزان الموضوعات المتكررة. نحن لا نحرّر التقييمات ولا نحذفها ولا نشتريها أبداً. الاقتباسات مختصرة من تقييمات حقيقية."
     },
     "foot": {
-      "tagline": "An honest summary of your reviews, made for small businesses.",
-      "made": "Made in Istanbul"
+      "tagline": "ملخص صادق لتقييماتك، صُنع لأصحاب الأعمال الصغيرة.",
+      "made": "صُنع في إسطنبول"
     },
     "band": {
       "a": {
-        "t": "Very good",
-        "d": "Your customers have taken ownership of you. At this level the job is to not break what's working and to turn satisfaction into new customers."
+        "t": "جيد جداً",
+        "d": "عملاؤك جعلوك جزءاً منهم. في هذا المستوى مهمتك ألّا تكسر ما ينجح، وأن تحوّل الرضا إلى عملاء جدد."
       },
       "b": {
-        "t": "Good",
-        "d": "There's a solid foundation here. Two small touches will move this visibly upward — you'll see which topic in the full report."
+        "t": "جيد",
+        "d": "الأساس متين هنا. لمستان صغيرتان سترفعان هذا بوضوح — وسترى الموضوع المقصود في التقرير الكامل."
       },
       "c": {
-        "t": "Average",
-        "d": "Not bad, but one single topic is dragging your score down. Touch that and the difference shows fast."
+        "t": "متوسط",
+        "d": "ليس سيئاً، لكن موضوعاً واحداً يسحب درجتك إلى الأسفل. عالجه وستظهر الفارق بسرعة."
       },
       "d": {
-        "t": "Struggling",
-        "d": "There's a problem piling up here. The good news: the most repeated topic is very clear, so you know exactly where to start."
+        "t": "متعثّر",
+        "d": "هناك مشكلة تتراكم هنا. الخبر الجيد: أكثر موضوع تكراراً واضح تماماً، تعرف من أين تبدأ بالضبط."
       }
     }
   }

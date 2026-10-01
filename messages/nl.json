@@ -17,136 +17,136 @@
   },
   "nb": {
     "brand": {
-      "sub": "read · weigh · advise"
+      "sub": "lees · weegt · adviseert"
     },
     "head": {
-      "note": "Preview is free"
+      "note": "Voorbeeld is gratis"
     },
     "intro": {
-      "eyebrow": "Free preview · No sign-up · ~40 seconds",
-      "h1a": "What are your customers",
-      "h1b": "<hl>really</hl> saying about you?",
-      "lede": "Paste your Google Maps link. We read <strong>every single one</strong> of your reviews and hand you a one-page honest summary: your satisfaction score, the topics that keep coming up, and the <strong>one concrete step</strong> you can take this week."
+      "eyebrow": "Gratis voorbeeld · Geen registratie · ~40 seconden",
+      "h1a": "Google-recensieanalyse:",
+      "h1b": "wat zeggen je klanten <hl>echt</hl>?",
+      "lede": "Plak je Google Maps-link. We lezen <strong>elke</strong> van je recensies en geven je een eerlijk overzicht op één pagina: je tevredenheidsscore, de onderwerpen die steeds terugkomen en de <strong>één concrete stap</strong> die je deze week kunt zetten."
     },
     "input": {
-      "label": "Google Maps business link",
-      "paste": "Paste from clipboard",
-      "cta": "Prepare my report",
-      "demo": "Try it with a sample business →",
-      "hint": "Open your business on Google Maps, hit “Share”, copy the link and paste it here.",
-      "err": "That doesn't look like a Google Maps link. Open your business on Google Maps, tap “Share”, copy the link and paste it here."
+      "label": "Google Maps-link naar je bedrijf",
+      "paste": "Plakken vanaf klembord",
+      "cta": "Mijn rapport maken",
+      "demo": "Probeer het met een voorbeeldbedrijf →",
+      "hint": "Open je bedrijf op Google Maps, tik op “Delen”, kopieer de link en plak hem hier.",
+      "err": "Dat lijkt geen Google Maps-link te zijn. Open je bedrijf op Google Maps, tik op “Delen”, kopieer de link en plak hem hier."
     },
     "step1": {
-      "t": "Paste your link",
-      "d": "The link to your Google Maps business page is all we need. Nothing to install, nothing to connect."
+      "t": "Plak je link",
+      "d": "We hebben alleen de link naar je bedrijfspagina op Google Maps nodig. Niets om te installeren, niets om te koppelen."
     },
     "step2": {
-      "t": "We read them",
-      "d": "We pull down your recent reviews, read every one and separate the praise, the complaints and the recurring topics."
+      "t": "We lezen ze",
+      "d": "We halen je recente recensies op, lezen ze allemaal en splitsen de lof, de klachten en de terugkerende onderwerpen."
     },
     "step3": {
-      "t": "We sum it up",
-      "d": "One page: your score, the topics that repeat, and one concrete step for this week. No dashboard, no chart overload."
+      "t": "We vatten het samen",
+      "d": "Eén pagina: je score, de onderwerpen die terugkomen en één concrete stap voor deze week. Geen dashboard, geen grafische bombarst."
     },
     "gets": {
-      "h": "What's in your report"
+      "h": "Wat er in je rapport staat"
     },
     "get1": {
-      "t": "Your satisfaction score",
-      "d": "One number out of 100, plus the tone split."
+      "t": "Je tevredenheidsscore",
+      "d": "Eén getal uit 100, plus de verdeling over toon."
     },
     "get2": {
-      "t": "Recurring topics",
-      "d": "The most repeated praise and complaints, with how many reviews mention each."
+      "t": "Onderwerpen die terugkomen",
+      "d": "De meest herhaalde lof en klachten, met hoeveel recensies elk noemt."
     },
     "get3": {
-      "t": "One concrete suggestion",
-      "d": "We won't tell you to “fix everything”. Just one step you can take this week."
+      "t": "Eén concreet advies",
+      "d": "We zullen niet zeggen dat je “alles moet repareren”. Alleen één stap die je deze week kunt zetten."
     },
     "assure": {
-      "text": "We don't edit your reviews, we don't delete them, we don't polish them. We read all of them and tell you the way someone would say it to your face.",
-      "sig": "TrueReviews · independent analysis"
+      "text": "We bewerken je recensies niet, we verwijderen ze niet en we poetsen ze niet op. We lezen ze allemaal en vertellen het je zoals iemand het je recht voor de neus zou zeggen.",
+      "sig": "TrueReviews · onafhankelijke analyse"
     },
     "float": {
-      "cap": "Sample output",
-      "note": "“Waiting during lunch hours” appears in 31 reviews."
+      "cap": "Voorbeeld van uitvoer",
+      "note": "“Wachten tijdens de lunchuren” komt in 31 recensies voor."
     },
     "load": {
-      "reading": "Reading your reviews…",
-      "foot": "Your reviews stay exactly as they are; we only read and summarise them. We don't ask for an email for this preview.",
-      "s1": "Finding your business",
-      "s2": "Downloading reviews",
-      "s3": "Reading every single one",
-      "s4": "Separating praise from complaints",
-      "s5": "Calculating your satisfaction score",
-      "s6": "Writing your report"
+      "reading": "Je recensies worden gelezen…",
+      "foot": "Je recensies blijven precies zoals ze zijn; we lezen en vatten ze alleen samen. We vragen geen e-mailadres voor dit voorbeeld.",
+      "s1": "Je bedrijf opzoeken",
+      "s2": "Recensies downloaden",
+      "s3": "Elke recensie lezen",
+      "s4": "Lof scheiden van klachten",
+      "s5": "Je tevredenheidsscore berekenen",
+      "s6": "Je rapport opstellen"
     },
     "rpt": {
-      "back": "← Analyse another business",
+      "back": "← Een ander bedrijf analyseren",
       "stamp": {
-        "prev": "Preview",
-        "full": "Full report"
+        "prev": "Voorbeeld",
+        "full": "Volledig rapport"
       },
-      "date": "Report date",
-      "scope": "Last {r} reviews",
+      "date": "Rapportdatum",
+      "scope": "Laatste {r} recensies",
       "score": {
-        "h": "Overall customer satisfaction",
-        "cap": "Satisfaction score"
+        "h": "Algemene klanttevredenheid",
+        "cap": "Tevredenheidsscore"
       },
       "tone": {
-        "h": "The tone of your reviews",
-        "pos": "Praise",
-        "neu": "Neutral",
-        "neg": "Complaint"
+        "h": "De toon van je recensies",
+        "pos": "Lof",
+        "neu": "Neutraal",
+        "neg": "Klacht"
       },
       "themes": {
-        "h": "The topics that keep coming up"
+        "h": "De onderwerpen die steeds terugkomen"
       },
-      "praise": "Praise",
-      "complaint": "Complaints",
-      "inreview": "reviews mention this",
-      "orig": "Original review",
-      "pdf": "Download PDF",
-      "new": "Analyse another business"
+      "praise": "Lof",
+      "complaint": "Klachten",
+      "inreview": "recensies noemen dit",
+      "orig": "Originele recensie",
+      "pdf": "PDF downloaden",
+      "new": "Een ander bedrijf analyseren"
     },
     "lock": {
-      "h": "Your report is ready — let's open the rest.",
-      "p": "The score and tone split are above. The recurring topics and the concrete suggestion live in the full report. Leave your email and we'll unlock everything.",
-      "ph": "you@mybusiness.com",
-      "cta": "Unlock the full report",
-      "note": "No ads, no bulk mail. Just this report and, if you want, one update a month.",
-      "err": "Please enter a valid email address.",
-      "done": "Unlocked",
-      "donet": "Your full report is open below. A copy is on its way to {e}.",
-      "donetMock": "Your full report is open below. (No copy was emailed because the email service is not connected.)"
+      "h": "Je rapport is klaar — laten we de rest openen.",
+      "p": "De score en de toonverdeling staan hierboven. De terugkerende onderwerpen en het concrete advies staan in het volledige rapport. Laat je e-mailadres achter en we ontgrendelen alles.",
+      "ph": "jij@mijnbedrijf.nl",
+      "cta": "Volledig rapport ontgrendelen",
+      "note": "Geen advertenties, geen bulk-mail. Alleen dit rapport en, als je wilt, één update per maand.",
+      "err": "Voer een geldig e-mailadres in.",
+      "done": "Ontgrendeld",
+      "donet": "Je volledige rapport staat hieronder open. Een kopie is onderweg naar {e}.",
+      "donetMock": "Je volledige rapport staat hieronder open. (Er is geen kopie verstuurd omdat de e-maildienst niet is gekoppeld.)"
     },
     "act": {
-      "k": "The one step to take this week"
+      "k": "De ene stap voor deze week"
     },
     "method": {
-      "h": "How we build this report",
-      "t": "The score is calculated from review volume, rating distribution and the weight of recurring topics. We never edit, delete or buy reviews. Quotes are shortened from real reviews."
+      "h": "Hoe we dit rapport opbouwen",
+      "t": "De score wordt berekend uit het aantal recensies, de verdeling van de beoordelingen en het gewicht van terugkerende onderwerpen. We bewerken, verwijderen of kopen nooit recensies. Citaten zijn ingekort uit echte recensies."
     },
     "foot": {
-      "tagline": "An honest summary of your reviews, made for small businesses.",
-      "made": "Made in Istanbul"
+      "tagline": "Een eerlijk overzicht van je recensies, gemaakt voor kleine bedrijven.",
+      "made": "Gemaakt in Istanbul"
     },
     "band": {
       "a": {
-        "t": "Very good",
-        "d": "Your customers have taken ownership of you. At this level the job is to not break what's working and to turn satisfaction into new customers."
+        "t": "Zeer goed",
+        "d": "Je klanten hebben zich achter jou geschaard. Op dit niveau is de taak om niet te verpesten wat werkt en tevredenheid om te zetten in nieuwe klanten."
       },
       "b": {
-        "t": "Good",
-        "d": "There's a solid foundation here. Two small touches will move this visibly upward — you'll see which topic in the full report."
+        "t": "Goed",
+        "d": "Er is een solide basis. Twee kleine ingrepen tillen dit duidelijk omhoog — in het volledige rapport zie je welk onderwerp het is."
       },
       "c": {
-        "t": "Average",
-        "d": "Not bad, but one single topic is dragging your score down. Touch that and the difference shows fast."
+        "t": "Gemiddeld",
+        "d": "Niet slecht, maar één enkel onderwerp drukt je score omlaag. Pak dat aan en het verschil is snel zichtbaar."
       },
       "d": {
-        "t": "Struggling",
-        "d": "There's a problem piling up here. The good news: the most repeated topic is very clear, so you know exactly where to start."
+        "t": "In de problemen",
+        "d": "Hier stapelt zich een probleem op. Het goede nieuws: het meest herhaalde onderwerp is heel duidelijk, dus je weet precies waar je moet beginnen."
       }
     }
   }

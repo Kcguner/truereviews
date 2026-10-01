@@ -17,136 +17,136 @@
   },
   "nb": {
     "brand": {
-      "sub": "read · weigh · advise"
+      "sub": "می‌خوانیم · می‌سنجیم · راهنمایی می‌کنیم"
     },
     "head": {
-      "note": "Preview is free"
+      "note": "پیش‌نمایش رایگان است"
     },
     "intro": {
-      "eyebrow": "Free preview · No sign-up · ~40 seconds",
-      "h1a": "What are your customers",
-      "h1b": "<hl>really</hl> saying about you?",
-      "lede": "Paste your Google Maps link. We read <strong>every single one</strong> of your reviews and hand you a one-page honest summary: your satisfaction score, the topics that keep coming up, and the <strong>one concrete step</strong> you can take this week."
+      "eyebrow": "پیش‌نمایش رایگان · بدون ثبت‌نام · حدود ۴۰ ثانیه",
+      "h1a": "تحلیل نظرات گوگل:",
+      "h1b": "مشتریان شما <hl>واقعاً</hl> چه می‌گویند؟",
+      "lede": "لینک کسب‌وکارتان در گوگل‌مپ را بچسبانید. ما <strong>تک‌تک</strong> نظرات شما را می‌خوانیم و یک خلاصه صادقانه در یک صفحه به شما می‌دهیم: امتیاز رضایت مشتریان، موضوعاتی که مدام تکرار می‌شوند، و <strong>تنها یک قدم مشخص</strong> که همین هفته می‌توانید بردارید."
     },
     "input": {
-      "label": "Google Maps business link",
-      "paste": "Paste from clipboard",
-      "cta": "Prepare my report",
-      "demo": "Try it with a sample business →",
-      "hint": "Open your business on Google Maps, hit “Share”, copy the link and paste it here.",
-      "err": "That doesn't look like a Google Maps link. Open your business on Google Maps, tap “Share”, copy the link and paste it here."
+      "label": "لینک کسب‌وکار در گوگل‌مپ",
+      "paste": "چسباندن از کلیپ‌بورد",
+      "cta": "آماده‌سازی گزارش من",
+      "demo": "با یک کسب‌وکار نمونه امتحان کنید →",
+      "hint": "کسب‌وکارتان را در گوگل‌مپ باز کنید، روی «اشتراک‌گذاری» بزنید، لینک را کپی کنید و اینجا بچسبانید.",
+      "err": "این لینک گوگل‌مپ به نظر نمی‌رسد. کسب‌وکارتان را در گوگل‌مپ باز کنید، روی «اشتراک‌گذاری» بزنید، لینک را کپی کنید و اینجا بچسبانید."
     },
     "step1": {
-      "t": "Paste your link",
-      "d": "The link to your Google Maps business page is all we need. Nothing to install, nothing to connect."
+      "t": "لینک را بچسبانید",
+      "d": "تنها چیزی که لازم داریم لینک صفحه کسب‌وکارتان در گوگل‌مپ است. نه نصبی لازم است، نه اتصالی."
     },
     "step2": {
-      "t": "We read them",
-      "d": "We pull down your recent reviews, read every one and separate the praise, the complaints and the recurring topics."
+      "t": "ما آن‌ها را می‌خوانیم",
+      "d": "نظرات اخیر شما را دریافت می‌کنیم، تک‌تک می‌خوانیم و تعریف‌ها، شکایت‌ها و موضوعات تکرارشونده را از هم جدا می‌کنیم."
     },
     "step3": {
-      "t": "We sum it up",
-      "d": "One page: your score, the topics that repeat, and one concrete step for this week. No dashboard, no chart overload."
+      "t": "ما جمع‌بندی می‌کنیم",
+      "d": "یک صفحه: امتیاز شما، موضوعات تکرارشونده و یک قدم مشخص برای این هفته. بدون داشبورد، بدون شلوغی نمودار."
     },
     "gets": {
-      "h": "What's in your report"
+      "h": "گزارش شما شامل چه چیزی است"
     },
     "get1": {
-      "t": "Your satisfaction score",
-      "d": "One number out of 100, plus the tone split."
+      "t": "امتیاز رضایت مشتریان",
+      "d": "یک عدد از ۱۰۰، به‌علاوه توزیع لحن."
     },
     "get2": {
-      "t": "Recurring topics",
-      "d": "The most repeated praise and complaints, with how many reviews mention each."
+      "t": "موضوعات تکرارشونده",
+      "d": "پرتکرارترین تعریف‌ها و شکایت‌ها، با تعداد نظراتی که به هرکدام اشاره کرده‌اند."
     },
     "get3": {
-      "t": "One concrete suggestion",
-      "d": "We won't tell you to “fix everything”. Just one step you can take this week."
+      "t": "یک پیشنهاد مشخص",
+      "d": "به شما نمی‌گوییم «همه‌چیز را درست کن». فقط یک قدم که همین هفته می‌توانید بردارید."
     },
     "assure": {
-      "text": "We don't edit your reviews, we don't delete them, we don't polish them. We read all of them and tell you the way someone would say it to your face.",
-      "sig": "TrueReviews · independent analysis"
+      "text": "ما نظرات شما را ویرایش نمی‌کنیم، حذف نمی‌کنیم و صیقل نمی‌دهیم. همه را می‌خوانیم و همان‌طور می‌گوییم که یک نفر رو‌به‌روی شما می‌گوید.",
+      "sig": "TrueReviews · تحلیل مستقل"
     },
     "float": {
-      "cap": "Sample output",
-      "note": "“Waiting during lunch hours” appears in 31 reviews."
+      "cap": "نمونه خروجی",
+      "note": "«انتظار در ساعات ناهار» در ۳۱ نظر تکرار شده است."
     },
     "load": {
-      "reading": "Reading your reviews…",
-      "foot": "Your reviews stay exactly as they are; we only read and summarise them. We don't ask for an email for this preview.",
-      "s1": "Finding your business",
-      "s2": "Downloading reviews",
-      "s3": "Reading every single one",
-      "s4": "Separating praise from complaints",
-      "s5": "Calculating your satisfaction score",
-      "s6": "Writing your report"
+      "reading": "در حال خواندن نظرات شما…",
+      "foot": "نظرات شما دقیقاً همان‌طور که هست می‌مانند؛ ما فقط آن‌ها را می‌خوانیم و خلاصه می‌کنیم. برای این پیش‌نمایش ایمیل نمی‌خواهیم.",
+      "s1": "پیدا کردن کسب‌وکار شما",
+      "s2": "دانلود نظرات",
+      "s3": "خواندن تک‌تک آن‌ها",
+      "s4": "جدا کردن تعریف از شکایت",
+      "s5": "محاسبه امتیاز رضایت شما",
+      "s6": "نوشتن گزارش شما"
     },
     "rpt": {
-      "back": "← Analyse another business",
+      "back": "← تحلیل کسب‌وکار دیگر",
       "stamp": {
-        "prev": "Preview",
-        "full": "Full report"
+        "prev": "پیش‌نمایش",
+        "full": "گزارش کامل"
       },
-      "date": "Report date",
-      "scope": "Last {r} reviews",
+      "date": "تاریخ گزارش",
+      "scope": "آخرین {r} نظر",
       "score": {
-        "h": "Overall customer satisfaction",
-        "cap": "Satisfaction score"
+        "h": "رضایت کلی مشتریان",
+        "cap": "امتیاز رضایت"
       },
       "tone": {
-        "h": "The tone of your reviews",
-        "pos": "Praise",
-        "neu": "Neutral",
-        "neg": "Complaint"
+        "h": "لحن نظرات شما",
+        "pos": "تعریف",
+        "neu": "خنثی",
+        "neg": "شکایت"
       },
       "themes": {
-        "h": "The topics that keep coming up"
+        "h": "موضوعاتی که مدام تکرار می‌شوند"
       },
-      "praise": "Praise",
-      "complaint": "Complaints",
-      "inreview": "reviews mention this",
-      "orig": "Original review",
-      "pdf": "Download PDF",
-      "new": "Analyse another business"
+      "praise": "تعریف‌ها",
+      "complaint": "شکایت‌ها",
+      "inreview": "نظر به این اشاره می‌کند",
+      "orig": "نظر اصلی",
+      "pdf": "دانلود PDF",
+      "new": "تحلیل کسب‌وکار دیگر"
     },
     "lock": {
-      "h": "Your report is ready — let's open the rest.",
-      "p": "The score and tone split are above. The recurring topics and the concrete suggestion live in the full report. Leave your email and we'll unlock everything.",
-      "ph": "you@mybusiness.com",
-      "cta": "Unlock the full report",
-      "note": "No ads, no bulk mail. Just this report and, if you want, one update a month.",
-      "err": "Please enter a valid email address.",
-      "done": "Unlocked",
-      "donet": "Your full report is open below. A copy is on its way to {e}.",
-      "donetMock": "Your full report is open below. (No copy was emailed because the email service is not connected.)"
+      "h": "گزارش شما آماده است — بیایید بقیه را باز کنیم.",
+      "p": "امتیاز و توزیع لحن بالا آمده است. موضوعات تکرارشونده و پیشنهاد مشخص در گزارش کامل است. ایمیلتان را بگذارید تا همه‌چیز را باز کنیم.",
+      "ph": "name@mybusiness.com",
+      "cta": "باز کردن گزارش کامل",
+      "note": "بدون تبلیغ، بدون ایمیل انبوه. فقط همین گزارش و اگر خواستید ماهی یک به‌روزرسانی.",
+      "err": "لطفاً یک نشانی ایمیل معتبر وارد کنید.",
+      "done": "باز شد",
+      "donet": "گزارش کامل شما پایین باز است. یک نسخه در راه {e} است.",
+      "donetMock": "گزارش کامل شما پایین باز است. (نسخه‌ای ارسال نشد چون سرویس ایمیل متصل نیست.)"
     },
     "act": {
-      "k": "The one step to take this week"
+      "k": "تنها قدم این هفته"
     },
     "method": {
-      "h": "How we build this report",
-      "t": "The score is calculated from review volume, rating distribution and the weight of recurring topics. We never edit, delete or buy reviews. Quotes are shortened from real reviews."
+      "h": "این گزارش را چطور می‌سازیم",
+      "t": "امتیاز بر پایه تعداد نظرات، توزیع امتیازها و وزن موضوعات تکرارشونده محاسبه می‌شود. ما هرگز نظرات را ویرایش، حذف یا خریداری نمی‌کنیم. نقل‌قول‌ها از نظرات واقعی کوتاه شده‌اند."
     },
     "foot": {
-      "tagline": "An honest summary of your reviews, made for small businesses.",
-      "made": "Made in Istanbul"
+      "tagline": "خلاصه‌ای صادقانه از نظرات شما، ساخته‌شده برای کسب‌وکارهای کوچک.",
+      "made": "ساخته‌شده در استانبول"
     },
     "band": {
       "a": {
-        "t": "Very good",
-        "d": "Your customers have taken ownership of you. At this level the job is to not break what's working and to turn satisfaction into new customers."
+        "t": "خیلی خوب",
+        "d": "مشتریان شما شما را از آنِ خود کرده‌اند. در این سطح، کار این است که چیزی را که کار می‌کند خراب نکنید و رضایت را به مشتری تازه تبدیل کنید."
       },
       "b": {
-        "t": "Good",
-        "d": "There's a solid foundation here. Two small touches will move this visibly upward — you'll see which topic in the full report."
+        "t": "خوب",
+        "d": "پایه محکمی وجود دارد. دو اصلاح کوچک این را به‌وضوح بالا می‌برد — در گزارش کامل می‌بینید موضوع کدام است."
       },
       "c": {
-        "t": "Average",
-        "d": "Not bad, but one single topic is dragging your score down. Touch that and the difference shows fast."
+        "t": "متوسط",
+        "d": "بد نیست، اما یک موضوع تنها امتیاز شما را پایین می‌کشد. همان را درست کنید و تفاوت زود معلوم می‌شود."
       },
       "d": {
-        "t": "Struggling",
-        "d": "There's a problem piling up here. The good news: the most repeated topic is very clear, so you know exactly where to start."
+        "t": "در تنگنا",
+        "d": "اینجا یک مشکل دارد انباشته می‌شود. خبر خوب: پرتکرارترین موضوع کاملاً روشن است، پس دقیقاً می‌دانید از کجا شروع کنید."
       }
     }
   }

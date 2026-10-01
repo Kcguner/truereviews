@@ -17,136 +17,136 @@
   },
   "nb": {
     "brand": {
-      "sub": "read · weigh · advise"
+      "sub": "oxuyuruq · çəkiyirik · məsləhət veririk"
     },
     "head": {
-      "note": "Preview is free"
+      "note": "Önizləmə pulsuzdur"
     },
     "intro": {
-      "eyebrow": "Free preview · No sign-up · ~40 seconds",
-      "h1a": "What are your customers",
-      "h1b": "<hl>really</hl> saying about you?",
-      "lede": "Paste your Google Maps link. We read <strong>every single one</strong> of your reviews and hand you a one-page honest summary: your satisfaction score, the topics that keep coming up, and the <strong>one concrete step</strong> you can take this week."
+      "eyebrow": "Pulsuz önizləmə · Qeydiyyatsız · ~40 saniyə",
+      "h1a": "Google rəy analizi:",
+      "h1b": "müştəriləriniz həqiqətən <hl>nə</hl> deyir?",
+      "lede": "Google Maps-dəki biznes linkinizi yapışdırın. Rəylərinizin <strong>hər birini</strong> oxuyur və sizə bir səhifəlik dürüst xülasə təqdim edirik: məmnuniyet balınız, daim təkrarlanan mövzular və bu həftə atacağınız <strong>bir konkret addım</strong>."
     },
     "input": {
-      "label": "Google Maps business link",
-      "paste": "Paste from clipboard",
-      "cta": "Prepare my report",
-      "demo": "Try it with a sample business →",
-      "hint": "Open your business on Google Maps, hit “Share”, copy the link and paste it here.",
-      "err": "That doesn't look like a Google Maps link. Open your business on Google Maps, tap “Share”, copy the link and paste it here."
+      "label": "Google Maps biznes linki",
+      "paste": "Buferdən yapışdır",
+      "cta": "Hesabatımı hazırla",
+      "demo": "Nümunə bizneslə yoxla →",
+      "hint": "Biznesinizi Google Maps-də açın, “Paylaş” düyməsini basın, linki kopyalayın və buraya yapışdırın.",
+      "err": "Bu, Google Maps linkinə bənzəmir. Biznesinizi Google Maps-də açın, “Paylaş” düyməsini basın, linki kopyalayın və buraya yapışdırın."
     },
     "step1": {
-      "t": "Paste your link",
-      "d": "The link to your Google Maps business page is all we need. Nothing to install, nothing to connect."
+      "t": "Linkinizi yapışdırın",
+      "d": "Bizə lazım olan yalnız Google Maps-dəki biznes səhifənizin linkidir. Quraşdırılacaq heç nə, qoşulacaq heç nə yoxdur."
     },
     "step2": {
-      "t": "We read them",
-      "d": "We pull down your recent reviews, read every one and separate the praise, the complaints and the recurring topics."
+      "t": "Biz oxuyuruq",
+      "d": "Son rəylərinizi çəkir, hər birini oxuyur və tərif, şikayətlər və təkrarlanan mövzuları bir-birindən ayırırıq."
     },
     "step3": {
-      "t": "We sum it up",
-      "d": "One page: your score, the topics that repeat, and one concrete step for this week. No dashboard, no chart overload."
+      "t": "Biz yekun veririk",
+      "d": "Bir səhifə: balınız, təkrarlanan mövzular və bu həftə üçün bir konkret addım. Dashboard yoxdur, qrafik yığını yoxdur."
     },
     "gets": {
-      "h": "What's in your report"
+      "h": "Hesabatınızda nə var"
     },
     "get1": {
-      "t": "Your satisfaction score",
-      "d": "One number out of 100, plus the tone split."
+      "t": "Məmnuniyet balınız",
+      "d": "100-dən bir rəqəm, üstəlik ton paylanması."
     },
     "get2": {
-      "t": "Recurring topics",
-      "d": "The most repeated praise and complaints, with how many reviews mention each."
+      "t": "Təkrarlanan mövzular",
+      "d": "Ən çox təkrarlanan tərif və şikayətlər, hər birini neçə rəyin qeyd etdiyi ilə."
     },
     "get3": {
-      "t": "One concrete suggestion",
-      "d": "We won't tell you to “fix everything”. Just one step you can take this week."
+      "t": "Bir konkret təklif",
+      "d": "Sizə “hər şeyi düzəlt” deməyəcəyik. Sadəcə bu həftə atacağınız bir addım."
     },
     "assure": {
-      "text": "We don't edit your reviews, we don't delete them, we don't polish them. We read all of them and tell you the way someone would say it to your face.",
-      "sig": "TrueReviews · independent analysis"
+      "text": "Rəylərinizi redaktə etmirik, silmirik, gözələşdirmirikik. Hamısını oxuyuruq və bir adamın üstünüzdə söylədiyi kimi deyirik.",
+      "sig": "TrueReviews · müstəqil analiz"
     },
     "float": {
-      "cap": "Sample output",
-      "note": "“Waiting during lunch hours” appears in 31 reviews."
+      "cap": "Nümunə nəticə",
+      "note": "“Nahar saatlarında gözləmək” 31 rəydə keçir."
     },
     "load": {
-      "reading": "Reading your reviews…",
-      "foot": "Your reviews stay exactly as they are; we only read and summarise them. We don't ask for an email for this preview.",
-      "s1": "Finding your business",
-      "s2": "Downloading reviews",
-      "s3": "Reading every single one",
-      "s4": "Separating praise from complaints",
-      "s5": "Calculating your satisfaction score",
-      "s6": "Writing your report"
+      "reading": "Rəyləriniz oxunur…",
+      "foot": "Rəyləriniz tam olduğu kimi qalır; biz onları yalnız oxuyuruq və xülasələndiririk. Bu önizləmə üçün e-poçt tələb etmirik.",
+      "s1": "Biznesiniz axtarılır",
+      "s2": "Rəylər yüklənir",
+      "s3": "Hər biri oxunur",
+      "s4": "Tərif şikayətlərdən ayrılır",
+      "s5": "Məmnuniyet balınız hesablanır",
+      "s6": "Hesabatınız yazılır"
     },
     "rpt": {
-      "back": "← Analyse another business",
+      "back": "← Başqa bir biznesi analiz et",
       "stamp": {
-        "prev": "Preview",
-        "full": "Full report"
+        "prev": "Önizləmə",
+        "full": "Tam hesabat"
       },
-      "date": "Report date",
-      "scope": "Last {r} reviews",
+      "date": "Hesabat tarixi",
+      "scope": "Son {r} rəy",
       "score": {
-        "h": "Overall customer satisfaction",
-        "cap": "Satisfaction score"
+        "h": "Ümumi müştəri məmnuniyyəti",
+        "cap": "Məmnuniyet balı"
       },
       "tone": {
-        "h": "The tone of your reviews",
-        "pos": "Praise",
-        "neu": "Neutral",
-        "neg": "Complaint"
+        "h": "Rəylərinizin tonu",
+        "pos": "Tərif",
+        "neu": "Neytral",
+        "neg": "Şikayət"
       },
       "themes": {
-        "h": "The topics that keep coming up"
+        "h": "Daim təkrarlanan mövzular"
       },
-      "praise": "Praise",
-      "complaint": "Complaints",
-      "inreview": "reviews mention this",
-      "orig": "Original review",
-      "pdf": "Download PDF",
-      "new": "Analyse another business"
+      "praise": "Təriflər",
+      "complaint": "Şikayətlər",
+      "inreview": "rəy buna toxunur",
+      "orig": "Orijinal rəy",
+      "pdf": "PDF yüklə",
+      "new": "Başqa bir biznesi analiz et"
     },
     "lock": {
-      "h": "Your report is ready — let's open the rest.",
-      "p": "The score and tone split are above. The recurring topics and the concrete suggestion live in the full report. Leave your email and we'll unlock everything.",
-      "ph": "you@mybusiness.com",
-      "cta": "Unlock the full report",
-      "note": "No ads, no bulk mail. Just this report and, if you want, one update a month.",
-      "err": "Please enter a valid email address.",
-      "done": "Unlocked",
-      "donet": "Your full report is open below. A copy is on its way to {e}.",
-      "donetMock": "Your full report is open below. (No copy was emailed because the email service is not connected.)"
+      "h": "Hesabatınız hazırdır — qalanını da açaq.",
+      "p": "Bal və ton paylanması yuxarıdadır. Təkrarlanan mövzular və konkret təklif tam hesabatdadır. E-poçtunuzu yazın, hamısını açaq.",
+      "ph": "siz@mobusiness.az",
+      "cta": "Tam hesabatı aç",
+      "note": "Reklam yoxdur, kütləvi e-poçt yoxdur. Sadəcə bu hesabat və istəsəniz ayda bir yeniləmə.",
+      "err": "Zəhmət olmasa düzgün e-poçt ünvanı daxil edin.",
+      "done": "Açıldı",
+      "donet": "Tam hesabatınız aşağıda açıqdır. Bir nüsxə {e} ünvanına göndərilir.",
+      "donetMock": "Tam hesabatınız aşağıda açıqdır. (E-poçt xidməti qoşulmadığı üçün nüsxə göndərilmədi.)"
     },
     "act": {
-      "k": "The one step to take this week"
+      "k": "Bu həftə atacağınız tək addım"
     },
     "method": {
-      "h": "How we build this report",
-      "t": "The score is calculated from review volume, rating distribution and the weight of recurring topics. We never edit, delete or buy reviews. Quotes are shortened from real reviews."
+      "h": "Bu hesabatı necə hazırlayırıq",
+      "t": "Bal rəy sayı, qiymət bölgüsü və təkrarlanan mövzuların çəkisi əsasında hesablanır. Rəyləri heç vaxt redaktə etmirik, silmirik və ya almırıq. Sitatlar həqiqi rəylərdən qısaltılıb."
     },
     "foot": {
-      "tagline": "An honest summary of your reviews, made for small businesses.",
-      "made": "Made in Istanbul"
+      "tagline": "Kiçik bizneslər üçün rəylərinizdən dürüst xülasə.",
+      "made": "İstanbulda hazırlandı"
     },
     "band": {
       "a": {
-        "t": "Very good",
-        "d": "Your customers have taken ownership of you. At this level the job is to not break what's working and to turn satisfaction into new customers."
+        "t": "Çox yaxşı",
+        "d": "Müştəriləriniz sizi qəbul edib. Bu səviyyədə işləyən şeyi pozmamaq və məmnuniyyəti yeni müştəriyə çevirməkdir."
       },
       "b": {
-        "t": "Good",
-        "d": "There's a solid foundation here. Two small touches will move this visibly upward — you'll see which topic in the full report."
+        "t": "Yaxşı",
+        "d": "Burada sağlam baza var. İki kiçik toxunuş bunu aydın şəkildə yuxarı qaldıracaq — hansı mövzunun olduğunu tam hesabatda görəcəksiniz."
       },
       "c": {
-        "t": "Average",
-        "d": "Not bad, but one single topic is dragging your score down. Touch that and the difference shows fast."
+        "t": "Orta",
+        "d": "Pis deyil, lakin tək bir mövzu balınızı aşağı çəkir. Ona toxunun, fərq tez görünəcək."
       },
       "d": {
-        "t": "Struggling",
-        "d": "There's a problem piling up here. The good news: the most repeated topic is very clear, so you know exactly where to start."
+        "t": "Çətinlikdə",
+        "d": "Burada problem yığılır. Xoş xəbər: ən çox təkrarlanan mövzu çox aydındır, yəni haradan başlayacağınızı dəqiq bilirsiniz."
       }
     }
   }

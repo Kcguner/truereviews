@@ -17,136 +17,136 @@
   },
   "nb": {
     "brand": {
-      "sub": "read · weigh · advise"
+      "sub": "lire · peser · conseiller"
     },
     "head": {
-      "note": "Preview is free"
+      "note": "L’aperçu est gratuit"
     },
     "intro": {
-      "eyebrow": "Free preview · No sign-up · ~40 seconds",
-      "h1a": "What are your customers",
-      "h1b": "<hl>really</hl> saying about you?",
-      "lede": "Paste your Google Maps link. We read <strong>every single one</strong> of your reviews and hand you a one-page honest summary: your satisfaction score, the topics that keep coming up, and the <strong>one concrete step</strong> you can take this week."
+      "eyebrow": "Aperçu gratuit · Sans inscription · ~40 secondes",
+      "h1a": "Analyse des avis Google :",
+      "h1b": "que disent vraiment <hl>vos clients</hl> ?",
+      "lede": "Collez le lien de votre établissement sur Google Maps. Nous lisons <strong>chacun</strong> de vos avis et vous remettons un résumé honnête d’une page : votre score de satisfaction, les thèmes qui reviennent sans cesse, et <strong>l’unique pas concret</strong> que vous pouvez faire cette semaine."
     },
     "input": {
-      "label": "Google Maps business link",
-      "paste": "Paste from clipboard",
-      "cta": "Prepare my report",
-      "demo": "Try it with a sample business →",
-      "hint": "Open your business on Google Maps, hit “Share”, copy the link and paste it here.",
-      "err": "That doesn't look like a Google Maps link. Open your business on Google Maps, tap “Share”, copy the link and paste it here."
+      "label": "Lien de votre établissement sur Google Maps",
+      "paste": "Coller depuis le presse-papiers",
+      "cta": "Préparer mon rapport",
+      "demo": "Essayer avec un établissement exemple →",
+      "hint": "Ouvrez votre établissement sur Google Maps, appuyez sur « Partager », copiez le lien et collez-le ici.",
+      "err": "Cela ne ressemble pas à un lien Google Maps. Ouvrez votre établissement sur Google Maps, appuyez sur « Partager », copiez le lien et collez-le ici."
     },
     "step1": {
-      "t": "Paste your link",
-      "d": "The link to your Google Maps business page is all we need. Nothing to install, nothing to connect."
+      "t": "Collez votre lien",
+      "d": "Nous avons besoin du seul lien vers la page de votre établissement sur Google Maps. Rien à installer, rien à connecter."
     },
     "step2": {
-      "t": "We read them",
-      "d": "We pull down your recent reviews, read every one and separate the praise, the complaints and the recurring topics."
+      "t": "Nous les lisons",
+      "d": "Nous récupérons vos avis récents, les lisons tous un par un et séparons les louanges, les réclamations et les thèmes récurrents."
     },
     "step3": {
-      "t": "We sum it up",
-      "d": "One page: your score, the topics that repeat, and one concrete step for this week. No dashboard, no chart overload."
+      "t": "Nous faisons la synthèse",
+      "d": "Une page : votre score, les thèmes qui reviennent, et un pas concret pour cette semaine. Pas de tableau de bord, pas de saturation de graphiques."
     },
     "gets": {
-      "h": "What's in your report"
+      "h": "Ce que contient votre rapport"
     },
     "get1": {
-      "t": "Your satisfaction score",
-      "d": "One number out of 100, plus the tone split."
+      "t": "Votre score de satisfaction",
+      "d": "Un nombre sur 100, plus la répartition par ton."
     },
     "get2": {
-      "t": "Recurring topics",
-      "d": "The most repeated praise and complaints, with how many reviews mention each."
+      "t": "Les thèmes qui reviennent",
+      "d": "Les louanges et les réclamations les plus répétées, avec le nombre d’avis qui citent chacune."
     },
     "get3": {
-      "t": "One concrete suggestion",
-      "d": "We won't tell you to “fix everything”. Just one step you can take this week."
+      "t": "Une suggestion concrète",
+      "d": "Nous ne vous dirons pas de « tout corriger ». Juste un pas que vous pouvez faire cette semaine."
     },
     "assure": {
-      "text": "We don't edit your reviews, we don't delete them, we don't polish them. We read all of them and tell you the way someone would say it to your face.",
-      "sig": "TrueReviews · independent analysis"
+      "text": "Nous ne modifions pas vos avis, nous ne les supprimons pas, nous ne les embellissons pas. Nous les lisons tous et vous le disons comme quelqu’un vous le dirait en face.",
+      "sig": "TrueReviews · analyse indépendante"
     },
     "float": {
-      "cap": "Sample output",
-      "note": "“Waiting during lunch hours” appears in 31 reviews."
+      "cap": "Exemple de résultat",
+      "note": "« Attente pendant les heures de déjeuner » apparaît dans 31 avis."
     },
     "load": {
-      "reading": "Reading your reviews…",
-      "foot": "Your reviews stay exactly as they are; we only read and summarise them. We don't ask for an email for this preview.",
-      "s1": "Finding your business",
-      "s2": "Downloading reviews",
-      "s3": "Reading every single one",
-      "s4": "Separating praise from complaints",
-      "s5": "Calculating your satisfaction score",
-      "s6": "Writing your report"
+      "reading": "Lecture de vos avis…",
+      "foot": "Vos avis restent exactement tels quels ; nous ne faisons que les lire et les résumer. Aucun e-mail demandé pour cet aperçu.",
+      "s1": "Recherche de votre établissement",
+      "s2": "Téléchargement des avis",
+      "s3": "Lecture de chacun d’eux",
+      "s4": "Séparation des louanges et des réclamations",
+      "s5": "Calcul de votre score de satisfaction",
+      "s6": "Rédaction de votre rapport"
     },
     "rpt": {
-      "back": "← Analyse another business",
+      "back": "← Analyser un autre établissement",
       "stamp": {
-        "prev": "Preview",
-        "full": "Full report"
+        "prev": "Aperçu",
+        "full": "Rapport complet"
       },
-      "date": "Report date",
-      "scope": "Last {r} reviews",
+      "date": "Date du rapport",
+      "scope": "{r} derniers avis",
       "score": {
-        "h": "Overall customer satisfaction",
-        "cap": "Satisfaction score"
+        "h": "Satisfaction globale des clients",
+        "cap": "Score de satisfaction"
       },
       "tone": {
-        "h": "The tone of your reviews",
-        "pos": "Praise",
-        "neu": "Neutral",
-        "neg": "Complaint"
+        "h": "Le ton de vos avis",
+        "pos": "Louange",
+        "neu": "Neutre",
+        "neg": "Réclamation"
       },
       "themes": {
-        "h": "The topics that keep coming up"
+        "h": "Les thèmes qui reviennent sans cesse"
       },
-      "praise": "Praise",
-      "complaint": "Complaints",
-      "inreview": "reviews mention this",
-      "orig": "Original review",
-      "pdf": "Download PDF",
-      "new": "Analyse another business"
+      "praise": "Louanges",
+      "complaint": "Réclamations",
+      "inreview": "avis mentionnent cela",
+      "orig": "Avis original",
+      "pdf": "Télécharger le PDF",
+      "new": "Analyser un autre établissement"
     },
     "lock": {
-      "h": "Your report is ready — let's open the rest.",
-      "p": "The score and tone split are above. The recurring topics and the concrete suggestion live in the full report. Leave your email and we'll unlock everything.",
-      "ph": "you@mybusiness.com",
-      "cta": "Unlock the full report",
-      "note": "No ads, no bulk mail. Just this report and, if you want, one update a month.",
-      "err": "Please enter a valid email address.",
-      "done": "Unlocked",
-      "donet": "Your full report is open below. A copy is on its way to {e}.",
-      "donetMock": "Your full report is open below. (No copy was emailed because the email service is not connected.)"
+      "h": "Votre rapport est prêt — ouvrons le reste.",
+      "p": "Le score et la répartition par ton sont ci-dessus. Les thèmes récurrents et la suggestion concrète se trouvent dans le rapport complet. Laissez votre e-mail et nous débloquons tout.",
+      "ph": "vous@monetablissement.fr",
+      "cta": "Débloquer le rapport complet",
+      "note": "Pas de publicité, pas d’envoi en masse. Juste ce rapport et, si vous le souhaitez, une mise à jour par mois.",
+      "err": "Veuillez saisir une adresse e-mail valide.",
+      "done": "Débloqué",
+      "donet": "Votre rapport complet est ouvert ci-dessous. Une copie est en route vers {e}.",
+      "donetMock": "Votre rapport complet est ouvert ci-dessous. (Aucune copie envoyée, car le service e-mail n’est pas connecté.)"
     },
     "act": {
-      "k": "The one step to take this week"
+      "k": "Le seul pas à faire cette semaine"
     },
     "method": {
-      "h": "How we build this report",
-      "t": "The score is calculated from review volume, rating distribution and the weight of recurring topics. We never edit, delete or buy reviews. Quotes are shortened from real reviews."
+      "h": "Comment nous construisons ce rapport",
+      "t": "Le score est calculé à partir du volume des avis, de la répartition des notes et du poids des thèmes récurrents. Nous ne modifions, ne supprimons et n’achetons jamais d’avis. Les citations sont raccourcies à partir d’avis réels."
     },
     "foot": {
-      "tagline": "An honest summary of your reviews, made for small businesses.",
-      "made": "Made in Istanbul"
+      "tagline": "Un résumé honnête de vos avis, conçu pour les petites entreprises.",
+      "made": "Fait à Istanbul"
     },
     "band": {
       "a": {
-        "t": "Very good",
-        "d": "Your customers have taken ownership of you. At this level the job is to not break what's working and to turn satisfaction into new customers."
+        "t": "Très bon",
+        "d": "Vos clients vous ont adopté. À ce niveau, l’enjeu est de ne pas casser ce qui marche et de transformer la satisfaction en nouveaux clients."
       },
       "b": {
-        "t": "Good",
-        "d": "There's a solid foundation here. Two small touches will move this visibly upward — you'll see which topic in the full report."
+        "t": "Bon",
+        "d": "Il y a une base solide. Deux petits ajustements le feront monter nettement — vous verrez de quel thème il s’agit dans le rapport complet."
       },
       "c": {
-        "t": "Average",
-        "d": "Not bad, but one single topic is dragging your score down. Touch that and the difference shows fast."
+        "t": "Moyen",
+        "d": "Pas mal, mais un seul thème fait plummet votre score. Touchez-le et la différence se voit vite."
       },
       "d": {
-        "t": "Struggling",
-        "d": "There's a problem piling up here. The good news: the most repeated topic is very clear, so you know exactly where to start."
+        "t": "En difficulté",
+        "d": "Un problème s’accumule ici. La bonne nouvelle : le thème le plus répété est très clair, vous savez donc exactement par où commencer."
       }
     }
   }
