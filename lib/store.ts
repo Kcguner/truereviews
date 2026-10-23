@@ -308,7 +308,8 @@ export async function upsertLead(
   email: string,
   reportId: string,
   locale: string,
-  verified: boolean
+  verified: boolean,
+  consentAt?: string
 ): Promise<void> {
   const norm = email.trim().toLowerCase();
   if (!norm) return;
@@ -318,13 +319,27 @@ export async function upsertLead(
       await redis.hset(keyLead(norm), {
         report_id: reportId,
         locale,
-        verified: verified ? '1' : '0'
+        verified: verified ? '1' : '0',
+        // Onay kanıtı yalnızca verildiğinde yazılır (KVKK m.5/m.6 ispat yükü).
+        ...(consentAt ? { consent_at: consentAt } : {})
       });
       await redis.sadd(keyLeadSet, norm);
       await redis.expire(keyLeadSet, LEAD_TTL_SECONDS);
+      // Hash de artık küme gibi 180 günde (kayan) düşer; böylece iki anahtar da
+      // aynı saklama vaadine uyar. Lead'in DERHAL silinmesi için tek yol
+      // `deleteLeadByEmail` olarak kalır (KVKK m.7 + m.11 silme hakkı).
+      await redis.expire(keyLead(norm), LEAD_TTL_SECONDS);
     },
     () => {
-      memStore.memLeads.push({ email: norm, report_id: reportId, locale, verified });
+      // Bellek satırı `memLeads: Record<string, unknown>[]` olduğu için alan
+      // eklemek tip değişikliği gerektirmez.
+      memStore.memLeads.push({
+        email: norm,
+        report_id: reportId,
+        locale,
+        verified,
+        ...(consentAt ? { consent_at: consentAt } : {})
+      });
     }
   );
   // Lead'in evi: Redis lead seti (dışa aktarım / bülten için).
@@ -334,8 +349,8 @@ export async function upsertLead(
 }
 
 /**
- * KVKK "silme talebi" yolunun uygulanabilir kısmı (henüz bir route'a bağlı DEĞİL;
- * route eklemek bu turun kapsamı dışında).
+ * KVKK "silme talebi" yolunun uygulanabilir kısmı. Admin uç noktası:
+ * POST /api/data-deletion (ADMIN_BYPASS_TOKEN ile korunur).
  *
  * Kapsam: lead hash'i, lead dizini (küme) ve ilişkili raporun `email_unlocked`
  * alanı. Rapor satırının kendisi zaten CACHE_TTL_SECONDS içinde düşer.

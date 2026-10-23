@@ -49,6 +49,24 @@ sadece aşağıdaki 5-10 dakikalık işlemler sizde kaldı (API anahtarları ben
    metadata route'ları ile elle üretiliyor (harici paket gerekmiyor).
    Not: `NEXT_PUBLIC_*` değişirse Redeploy şart (build-time gömülür).
 
+## 7) KVKK operasyon kontrol listesi (tek seferlik + sürekli)
+1. VERBIS muafiyet kararını yazılı verin ve saklayın: yıllık çalışan sayısı
+   50'den az, mali bilanço 100 milyon TL'nin altında **ve** esas faaliyet konusu
+   kişisel veri işlemek değilse muafiyet var; şüphedeyseniz kaydolun.
+2. Veri işleyenlerin her biriyle (Upstash, Vercel, Apify, Google, Brevo,
+   Cloudflare) standart sözleşmeyi imzalayın — yurt dışına aktarımın dayanağı budur.
+3. İmzadan itibaren **5 iş günü** içinde standart sözleşmeyi KVKK'ya bildirin
+   (Sözleşme Bilgi Sistemi / KEP).
+4. Silme talebini `POST /api/data-deletion` ile uygulayın; istekte
+   `x-admin-key: $ADMIN_BYPASS_TOKEN` başlığı zorunlu (anahtarsız 403).
+5. Yanıtı talepten itibaren **30 gün** içinde verin (KVKK m.13); silme ücretsizdir.
+6. Silme kaydı tutun: talep tarihi, adres, talebin sahibine ait olduğunun
+   doğrulanması, dönen `deleted` değeri ve yanıt tarihi.
+7. Kapsam dışını kayda geçirin: rapor gövdesi `CACHE_TTL_HOURS` ile düşer, aynı
+   adresle açılmış başka raporların `email_unlocked` alanı silinmez.
+8. Talep İletişim sayfasındaki adrese (`NEXT_PUBLIC_CONTACT_EMAIL`) gelir;
+   yanıtı da aynı adresten verin.
+
 ## Hızlı test (anahtarsız)
 ```powershell
 Copy-Item .env.example .env.local

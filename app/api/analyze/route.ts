@@ -152,7 +152,8 @@ export async function POST(req: NextRequest) {
       place_url: placeUrl,
       place_key: placeKey,
       business_name: businessName,
-      reviews: reviews.map((r) => ({ text: r.text, rating: r.rating, author: r.author })),
+      // KVKK: author (yorum yazarı adı) saklanmaz — lib/legal.ts taahhüdü.
+      reviews: reviews.map((r) => ({ text: r.text, rating: r.rating })),
       full_report: report,
       preview,
       locale,

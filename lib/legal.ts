@@ -20,6 +20,23 @@ export type LegalDocResult = {
   fallback: boolean;
 };
 
+/**
+ * Veri sorumlusu kimliği — KVKK m.10'un zorunlu unsuru.
+ *
+ * `legalName`, `address` ve `kep` yayına almadan önce doldurulmalıdır; köşeli
+ * parantezli değerler bilinçli yer tutucudur, uydurma şirket bilgisi değildir.
+ * E-posta, site genelindeki tek kaynak olan `NEXT_PUBLIC_CONTACT_EMAIL`
+ * değişkeninden okunur (bkz. `lib/site.ts` → `getContactEmail`); tanımlı
+ * değilse metinde yer tutucu görünür.
+ */
+export const CONTROLLER_INFO = {
+  name: 'TrueReviews',
+  legalName: '[TODO: ticari unvan / şahıs adı]',
+  address: '[TODO: tebligat adresi]',
+  kep: '[TODO: KEP adresi]',
+  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || '[TODO: iletişim e-postası]'
+};
+
 const PAGE_NAMES: Record<LegalSlug, Record<string, string>> = {
   sss: {
     tr: 'Sık Sorulan Sorular', en: 'Frequently Asked Questions', de: 'Häufige Fragen',
@@ -110,97 +127,358 @@ const DOCS: Record<string, Record<string, LegalDoc>> = {
   gizlilik: {
     tr: {
       title: 'Gizlilik Politikası',
-      intro: 'Bu politika, TrueReviews kullanırken verilerinizin nasıl işlendiğini açıklar.',
+      intro: 'Bu politika; TrueReviews’in hangi verileri, hangi amaçla ve hangi hukuki sebebe dayanarak işlediğini, kimlere aktardığını ve ne kadar süre sakladığını açıklar. KVKK kapsamındaki zorunlu bilgilendirme ayrıca Aydınlatma Metni’nde yer alır.',
       sections: [
         {
-          h: 'Toplanan veriler',
+          h: 'Veri sorumlusu',
           p: [
-            'Analiz için yapıştırdığınız Google Maps işletme linki, tam rapor için bıraktığınız e-posta adresi ve kötüye kullanımı engellemek için IP adresinizle kota kayıtları işlenir.'
+            `Veri sorumlusu: ${CONTROLLER_INFO.name} — ${CONTROLLER_INFO.legalName}. Tebligat adresi: ${CONTROLLER_INFO.address}. KEP: ${CONTROLLER_INFO.kep}. E-posta: ${CONTROLLER_INFO.email}.`
           ]
         },
         {
-          h: 'Kullanım amacı',
+          h: 'İşlenen veriler, amaç ve hukuki sebep',
           p: [
-            'Veriler yalnızca rapor üretmek, e-posta onayını tamamlamak ve kota uygulamak için kullanılır. Reklam ve toplu pazarlama maili gönderilmez.'
+            'Raporun üretilmesi ve e-posta ile iletilmesi (KVKK m.5/2-c, sözleşmenin ifası): yapıştırdığınız Google Maps işletme linki, işletme adı, sayfadan çekilen herkese açık yorum metinleri ve puanları, e-posta adresiniz ve onay kaydınız.',
+            'Bot ve kötüye kullanım koruması (m.5/2-f, meşru menfaat): IP adresine bağlı kota sayaçları, istek zamanı ve dil tercihiniz.',
+            'Hukuki yükümlülükler (m.5/2-ç): yetkili kamu kurumlarının usulüne uygun taleplerine cevap verilmesi ve uyuşmazlıklarda delil saklanması.'
           ]
         },
         {
-          h: 'Saklama ve silme',
+          h: 'Alıcılar',
           p: [
-            'Raporlar ve e-postalar güvenli altyapıda (Upstash Redis + Brevo) saklanır. Verilerinizin silinmesini isterseniz İletişim sayfasından yazmanız yeterli.'
+            'Veriler, hizmetin sunulması için yalnızca kendi hizmet kapsamlarında şu tedarikçilerle paylaşılır: Upstash (rapor, yorum metinleri ve lead kaydı; Redis, AB bölgesi), Vercel (barındırma ve sunucu günlükleri; fra1), Apify (herkese açık Google Maps sayfasının adresi), Google AI Studio / Gemini (işletme adı, yorum metinleri ve puanları), Brevo (yalnızca e-posta adresiniz ve rapor bağlantısı), Cloudflare Turnstile (bot kontrolü için IP adresi ve tarayıcı sinyalleri). Plausible yapılandırılmışsa çerezsiz çalışır ve yalnızca sayfa görüntüleme sayıları alır.'
           ]
         },
         {
-          h: 'Üçüncü taraflar',
+          h: 'Yurt dışına aktarım',
           p: [
-            'E-posta gönderimi (Brevo), yorum çekme (Apify), analiz (Google AI) ve bot koruması (Cloudflare Turnstile) için ilgili servislerle sınırlı paylaşım yapılır.'
+            'Adı geçen tedarikçilerin sunucuları yurt dışında olduğundan veriler yurt dışına aktarılır. Aktarım, KVKK m.9 uyarınca standart sözleşme hükümlerine dayanılarak yapılır; bu aktarımlar için verilmiş bir yeterlilik kararı bulunmamaktadır. Sözleşme metinleri ve aktarım detayları talebiniz üzerine paylaşılır.'
           ]
         },
         {
-          h: 'Çerezler',
-          p: ['Zorunlu takip çerezi kullanılmaz; tema tercihiniz yalnızca tarayıcınızda (localStorage) saklanır.']
+          h: 'Saklama süreleri',
+          p: [
+            'Rapor ve çekilen yorum metinleri varsayılan olarak 24 saat (yapılandırmaya göre 1 saat ile 30 gün arasında), e-posta doğrulama bağlantısı 48 saat, e-posta/lead kaydı 180 gün, IP kota sayaçları 1 saat ve 24 saat saklanır. Süre dolduğunda kayıtlar otomatik olarak silinir.'
+          ]
+        },
+        {
+          h: 'Çerezler ve yerel depolama',
+          p: [
+            'Yalnızca işlevsel bir çerez kullanılır: NEXT_LOCALE, dil tercihinizi 1 yıl boyunca hatırlar (SameSite=Lax). Bot koruması için Cloudflare Turnstile, sayfa yüklendiğinde tarayıcınızdan teknik sinyaller alır.',
+            'Tema ve e-posta tercihleri çerez değildir; tarayıcınızın localStorage alanında tutulur. Varsayılan olarak reklam veya analiz çerezi kullanılmaz; Plausible etkinleştirilirse çerezsiz çalışır.'
+          ]
+        },
+        {
+          h: 'Çekilen yorumlar (üçüncü kişilere ait içerik)',
+          p: [
+            'Analiz edilen yorumlar, işletmenin Google Maps sayfasındaki herkese açık içeriktir ve yorum sahiplerine aittir. Bu metinler yalnızca işletme için özet rapor üretmek amacıyla işlenir; yorum yazarı adları saklanmaz. Yorumunuzun işlenmesini istemiyorsanız iletişim adresimize yazabilirsiniz; talebiniz en kısa sürede sonuçlandırılır.'
+          ]
+        },
+        {
+          h: 'Haklarınız ve başvuru yolu',
+          p: [
+            'KVKK m.11 kapsamında; verilerinizin işlenip işlenmediğini öğrenme, bilgi talep etme, işlenme amacını ve aktarıldığı tarafları öğrenme, eksik veya yanlış verilerin düzeltilmesini, silinmesini veya yok edilmesini ve bu işlemlerin alıcılara bildirilmesini isteme, münhasıran otomatik sistemlerle yapılan analiz sonucunda aleyhinize bir sonucun ortaya çıkmasına itiraz etme ve zararın giderilmesini talep etme haklarına sahipsiniz.',
+            'Başvurunuzu yazılı olarak yukarıdaki tebligat adresine, KEP adresimize veya güvenli elektronik imza ile e-posta adresimize iletebilirsiniz. Talepler en geç 30 gün içinde cevaplanır. Kişisel Verileri Koruma Kurulu’na şikâyet hakkınız saklıdır.'
+          ]
         }
       ]
     },
     en: {
       title: 'Privacy Policy',
-      intro: 'This policy explains how your data is processed when you use TrueReviews.',
+      intro: 'This policy explains what personal data TrueReviews processes, why, on which legal basis, who receives it and for how long. The statutory information under the Turkish KVKK is also set out in the Privacy Notice.',
       sections: [
-        { h: 'Data we collect', p: ['The Google Maps business link you paste, the email address you leave for the full report, and IP/quota logs to prevent abuse.'] },
-        { h: 'Purpose', p: ['Data is used only to generate the report, complete email confirmation and enforce quotas. No ads, no marketing blasts.'] },
-        { h: 'Storage and deletion', p: ['Reports and emails are stored on secure infrastructure (Upstash Redis + Brevo). Write to us via the Contact page to delete your data.'] },
-        { h: 'Third parties', p: ['Limited sharing with email delivery (Brevo), review fetching (Apify), analysis (Google AI) and bot protection (Cloudflare Turnstile).'] },
-        { h: 'Cookies', p: ['No tracking cookies; your theme preference is stored only in your browser (localStorage).'] }
+        {
+          h: 'Data controller',
+          p: [
+            `Controller: ${CONTROLLER_INFO.name} — ${CONTROLLER_INFO.legalName}. Address: ${CONTROLLER_INFO.address}. KEP: ${CONTROLLER_INFO.kep}. Email: ${CONTROLLER_INFO.email}.`
+          ]
+        },
+        {
+          h: 'Data, purpose and legal basis',
+          p: [
+            'Producing the report and delivering it by email (KVKK art. 5/2-c, performance of a contract): the Google Maps business link you paste, the business name, the public review texts and ratings fetched from that page, your email address and your confirmation record.',
+            'Bot and abuse prevention (art. 5/2-f, legitimate interest): IP-based quota counters, request time and your language preference.',
+            'Legal obligations (art. 5/2-ç): responding to lawful requests from competent authorities and preserving evidence in disputes.'
+          ]
+        },
+        {
+          h: 'Recipients',
+          p: [
+            'Data is shared only as needed to run the service, and only within each provider’s scope: Upstash (report, review texts and lead record; Redis, EU region), Vercel (hosting and server logs; fra1), Apify (the public Google Maps page URL), Google AI Studio / Gemini (business name, review texts and ratings), Brevo (only your email address and the report link), Cloudflare Turnstile (IP address and browser signals for bot checks). If Plausible is configured, it runs cookieless and receives page-view counts only.'
+          ]
+        },
+        {
+          h: 'International transfers',
+          p: [
+            'The providers above process data outside Türkiye. Transfers rely on the standard contractual clauses under KVKK art. 9; no adequacy decision is relied upon. The contract texts and transfer details are available on request.'
+          ]
+        },
+        {
+          h: 'Retention',
+          p: [
+            'Reports and fetched review texts are kept for 24 hours by default (1 hour to 30 days depending on configuration), the email verification link for 48 hours, the email/lead record for 180 days, and IP quota counters for 1 hour and 24 hours. Records are deleted automatically once the period ends.'
+          ]
+        },
+        {
+          h: 'Cookies and local storage',
+          p: [
+            'One functional cookie is used: NEXT_LOCALE remembers your language choice for 1 year (SameSite=Lax). For bot protection, Cloudflare Turnstile receives technical signals from your browser when the page loads.',
+            'Theme and email preferences are not cookies; they live in your browser’s localStorage. No advertising or analytics cookies are set by default; if Plausible is enabled it is cookieless.'
+          ]
+        },
+        {
+          h: 'Fetched reviews (third-party content)',
+          p: [
+            'The reviews analysed are public content on the business’s Google Maps page and belong to their authors. They are processed only to produce a summary report for the business; author names are not stored. If you do not want your review processed, write to the contact address and your request will be handled as soon as possible.'
+          ]
+        },
+        {
+          h: 'Your rights and how to apply',
+          p: [
+            'Under KVKK art. 11 you may learn whether your data is processed, request information, learn the purpose and the recipients, have incomplete or inaccurate data corrected, have it erased or destroyed and have this notified to recipients, object to a result arising solely from automated analysis, and claim compensation for damage.',
+            'Send requests in writing to the address above, by KEP, or with a secure electronic signature to the email address above. We respond within 30 days at the latest. You may also lodge a complaint with the Turkish Personal Data Protection Board.'
+          ]
+        }
       ]
     },
     de: {
       title: 'Datenschutzerklärung',
-      intro: 'Diese Erklärung beschreibt, wie Ihre Daten bei TrueReviews verarbeitet werden.',
+      intro: 'Diese Erklärung beschreibt, welche personenbezogenen Daten TrueReviews verarbeitet, zu welchem Zweck, auf welcher Rechtsgrundlage, an wen sie übermittelt und wie lange sie gespeichert werden. Die förmliche Information nach dem türkischen KVKK steht im KVKK-Datenschutzhinweis.',
       sections: [
-        { h: 'Erhobene Daten', p: ['Der eingefügte Google-Maps-Link, Ihre E-Mail-Adresse für den vollständigen Bericht sowie IP-/Kontingentprotokolle gegen Missbrauch.'] },
-        { h: 'Zweck', p: ['Die Daten dienen nur der Berichtserstellung, der E-Mail-Bestätigung und der Kontingentkontrolle. Keine Werbung, keine Newsletter.'] },
-        { h: 'Speicherung und Löschung', p: ['Sichere Speicherung (Upstash Redis + Brevo). Zur Löschung Ihrer Daten schreiben Sie uns über die Kontaktseite.'] },
-        { h: 'Dritte', p: ['Begrenzte Weitergabe an E-Mail-Versand (Brevo), Bewertungsabruf (Apify), Analyse (Google AI) und Bot-Schutz (Cloudflare Turnstile).'] },
-        { h: 'Cookies', p: ['Keine Tracking-Cookies; das Theme wird nur lokal in Ihrem Browser gespeichert.'] }
+        {
+          h: 'Verantwortlicher',
+          p: [
+            `Verantwortlich: ${CONTROLLER_INFO.name} — ${CONTROLLER_INFO.legalName}. Anschrift: ${CONTROLLER_INFO.address}. KEP: ${CONTROLLER_INFO.kep}. E-Mail: ${CONTROLLER_INFO.email}.`
+          ]
+        },
+        {
+          h: 'Daten, Zweck und Rechtsgrundlage',
+          p: [
+            'Erstellung und E-Mail-Versand des Berichts (KVKK Art. 5/2-c, Vertragserfüllung): der eingefügte Google-Maps-Link, der Unternehmensname, die öffentlich abgerufenen Bewertungstexte und Sternebewertungen, Ihre E-Mail-Adresse und Ihr Bestätigungsnachweis.',
+            'Schutz vor Bots und Missbrauch (Art. 5/2-f, berechtigtes Interesse): IP-basierte Kontingentzähler, Anfragezeitpunkt und Ihre Sprachpräferenz.',
+            'Rechtliche Pflichten (Art. 5/2-ç): Beantwortung rechtmäßiger Anfragen zuständiger Behörden und Beweissicherung bei Streitigkeiten.'
+          ]
+        },
+        {
+          h: 'Empfänger',
+          p: [
+            'Daten werden nur soweit erforderlich und nur im jeweiligen Leistungsumfang weitergegeben: Upstash (Bericht, Bewertungstexte und Lead-Datensatz; Redis, EU-Region), Vercel (Hosting und Server-Logs; fra1), Apify (die öffentliche Google-Maps-URL), Google AI Studio / Gemini (Unternehmensname, Bewertungstexte und Sterne), Brevo (nur Ihre E-Mail-Adresse und der Berichtslink), Cloudflare Turnstile (IP-Adresse und Browsersignale zur Bot-Erkennung). Ist Plausible konfiguriert, arbeitet es cookielos und erhält nur Seitenaufrufzahlen.'
+          ]
+        },
+        {
+          h: 'Drittlandübermittlung',
+          p: [
+            'Die genannten Anbieter verarbeiten Daten außerhalb der Türkei. Die Übermittlung stützt sich auf die Standardvertragsklauseln nach KVKK Art. 9; eine Angemessenheitsentscheidung liegt nicht vor. Vertragstexte und Einzelheiten erteilen wir auf Anfrage.'
+          ]
+        },
+        {
+          h: 'Speicherdauer',
+          p: [
+            'Berichte und abgerufene Bewertungstexte werden standardmäßig 24 Stunden gespeichert (je nach Konfiguration 1 Stunde bis 30 Tage), der E-Mail-Bestätigungslink 48 Stunden, der E-Mail-/Lead-Datensatz 180 Tage, IP-Kontingentzähler 1 Stunde und 24 Stunden. Nach Ablauf werden die Datensätze automatisch gelöscht.'
+          ]
+        },
+        {
+          h: 'Cookies und lokaler Speicher',
+          p: [
+            'Es wird ein einziges funktionales Cookie gesetzt: NEXT_LOCALE speichert Ihre Sprachwahl für 1 Jahr (SameSite=Lax). Cloudflare Turnstile erhält beim Seitenaufruf technische Signale Ihres Browsers zur Bot-Erkennung.',
+            'Theme- und E-Mail-Präferenzen sind keine Cookies, sondern liegen im localStorage Ihres Browsers. Standardmäßig werden keine Werbe- oder Analyse-Cookies gesetzt; Plausible ist, falls aktiviert, cookielos.'
+          ]
+        },
+        {
+          h: 'Abgerufene Bewertungen (Inhalte Dritter)',
+          p: [
+            'Die analysierten Bewertungen sind öffentliche Inhalte der Google-Maps-Seite eines Unternehmens und gehören ihren Verfassern. Sie werden ausschließlich zur Erstellung der Zusammenfassung verarbeitet; Verfassernamen werden nicht gespeichert. Möchten Sie die Verarbeitung Ihrer Bewertung nicht, schreiben Sie an die Kontaktadresse; Ihr Anliegen wird umgehend bearbeitet.'
+          ]
+        },
+        {
+          h: 'Ihre Rechte und Anträge',
+          p: [
+            'Nach KVKK Art. 11 können Sie Auskunft verlangen, Informationen anfordern, Zweck und Empfänger erfahren, unvollständige oder unrichtige Daten berichtigen, löschen oder vernichten lassen und dies Empfängern mitteilen lassen, gegen ein allein automationsgestütztes Ergebnis Widerspruch einlegen und Ersatz eines Schadens verlangen.',
+            'Anträge richten Sie schriftlich an die oben genannte Anschrift, per KEP oder mit qualifizierter elektronischer Signatur an die angegebene E-Mail-Adresse. Wir antworten spätestens innerhalb von 30 Tagen. Beschwerden können Sie beim türkischen Datenschutzrat einlegen.'
+          ]
+        }
       ]
     }
   },
   kvkk: {
     tr: {
       title: 'KVKK Aydınlatma Metni',
-      intro: '6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında veri sorumlusu TrueReviews’dir.',
+      intro: '6698 sayılı Kişisel Verilerin Korunması Kanunu’nun 10. maddesi uyarınca hazırlanan bu metin; veri sorumlusunun kimliği, işlenen veriler, amaçlar, hukuki sebepler, alıcılar, saklama süreleri ve başvuru yolları hakkında bilgi verir.',
       sections: [
         {
-          h: 'İşlenen veriler ve amaç',
+          h: 'Veri sorumlusunun kimliği',
           p: [
-            'E-posta adresiniz (rapor iletimi), işletme linkiniz (analiz) ve IP/kota kayıtları (güvenlik), açık rızanıza dayanarak işlenir.'
+            `${CONTROLLER_INFO.name} — ${CONTROLLER_INFO.legalName}. Tebligat adresi: ${CONTROLLER_INFO.address}. KEP: ${CONTROLLER_INFO.kep}. E-posta: ${CONTROLLER_INFO.email}.`
           ]
         },
-        { h: 'Saklama süresi', p: ['Veriler, talebiniz üzerine silinir; onay kayıtları yasal yükümlülüklerle sınırlı süre tutulur.'] },
         {
-          h: 'Haklarınız (m. 11)',
+          h: 'İşlenen veri kategorileri, amaç ve hukuki sebep',
           p: [
-            'Erişim, düzeltme, silme, işleme itirazı ve zararın giderilmesini talep etme haklarınızı İletişim sayfası üzerinden kullanabilirsiniz.'
+            'İletişim verisi — e-posta adresi ve onay kaydı: raporun e-posta ile iletilmesi ve e-posta adresinin çift onayla doğrulanması (m.5/2-c, sözleşmenin ifası).',
+            'İşlem verisi — yapıştırdığınız Google Maps linki, işletme adı, sayfadan çekilen herkese açık yorum metinleri ve puanları, dil tercihi: raporun üretilmesi (m.5/2-c).',
+            'Güvenlik verisi — IP adresine bağlı kota sayaçları ve istek zamanı: bot ve kötüye kullanım koruması (m.5/2-f, meşru menfaat).',
+            'Hukuki yükümlülük verisi — yetkili kamu kurumlarının usulüne uygun taleplerine cevap ve uyuşmazlıklarda delil: (m.5/2-ç).',
+            'Toplama yöntemi: veriler, site üzerindeki form ve otomatik sunucu kayıtları aracılığıyla elektronik ortamda toplanır.'
+          ]
+        },
+        {
+          h: 'Alıcılar ve aktarılan taraflar',
+          p: [
+            'Veriler, hizmetin sunulması için yalnızca kendi hizmet kapsamlarında şu tedarikçilere aktarılır: Upstash (rapor, yorum metinleri ve lead kaydı; Redis, AB bölgesi), Vercel (barındırma ve sunucu günlükleri; fra1), Apify (herkese açık Google Maps sayfasının adresi), Google AI Studio / Gemini (işletme adı, yorum metinleri ve puanları), Brevo (yalnızca e-posta adresiniz ve rapor bağlantısı), Cloudflare Turnstile (bot kontrolü için IP adresi ve tarayıcı sinyalleri). Plausible yapılandırılmışsa çerezsiz çalışır ve yalnızca sayfa görüntüleme sayıları alır.',
+            'Yetkili kamu kurumlarına aktarım yalnızca usulüne uygun bir talep hâlinde ve hukuki yükümlülük kapsamında yapılır.'
+          ]
+        },
+        {
+          h: 'Yurt dışına aktarım',
+          p: [
+            'Adı geçen tedarikçilerin sunucuları yurt dışında olduğundan veriler yurt dışına aktarılır. Aktarım, KVKK m.9 uyarınca standart sözleşme hükümlerine dayanılarak yapılır; bu aktarımlar için verilmiş bir yeterlilik kararı bulunmamaktadır. Sözleşme metinleri ve aktarım detayları talebiniz üzerine paylaşılır.'
+          ]
+        },
+        {
+          h: 'Saklama süreleri',
+          p: [
+            'Rapor ve çekilen yorum metinleri varsayılan olarak 24 saat (yapılandırmaya göre 1 saat ile 30 gün arasında), e-posta doğrulama bağlantısı 48 saat, e-posta/lead kaydı 180 gün, IP kota sayaçları 1 saat ve 24 saat saklanır. Süre dolduğunda kayıtlar otomatik olarak silinir.'
+          ]
+        },
+        {
+          h: 'Çerezler',
+          p: [
+            'Yalnızca işlevsel bir çerez kullanılır: NEXT_LOCALE, dil tercihinizi 1 yıl boyunca hatırlar (SameSite=Lax). Bot koruması için Cloudflare Turnstile, sayfa yüklendiğinde tarayıcınızdan teknik sinyaller alır. Tema ve e-posta tercihleri localStorage’da tutulur. Varsayılan olarak reklam veya analiz çerezi kullanılmaz; Plausible etkinleştirilirse çerezsiz çalışır.'
+          ]
+        },
+        {
+          h: 'Çekilen yorumlar (üçüncü kişilere ait içerik)',
+          p: [
+            'Analiz edilen yorumlar, işletmenin Google Maps sayfasındaki herkese açık içeriktir ve yorum sahiplerine aittir. Bu metinler yalnızca işletme için özet rapor üretmek amacıyla işlenir; yorum yazarı adları saklanmaz. Yorumunuzun işlenmesini istemiyorsanız iletişim adresimize yazabilirsiniz; talebiniz en kısa sürede sonuçlandırılır.'
+          ]
+        },
+        {
+          h: 'm.11 kapsamındaki haklar ve başvuru yolu',
+          p: [
+            'Verilerinizin işlenip işlenmediğini öğrenme, bilgi talep etme, işlenme amacını ve aktarıldığı tarafları öğrenme, eksik veya yanlış verilerin düzeltilmesini, silinmesini veya yok edilmesini ve bu işlemlerin alıcılara bildirilmesini isteme, münhasıran otomatik sistemlerle yapılan analiz sonucunda aleyhinize bir sonucun ortaya çıkmasına itiraz etme ve zararın giderilmesini talep etme haklarına sahipsiniz.',
+            'Başvurunuzu yazılı olarak yukarıdaki tebligat adresine, KEP adresimize veya güvenli elektronik imza ile e-posta adresimize iletebilirsiniz. Talepler en geç 30 gün içinde cevaplanır. Kişisel Verileri Koruma Kurulu’na şikâyet hakkınız saklıdır.'
           ]
         }
       ]
     },
     en: {
       title: 'Privacy Notice (KVKK/GDPR)',
-      intro: 'TrueReviews is the data controller for the data described below.',
+      intro: 'This notice is given under article 10 of the Turkish Personal Data Protection Law (KVKK). It covers the controller, the data processed, purposes, legal bases, recipients, retention and how to apply.',
       sections: [
-        { h: 'Data and purpose', p: ['Your email (report delivery), business link (analysis) and IP/quota logs (security), processed on the basis of your explicit consent.'] },
-        { h: 'Retention', p: ['Data is deleted on request; confirmation records are kept only as long as legally required.'] },
-        { h: 'Your rights', p: ['Access, rectification, erasure, objection and compensation rights can be exercised via the Contact page.'] }
+        {
+          h: 'Data controller',
+          p: [
+            `${CONTROLLER_INFO.name} — ${CONTROLLER_INFO.legalName}. Address: ${CONTROLLER_INFO.address}. KEP: ${CONTROLLER_INFO.kep}. Email: ${CONTROLLER_INFO.email}.`
+          ]
+        },
+        {
+          h: 'Data categories, purpose and legal basis',
+          p: [
+            'Contact data — email address and confirmation record: delivering the report by email and the double opt-in check (art. 5/2-c, performance of a contract).',
+            'Transaction data — the Google Maps link you paste, the business name, the public review texts and ratings fetched from that page, language preference: producing the report (art. 5/2-c).',
+            'Security data — IP-based quota counters and request time: bot and abuse prevention (art. 5/2-f, legitimate interest).',
+            'Compliance data — responding to lawful requests from competent authorities and evidence in disputes (art. 5/2-ç).',
+            'Collection method: data is collected electronically through the form on the site and automatic server logs.'
+          ]
+        },
+        {
+          h: 'Recipients',
+          p: [
+            'Data is transferred only as needed to run the service and only within each provider’s scope: Upstash (report, review texts and lead record; Redis, EU region), Vercel (hosting and server logs; fra1), Apify (the public Google Maps page URL), Google AI Studio / Gemini (business name, review texts and ratings), Brevo (only your email address and the report link), Cloudflare Turnstile (IP address and browser signals for bot checks). If Plausible is configured, it runs cookieless and receives page-view counts only.',
+            'Transfers to public authorities take place only on a lawful request and as required by a legal obligation.'
+          ]
+        },
+        {
+          h: 'International transfers',
+          p: [
+            'The providers above process data outside Türkiye. Transfers rely on the standard contractual clauses under KVKK art. 9; no adequacy decision is relied upon. The contract texts and transfer details are available on request.'
+          ]
+        },
+        {
+          h: 'Retention',
+          p: [
+            'Reports and fetched review texts are kept for 24 hours by default (1 hour to 30 days depending on configuration), the email verification link for 48 hours, the email/lead record for 180 days, and IP quota counters for 1 hour and 24 hours. Records are deleted automatically once the period ends.'
+          ]
+        },
+        {
+          h: 'Cookies',
+          p: [
+            'One functional cookie is used: NEXT_LOCALE remembers your language choice for 1 year (SameSite=Lax). For bot protection, Cloudflare Turnstile receives technical signals from your browser when the page loads. Theme and email preferences live in localStorage. No advertising or analytics cookies are set by default; if Plausible is enabled it is cookieless.'
+          ]
+        },
+        {
+          h: 'Fetched reviews (third-party content)',
+          p: [
+            'The reviews analysed are public content on the business’s Google Maps page and belong to their authors. They are processed only to produce a summary report for the business; author names are not stored. If you do not want your review processed, write to the contact address and your request will be handled as soon as possible.'
+          ]
+        },
+        {
+          h: 'Your rights (art. 11) and how to apply',
+          p: [
+            'You may learn whether your data is processed, request information, learn the purpose and the recipients, have incomplete or inaccurate data corrected, have it erased or destroyed and have this notified to recipients, object to a result arising solely from automated analysis, and claim compensation for damage.',
+            'Send requests in writing to the address above, by KEP, or with a secure electronic signature to the email address above. We respond within 30 days at the latest. You may also lodge a complaint with the Turkish Personal Data Protection Board.'
+          ]
+        }
       ]
     },
     de: {
       title: 'KVKK-Datenschutzhinweis',
-      intro: 'TrueReviews ist Verantwortlicher für die unten beschriebenen Daten.',
+      intro: 'Dieser Hinweis erfolgt nach Artikel 10 des türkischen Datenschutzgesetzes (KVKK) und nennt Verantwortlichen, Daten, Zwecke, Rechtsgrundlagen, Empfänger, Speicherdauer und Antragswege.',
       sections: [
-        { h: 'Daten und Zweck', p: ['Ihre E-Mail (Berichtversand), Ihr Unternehmenslink (Analyse) und IP-/Kontingentprotokolle (Sicherheit) — auf Grundlage Ihrer Einwilligung.'] },
-        { h: 'Speicherdauer', p: ['Löschung auf Anfrage; Nachweise nur so lange wie gesetzlich erforderlich.'] },
-        { h: 'Ihre Rechte', p: ['Auskunft, Berichtigung, Löschung, Widerspruch und Schadensersatz — über die Kontaktseite.'] }
+        {
+          h: 'Verantwortlicher',
+          p: [
+            `${CONTROLLER_INFO.name} — ${CONTROLLER_INFO.legalName}. Anschrift: ${CONTROLLER_INFO.address}. KEP: ${CONTROLLER_INFO.kep}. E-Mail: ${CONTROLLER_INFO.email}.`
+          ]
+        },
+        {
+          h: 'Datenkategorien, Zweck und Rechtsgrundlage',
+          p: [
+            'Kontaktdaten — E-Mail-Adresse und Bestätigungsnachweis: E-Mail-Versand des Berichts und Double-Opt-in-Prüfung (Art. 5/2-c, Vertragserfüllung).',
+            'Transaktionsdaten — der eingefügte Google-Maps-Link, der Unternehmensname, die öffentlich abgerufenen Bewertungstexte und Sterne, Sprachpräferenz: Erstellung des Berichts (Art. 5/2-c).',
+            'Sicherheitsdaten — IP-basierte Kontingentzähler und Anfragezeitpunkt: Schutz vor Bots und Missbrauch (Art. 5/2-f, berechtigtes Interesse).',
+            'Pflichtdaten — Beantwortung rechtmäßiger Behördenanfragen und Beweissicherung bei Streitigkeiten (Art. 5/2-ç).',
+            'Erhebung: Die Daten werden elektronisch über das Formular auf der Website und automatische Server-Logs erhoben.'
+          ]
+        },
+        {
+          h: 'Empfänger',
+          p: [
+            'Daten werden nur soweit erforderlich und nur im jeweiligen Leistungsumfang übermittelt: Upstash (Bericht, Bewertungstexte und Lead-Datensatz; Redis, EU-Region), Vercel (Hosting und Server-Logs; fra1), Apify (die öffentliche Google-Maps-URL), Google AI Studio / Gemini (Unternehmensname, Bewertungstexte und Sterne), Brevo (nur Ihre E-Mail-Adresse und der Berichtslink), Cloudflare Turnstile (IP-Adresse und Browsersignale zur Bot-Erkennung). Ist Plausible konfiguriert, arbeitet es cookielos und erhält nur Seitenaufrufzahlen.',
+            'Übermittlungen an Behörden erfolgen nur auf rechtmäßige Anfrage und soweit eine gesetzliche Pflicht besteht.'
+          ]
+        },
+        {
+          h: 'Drittlandübermittlung',
+          p: [
+            'Die genannten Anbieter verarbeiten Daten außerhalb der Türkei. Die Übermittlung stützt sich auf die Standardvertragsklauseln nach KVKK Art. 9; eine Angemessenheitsentscheidung liegt nicht vor. Vertragstexte und Einzelheiten erteilen wir auf Anfrage.'
+          ]
+        },
+        {
+          h: 'Speicherdauer',
+          p: [
+            'Berichte und abgerufene Bewertungstexte werden standardmäßig 24 Stunden gespeichert (je nach Konfiguration 1 Stunde bis 30 Tage), der E-Mail-Bestätigungslink 48 Stunden, der E-Mail-/Lead-Datensatz 180 Tage, IP-Kontingentzähler 1 Stunde und 24 Stunden. Nach Ablauf werden die Datensätze automatisch gelöscht.'
+          ]
+        },
+        {
+          h: 'Cookies',
+          p: [
+            'Es wird ein einziges funktionales Cookie gesetzt: NEXT_LOCALE speichert Ihre Sprachwahl für 1 Jahr (SameSite=Lax). Cloudflare Turnstile erhält beim Seitenaufruf technische Signale Ihres Browsers zur Bot-Erkennung. Theme- und E-Mail-Präferenzen liegen im localStorage. Standardmäßig werden keine Werbe- oder Analyse-Cookies gesetzt; Plausible ist, falls aktiviert, cookielos.'
+          ]
+        },
+        {
+          h: 'Abgerufene Bewertungen (Inhalte Dritter)',
+          p: [
+            'Die analysierten Bewertungen sind öffentliche Inhalte der Google-Maps-Seite eines Unternehmens und gehören ihren Verfassern. Sie werden ausschließlich zur Erstellung der Zusammenfassung verarbeitet; Verfassernamen werden nicht gespeichert. Möchten Sie die Verarbeitung Ihrer Bewertung nicht, schreiben Sie an die Kontaktadresse; Ihr Anliegen wird umgehend bearbeitet.'
+          ]
+        },
+        {
+          h: 'Rechte nach Art. 11 und Antragsweg',
+          p: [
+            'Sie können Auskunft verlangen, Informationen anfordern, Zweck und Empfänger erfahren, unvollständige oder unrichtige Daten berichtigen, löschen oder vernichten lassen und dies Empfängern mitteilen lassen, gegen ein allein automationsgestütztes Ergebnis Widerspruch einlegen und Ersatz eines Schadens verlangen.',
+            'Anträge richten Sie schriftlich an die oben genannte Anschrift, per KEP oder mit qualifizierter elektronischer Signatur an die angegebene E-Mail-Adresse. Wir antworten spätestens innerhalb von 30 Tagen. Beschwerden können Sie beim türkischen Datenschutzrat einlegen.'
+          ]
+        }
       ]
     }
   },

@@ -98,10 +98,6 @@ export function extractJson(text: string): unknown {
   return JSON.parse(t);
 }
 
-function errorMessage(e: unknown): string {
-  return e instanceof Error ? e.message : String(e);
-}
-
 /** Sözleşme guard'ı: score her yolda 0-10 aralığında kalmalı. */
 function clampScore(n: number): number {
   if (!Number.isFinite(n)) return SCORE_MIN;
@@ -238,10 +234,11 @@ export async function analyzeReviews(
   // `kind` kısa ve sabit bir kategori olmalı: warnProdOnce anahtarı bu değerden
   // üretilir, upstream metin (yanıt gövdesi) anahtara giremez — aksi halde
   // env-guard'ın `warned` kümesi her istekle büşür (bellek sızıntısı).
-  // Ayrıntılı neden yalnızca console.warn'a gider (her seferinde, log kirliliği olmadan).
-  const fallback = (kind: string, detail: string): { report: AnalysisReport; mocked: boolean } => {
+  // KVKK: log'a model ÇIKTISI (yorum metni = kişisel veri olabilir) yazılmaz;
+  // yalnızca kısa kategori + hata tipi/status kodu gider.
+  const fallback = (kind: string, code?: string): { report: AnalysisReport; mocked: boolean } => {
     // eslint-disable-next-line no-console
-    console.warn(`Gemma ${detail} -> heuristic fallback (model=${model})`);
+    console.warn(`Gemma ${kind}${code ? ` (${code})` : ''} -> heuristic fallback (model=${model})`);
     warnProdOnce(
       `gemma-fallback-${kind}`,
       `Gemma sürekli "${kind}" nedeniyle heuristic rapora düşüyor (model=${model}) — gerçek AI analizi üretilmiyor.`
@@ -282,7 +279,7 @@ export async function analyzeReviews(
         data = null;
       }
       if (!data || typeof data !== 'object' || Array.isArray(data)) {
-        return fallback('bozuk-gövde', 'geçersiz/boş JSON gövdesi');
+        return fallback('bozuk-gövde');
       }
       const text =
         (data as { candidates?: { content?: { parts?: { text?: string }[] } }[] })
@@ -296,10 +293,7 @@ export async function analyzeReviews(
         parsed.business_name = businessName;
         return { report: parsed, mocked: false };
       } catch (e) {
-        return fallback(
-          'parse-veya-sema',
-          `JSON parse fallback (ilk 200 karakter: ${text.slice(0, 200)}; hata: ${errorMessage(e)})`
-        );
+        return fallback('parse-veya-sema', e instanceof Error ? e.name : 'Error');
       }
     }
     lastStatus = res.status;
@@ -314,11 +308,11 @@ export async function analyzeReviews(
         'gemma-model-404',
         `Gemma modeli bulunamadı (404): "${model}" — AI Studio'daki gerçek model id'siyle eşleşmiyor. GEMMA_MODEL env'ini düzeltin.`
       );
-      return fallback('model-404', `model 404 (${lastText})`);
+      return fallback('model-404', `status=${res.status}`);
     }
     if (res.status === 429) {
       // Kota: tekrar denemek anlamlı değil (bütçe dakikalar içinde dolar), düş.
-      return fallback('kota-429', `kota 429 (${lastText})`);
+      return fallback('kota-429', `status=${res.status}`);
     }
     if (res.status < 500) {
       throw new Error(`Gemma hatası (${res.status}): ${lastText}`);

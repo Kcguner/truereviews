@@ -133,9 +133,10 @@ describe('fetchReviews — gerçek yol (asenkron run + poll)', () => {
     const res = await fetchReviews(PLACE_URL, 10, 'tr');
     expect(res.mocked).toBe(false);
     expect(res.businessName).toBe('Örnek Lokanta');
+    // KVKK: author alanı bilinçli olarak düşürülür (gizlilik politikası taahhüdü).
     expect(res.reviews).toEqual([
-      { text: 'Harika', rating: 5, author: 'Ayşe' },
-      { text: 'Berbat', rating: 1, author: undefined }
+      { text: 'Harika', rating: 5 },
+      { text: 'Berbat', rating: 1 }
     ]);
     // Senkron uç nokta artık kullanılmıyor: run + poll + dataset.
     expect(seen.some((u) => u.includes('run-sync-get-dataset-items'))).toBe(false);

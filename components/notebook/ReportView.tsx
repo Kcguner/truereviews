@@ -37,7 +37,7 @@ export default function ReportView({
   mailSent: boolean;
   isMockMail: boolean;
   devUrl?: string;
-  onUnlock: (email: string, turnstileToken: string) => Promise<string | null>;
+  onUnlock: (email: string, turnstileToken: string, consent: boolean) => Promise<string | null>;
   onReset: () => void;
 }) {
   const t = useTranslations('nb');
@@ -103,7 +103,7 @@ export default function ReportView({
     }
     setMailErr('');
     setSending(true);
-    const err = await onUnlock(v, lockToken);
+    const err = await onUnlock(v, lockToken, true);
     setSending(false);
     if (err) {
       setMailErr(err);

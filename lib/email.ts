@@ -21,6 +21,14 @@ function redactToken(url: string): string {
   return url.replace(/([?&](?:token|tk)=)[^&#]*/gi, '$1[REDACTED]');
 }
 
+/** Log satırında e-posta adresini maskeler (`a***@example.com`): lead adresi
+ *  kişisel veridir, düz metin log'a düşmemeli (KVKK m.4 veri minimizasyonu). */
+function maskEmail(email: string): string {
+  const at = email.indexOf('@');
+  if (at <= 0) return '***';
+  return `${email[0]}***${email.slice(at)}`;
+}
+
 function parseFrom(raw: string): { name: string; email: string } | null {
   const m = raw.match(/^(.*)<([^<>@\s]+@[^<>@\s]+)>\s*$/);
   if (m) return { name: m[1].trim().replace(/^["']|["']$/g, '') || 'TrueReviews', email: m[2].trim() };
@@ -45,7 +53,7 @@ export async function sendDoubleOptInEmail(
     );
     // Token loglanmaz (rapor ele geçirilebilir): linkin şeması/host'u korunur, gizli kısım maskelenir.
     // eslint-disable-next-line no-console
-    console.log(`[MOCK-EMAIL] to=${to} locale=${locale} verifyUrl=${redactToken(verifyUrl)}`);
+    console.log(`[MOCK-EMAIL] to=${maskEmail(to)} locale=${locale} verifyUrl=${redactToken(verifyUrl)}`);
     // GÜVENLİK: Doğrulama linki 48 saat geçerli ve TEK KULLANIMLI DEĞİL
     // (lib/store.ts consumeVerificationToken idempotenttir). Üretimde anahtar
     // yoksa linki çağırıya döndürmek, double opt-in'i e-posta sahipliği

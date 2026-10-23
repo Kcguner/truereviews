@@ -33,7 +33,8 @@ export interface StoredReport {
   place_url: string;
   place_key: string;
   business_name: string;
-  reviews: { text: string; rating: number; author?: string }[];
+  // author bilinçli olarak YOK: yorum yazarı adları saklanmaz (KVKK — bkz. lib/legal.ts).
+  reviews: { text: string; rating: number }[];
   full_report: AnalysisReport;
   preview: PreviewData;
   locale: string;

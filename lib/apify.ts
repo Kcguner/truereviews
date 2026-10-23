@@ -83,8 +83,7 @@ export function mockReviews(businessName: string, count: number): ScrapedReview[
   for (let i = 0; i < count; i++) {
     out.push({
       text: MOCK_TEXTS_TR[i % MOCK_TEXTS_TR.length],
-      rating: [5, 4, 5, 3, 4, 5, 2, 5, 4, 3][i % 10],
-      author: `Kullanıcı ${i + 1}`
+      rating: [5, 4, 5, 3, 4, 5, 2, 5, 4, 3][i % 10]
     });
   }
   return out;
@@ -243,10 +242,12 @@ export async function fetchReviews(
       const rating = normalizeRating(r.stars ?? r.rating ?? r.score);
       // Metinsiz (sadece puan) yorumlar da skora/tona katılır;
       // metin analizi buildPrompt'ta metinlilerle sınırlanır.
+      // KVKK: yorum yazarı adı (author) BİLİNÇLİ olarak düşürülür — gizlilik
+      // politikası "yorum yazarı adları saklanmaz" dediği için depolamamız
+      // gerekir. Analiz yalnızca metin + puana ihtiyaç duyar.
       reviews.push({
         text: String(text).slice(0, 2000),
-        rating,
-        author: (r.author as string) || undefined
+        rating
       });
       if (reviews.length >= maxReviews) break;
     }

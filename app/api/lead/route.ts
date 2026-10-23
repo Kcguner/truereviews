@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getReportById, upsertLead, createVerificationToken, markReportUnlocked } from '@/lib/store';
 import { isValidEmailFormat, isDisposableEmail, verifyTurnstile } from '@/lib/validation';
 import { isAdminBypass } from '@/lib/admin';
+import { reserveRequest } from '@/lib/quota';
 import { sendDoubleOptInEmail } from '@/lib/email';
 import { locales } from '@/i18n.config';
 
@@ -73,6 +74,7 @@ export async function POST(req: NextRequest) {
       locale?: string;
       turnstileToken?: string;
       adminKey?: string;
+      consent?: boolean;
     } | null;
     const reportId = (body?.reportId || '').trim();
     const email = (body?.email || '').trim().toLowerCase();
@@ -98,6 +100,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'bot_check_failed' }, { status: 403 });
     }
 
+    // İSTEK tavanı: bu route onay e-postası tetikliyor, tavansız hâlde tek IP
+    // sınırsız e-posta göndertebiliyordu. /api/verify ile aynı sözleşme:
+    // aynı sayaç (`ya:q:req:<ip>`) ve aynı 429 gövdesi.
+    if (!admin) {
+      const request = await reserveRequest(ip);
+      if (!request.ok) {
+        return NextResponse.json(
+          { error: request.reason, message: 'Çok sık denediniz, 1 saat sonra tekrar deneyin.' },
+          { status: 429 }
+        );
+      }
+    }
+
     const report = await getReportById(reportId);
     if (!report)
       return NextResponse.json(
@@ -105,11 +120,21 @@ export async function POST(req: NextRequest) {
         { status: 404 }
       );
 
+    // KVKK: lead yazımı için açık rıza ZORUNLU — onay kutusu işaretlenmeden
+    // e-posta gönderilmez ve lead kaydı oluşmaz. Admin yolu da muaf DEĞİLDİR:
+    // istemci tarafındaki kutu tek yol olduğu için istisna, rızasız kayıt
+    // üretmenin arka kapısı olurdu.
+    if (!body?.consent)
+      return NextResponse.json(
+        { error: 'consent_required', message: 'Devam etmek için gizlilik/KVKK onayını işaretleyin.' },
+        { status: 400 }
+      );
+
     // Admin/test kolaylığı: sunucu anahtarı (ADMIN_BYPASS_TOKEN) doğrulanmışsa onay
     // e-postası beklemez, tam rapor yanıtta hemen döner (yeni Apify/Gemma çağrısı YOK).
     if (admin) {
       await markReportUnlocked(report.id, email);
-      await upsertLead(email, report.id, locale, true);
+      await upsertLead(email, report.id, locale, true, new Date().toISOString());
       return NextResponse.json({
         ok: true,
         adminBypass: true,
@@ -138,7 +163,7 @@ export async function POST(req: NextRequest) {
 
     // Lead yalnızca e-posta gönderilebildiğinde kaydedilir: Brevo hata verirse
     // kullanıcı yeniden deneyebilsin, ama "doğrulanmamış lead" birikmesin.
-    await upsertLead(email, reportId, locale, false);
+    await upsertLead(email, reportId, locale, false, new Date().toISOString());
 
     // Sıkı double opt-in: rapor linki SADECE e-posta onayından sonra açılır.
     // Mock link (token'ı taşıyan doğrulama URL'si) üretimde ASLA dönmez —

@@ -78,8 +78,9 @@ Graph and sitemap are all generated from this variable._
   `GET /api/verify`; the full report is returned only there, server-side verified,
   and **no new Apify/Gemma call is made**.
 - **Disposable email block:** Providers such as mailinator / 10minutemail are
-  rejected via the `disposable-email-domains` list; GDPR consent is a mandatory
-  step before the email lock.
+  rejected via the `disposable-email-domains` list; a lead is only written when
+  the request carries `consent: true` — consent is enforced server-side, not
+  just by the checkbox.
 - **Bot protection:** Cloudflare Turnstile; without a key the form keeps working,
   and in production this silent degradation is reported loudly via a
   `[PROD-GUARD]` log.
@@ -209,14 +210,17 @@ The 10 supported locales ([`i18n.config.ts`](i18n.config.ts)):
   `title`, `description`, `keywords`, `og:locale`, currency and hreflang maps.
   Every indexable page (homepage + legal) calls `getAlternates(locale, slug?)`,
   which returns the canonical URL plus a map of all 10 locales of *that same
-  page* and `x-default` → the site root. `getOgLocaleAlternates()` produces the
+  page* and `x-default` → the default-locale version of that same page
+  (`/tr` for homepages, `/tr/{slug}` for legal pages — the bare `/` carries
+  no content and only redirects). `getOgLocaleAlternates()` produces the
   nine `og:locale:alternate` values. Titles lead with the primary keyword
   ("Google Yorum Analizi", "Analyse avis Google", …) and keep the brand at the
   end; every description contains its own primary keyword. `tests/seo.test.ts`
   locks all of this down per locale.
-- **`x-default` points at the site root:** the bare `/` negotiates the visitor's
-  language (`NEXT_LOCALE` → `Accept-Language` → `tr`) and redirects, so an
-  unmatched visitor still lands in a language they can read.
+- **`x-default` points at the default locale (`/tr`):** the bare `/` carries no
+  content and only redirects (`NEXT_LOCALE` → `Accept-Language` → `tr`), so
+  pointing `x-default` at the root would send crawlers through an empty
+  redirect instead of the canonical Turkish homepage.
 - **Scope difference:** The legal texts are full text for `tr` / `en` / `de`; in
   the other languages English content plus a translation note shown to the user
   kicks in. The FAQ, the GDPR consent text and the legal page metadata, on the
@@ -263,13 +267,15 @@ regime the app is designed for.*
   hexadecimal characters, is bound to a single report and expires after 48 hours.
   The link is built from `APP_URL` only — the `Origin` header is never trusted,
   so a confirmation link cannot be pointed at an attacker's domain.
-- **Lead retention:** Lead records (email, report id, locale) are written with a
-  **180-day TTL**, which is the number the privacy and KVKK pages promise. The
-  report row itself falls away with the cache TTL (`CACHE_TTL_HOURS`), the
-  verification token after 48 hours. `deleteLeadByEmail()` in `lib/store.ts`
-  implements the erasure request (it clears the lead hash, the lead index and
-  the report's `email_unlocked` field); wiring it to an authenticated endpoint
-  is still open work.
+- **Lead retention:** Lead records (email, report id, locale) expire after
+  **180 days** via a Redis TTL on **both** the lead hash and the lead set
+  (`LEAD_RETENTION_DAYS` in `lib/store.ts`), which is the number the privacy and
+  KVKK pages promise. The report row itself falls away with the cache TTL
+  (`CACHE_TTL_HOURS`), the verification token after 48 hours.
+  `deleteLeadByEmail()` in `lib/store.ts` implements the erasure request (it
+  clears the lead hash, the lead-set membership and the report's
+  `email_unlocked` field) and is exposed through the admin-only
+  `POST /api/data-deletion` endpoint described below.
 
 **KVKK and data**
 
@@ -282,13 +288,39 @@ regime the app is designed for.*
 - **Cookies:** No tracking cookie is used; the theme preference is stored only in
   `localStorage`. Analytics is optional and is not rendered at all when no data
   setting exists.
-- **KVKK consent is mandatory:** The report is not unlocked until the checkbox
-  in the email form is ticked; the consent text is written separately for every
-  language.
+- **KVKK consent is mandatory and server-side:** `POST /api/lead` rejects a
+  request that does not carry `consent: true`, so the checkbox is not merely a
+  UI step — a lead without consent is never written. The lead record stores a
+  `consent_at` ISO timestamp alongside the address, and the consent text is
+  written separately for every language.
 - **Legal pages:** `/{locale}/gizlilik`, `/{locale}/kvkk`, `/{locale}/sss` and
   `/{locale}/iletisim` in 10 languages. The data collected, the purpose of use,
   retention and deletion, third parties and the rights under art. 11 are written
   out explicitly.
+
+### Veri silme (KVKK m.11)
+
+- `POST /api/data-deletion` is **admin-only**: the request must carry
+  `ADMIN_BYPASS_TOKEN`, either as `adminKey` in the body or in the `x-admin-key`
+  header. Anything else gets `403 {"error":"forbidden"}` and nothing is deleted.
+- Body `{ "email": "..." }` → `{ "ok": true, "deleted": true|false }`;
+  `deleted: false` means no lead record existed for that address.
+- Scope: the lead hash, the lead-set membership and the linked report's
+  `email_unlocked` field. The report body itself is not deleted — it expires with
+  `CACHE_TTL_HOURS` — and other reports unlocked with the same address are not
+  rewritten.
+
+```bash
+curl -X POST https://<your-domain>/api/data-deletion \
+  -H "Content-Type: application/json" \
+  -H "x-admin-key: $ADMIN_BYPASS_TOKEN" \
+  -d '{"email":"kisi@ornek.com"}'
+```
+
+An erasure request must be answered within **30 days** (KVKK art. 13). Requests
+arrive through the address on the contact page
+(`NEXT_PUBLIC_CONTACT_EMAIL`, shown on `/{locale}/iletisim`); not every deletion
+claim is made through the API.
 
 **Developer convenience (dev/test)**
 

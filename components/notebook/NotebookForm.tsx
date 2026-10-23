@@ -158,7 +158,9 @@ export default function NotebookForm() {
 
   // turnstileToken kilit duvarındaki widget'tan gelir; giriş ekranının token'ı
   // tek kullanımlık olduğu için burada yeniden kullanılamaz.
-  async function unlock(email: string, turnstileToken: string): Promise<string | null> {
+  // `consent` kilit duvarındaki KVKK onay kutusundan gelir (ReportView `agreed`
+  // doğrulamasından sonra): rıza sunucuda da ZORUNLU, istemci kontrolü tek başına yeterli değil.
+  async function unlock(email: string, turnstileToken: string, consent: boolean): Promise<string | null> {
     try {
       const res = await fetch('/api/lead', {
         method: 'POST',
@@ -168,6 +170,7 @@ export default function NotebookForm() {
           email,
           locale,
           turnstileToken,
+          consent,
           adminKey: adminKey.trim() || undefined
         })
       });
