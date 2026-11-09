@@ -109,11 +109,11 @@ describe('fetchReviews — gerçek yol (asenkron run + poll)', () => {
     process.env.APIFY_API_TOKEN = 'test-token';
   });
 
-  it('run başlatır, durum yoklar, datasetten yorum toplar', async () => {
+  it('run başlatır, run durumunu yoklar, datasetten yorum toplar', async () => {
     const seen = routes((u) => {
-      if (u.includes('/runs?')) return { ok: true, body: { data: { id: 'TASK1', status: 'READY' } } };
-      if (u.includes('/actor-tasks/TASK1?')) return { ok: true, body: { data: { status: 'SUCCEEDED' } } };
-      if (u.includes('/actor-tasks/TASK1/dataset/items')) {
+      if (u.includes('/runs?')) return { ok: true, body: { data: { id: 'RUN1', status: 'READY' } } };
+      if (u.includes('/actor-runs/RUN1?')) return { ok: true, body: { data: { status: 'SUCCEEDED' } } };
+      if (u.includes('/actor-runs/RUN1/dataset/items')) {
         return {
           ok: true,
           body: [
@@ -140,13 +140,16 @@ describe('fetchReviews — gerçek yol (asenkron run + poll)', () => {
     ]);
     // Senkron uç nokta artık kullanılmıyor: run + poll + dataset.
     expect(seen.some((u) => u.includes('run-sync-get-dataset-items'))).toBe(false);
-    expect(seen.some((u) => u.includes('/actor-tasks/TASK1/dataset/items?format=json'))).toBe(true);
+    // Regresyon: run ID'si actor-task ID'si sanılıp /actor-tasks/{id} çağrılıyordu
+    // ve Apify 404 "Actor task was not found" dönüyordu.
+    expect(seen.some((u) => u.includes('/actor-tasks/'))).toBe(false);
+    expect(seen.some((u) => u.includes('/actor-runs/RUN1/dataset/items?format=json'))).toBe(true);
   });
 
   it('dataset yorumlarını normalize eder ve maxReviews ile sınırlar', async () => {
     routes((u) => {
-      if (u.includes('/runs?')) return { ok: true, body: { data: { id: 'T2' } } };
-      if (u.includes('/actor-tasks/T2?')) return { ok: true, body: { data: { status: 'SUCCEEDED' } } };
+      if (u.includes('/runs?')) return { ok: true, body: { data: { id: 'RUN2' } } };
+      if (u.includes('/actor-runs/RUN2?')) return { ok: true, body: { data: { status: 'SUCCEEDED' } } };
       return {
         ok: true,
         body: [
@@ -171,7 +174,7 @@ describe('fetchReviews — gerçek yol (asenkron run + poll)', () => {
         if (String(_url).includes('/runs?')) {
           return { ok: true, status: 200, json: async () => ({ data: { id: 'T3' } }) } as never;
         }
-        if (String(_url).includes('/actor-tasks/T3?')) {
+        if (String(_url).includes('/actor-runs/T3?')) {
           return { ok: true, status: 200, json: async () => ({ data: { status: 'SUCCEEDED' } }) } as never;
         }
         return { ok: true, status: 200, json: async () => [] } as never;
@@ -233,7 +236,7 @@ describe('fetchReviews — gerçek yol (asenkron run + poll)', () => {
   it('dataset dizi değilse açık hata verir', async () => {
     routes((u) => {
       if (u.includes('/runs?')) return { ok: true, body: { data: { id: 'T6' } } };
-      if (u.includes('/actor-tasks/T6?')) return { ok: true, body: { data: { status: 'SUCCEEDED' } } };
+      if (u.includes('/actor-runs/T6?')) return { ok: true, body: { data: { status: 'SUCCEEDED' } } };
       return { ok: true, body: { nope: true } };
     });
     await expect(fetchReviews(PLACE_URL, 3, 'tr')).rejects.toThrow(/dizi değil/);
@@ -244,9 +247,9 @@ describe('fetchReviews — gerçek yol (asenkron run + poll)', () => {
     await expect(fetchReviews(PLACE_URL, 3, 'tr')).rejects.toThrow(/Apify hatası \(401\)/);
   });
 
-  it('run yanıtında taskId yoksa açık hata verir', async () => {
+  it('run yanıtında run id yoksa açık hata verir', async () => {
     routes(() => ({ ok: true, body: { data: {} } }));
-    await expect(fetchReviews(PLACE_URL, 3, 'tr')).rejects.toThrow(/taskId/);
+    await expect(fetchReviews(PLACE_URL, 3, 'tr')).rejects.toThrow(/run id/);
   });
 });
 

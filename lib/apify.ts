@@ -141,12 +141,15 @@ function pollBudgetMs(): number {
  * DAVRANIŞ DEĞİŞİKLİĞİ: eskiden `run-sync-get-dataset-items` tek HTTP isteğinde
  * actor bitene kadar bekliyordu (30-120 sn, timeout'suz). Artık run başlatılır
  * (`POST /v2/acts/{id}/runs`) ve durum tekrarlarla izlenir
- * (`GET /v2/actor-tasks/{taskId}`), sonuç `GET
- * /v2/actor-tasks/{taskId}/dataset/items?format=json` ile alınır. Her HTTP
+ * (`GET /v2/actor-runs/{runId}`), sonuç `GET
+ * /v2/actor-runs/{runId}/dataset/items?format=json` ile alınır. Her HTTP
  * isteği kısa (15 sn) ve timeout'lu; toplam bekleme bütçesi APIFY_TIMEOUT_MS
  * (varsayılan 30 sn) ile sınırlı. Bütçe dolarsa ya da actor FAILED/ABORTED/
- * TIMED-OUT olursa açık bir hata fırlatılır — kullanıcıya sahte/m mock veri
+ * TIMED-OUT olursa açık bir hata fırlatılır — kullanıcıya sahte/mock veri
  * SIZDIRILMAZ (mock yalnızca APIFY_API_TOKEN yokken devreye girer).
+ * DİKKAT: `POST /acts/{id}/runs` bir TASK değil RUN döndürür; dönen `data.id`
+ * yalnızca `/v2/actor-runs/{id}` altında geçerlidir. Bu id ile
+ * `/v2/actor-tasks/{id}` çağrılırsa Apify 404 "Actor task was not found" verir.
  * Not: fonksiyon hâlâ poll döngüsü boyunca açık kalır; gerçekten bloke etmeyen
  * bir tasarım için kuyruk/webhook gerekir. Bütçe, deploy'un maxDuration'ının
  * ALTINDA olacak şekilde ayarlanmalıdır (üstteki aritmetik).
@@ -162,35 +165,35 @@ async function collectItems(
     { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(input) },
     'çalıştırma başlatma'
   )) as { data?: { id?: string } } | null;
-  const taskId = started?.data?.id;
-  if (!taskId) {
-    throw new Error('Apify yanıtı beklenmeyen biçimde: run id (taskId) yok.');
+  const runId = started?.data?.id;
+  if (!runId) {
+    throw new Error('Apify yanıtı beklenmeyen biçimde: run id yok.');
   }
 
   const budget = pollBudgetMs();
   const deadline = Date.now() + budget;
   for (;;) {
-    const task = (await apifyJson(
-      `https://api.apify.com/v2/actor-tasks/${encodeURIComponent(taskId)}?${auth}`,
+    const run = (await apifyJson(
+      `https://api.apify.com/v2/actor-runs/${encodeURIComponent(runId)}?${auth}`,
       {},
       'durum sorgulama'
     )) as { data?: { status?: string } } | null;
-    const status = (task?.data?.status || '').toUpperCase();
+    const status = (run?.data?.status || '').toUpperCase();
     if (status === 'SUCCEEDED') break;
     if (APIFY_FATAL_STATUSES.has(status)) {
-      throw new Error(`Apify actor ${status} (task ${taskId}).`);
+      throw new Error(`Apify actor ${status} (run ${runId}).`);
     }
     const remaining = deadline - Date.now();
     if (remaining <= 0) {
       throw new Error(
-        `Apify zaman aşımı: actor ${Math.round(budget / 1000)} saniyede bitmedi (task ${taskId}).`
+        `Apify zaman aşımı: actor ${Math.round(budget / 1000)} saniyede bitmedi (run ${runId}).`
       );
     }
     await sleep(Math.min(APIFY_POLL_INTERVAL_MS, remaining));
   }
 
   const items = await apifyJson(
-    `https://api.apify.com/v2/actor-tasks/${encodeURIComponent(taskId)}/dataset/items?format=json&${auth}`,
+    `https://api.apify.com/v2/actor-runs/${encodeURIComponent(runId)}/dataset/items?format=json&${auth}`,
     {},
     'dataset okuma'
   );
