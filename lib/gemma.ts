@@ -2,15 +2,24 @@ import type { AnalysisReport } from './types';
 import { normalizeRating, type ScrapedReview } from './apify';
 import { warnProdOnce } from './env-guard';
 
-/** Varsayılan model. Üretimde GEMMA_MODEL ile AI Studio'daki gerçek id yazılmalı. */
-export const GEMMA_MODEL_DEFAULT = 'gemma-4-31b-it';
+/** Birincil model: hızlı ve ucuz Gemini 3.5 Flash-Lite (GEMMA_MODEL ile ezilir). */
+export const GEMMA_MODEL_DEFAULT = 'gemini-3.5-flash-lite';
+
+/** Birincil model hata verirse denenen yedek model (GEMMA_FALLBACK_MODEL ile ezilir). */
+export const GEMMA_FALLBACK_MODEL_DEFAULT = 'gemma-4-26b-a4b-it';
 
 /**
- * Gemini üretim çağrısı zaman aşımı. 31B sınıfı bir model + 50 yorumluk prompt
- * pratikte 8-15 s sürüyor; üstü 20 s ise kilitlenmiş istek demek. İki deneme
- * + 2.5 s bekleme toplam ~43 s, sunucu platformlarının normal sınırının altında.
+ * Tek bir model isteğinin zaman aşımı. Flash-Lite ve 26B MoE modeli için 15 sn
+ * bol; üstü kilitlenmiş istek demek.
  */
-const GEMMA_TIMEOUT_MS = 20_000;
+const GEMMA_TIMEOUT_MS = 15_000;
+
+/**
+ * İki modelin TOPLAM bütçesi. Fonksiyonun `maxDuration`'ı 60 sn ve Apify en
+ * fazla 30 sn bekliyor: 30 + 28 + ~1 (Redis) = 59 sn, yani platform fonksiyonu
+ * öldürmeden kontrollü hata döneriz. Bütçe dolarsa kalan model denenmez.
+ */
+const GEMMA_TOTAL_BUDGET_MS = 28_000;
 
 /** AI Studio'dan kopyalanmamış id kalıpları (ornek/example/your-model/…). */
 const PLACEHOLDER_MODEL_RE = /^(ornek|example|your|model|test|xxx|placeholder)/i;
@@ -196,6 +205,96 @@ function heuristicReport(
   };
 }
 
+type ModelResult =
+  | { ok: true; report: AnalysisReport }
+  | { ok: false; retryable: true; kind: string; status: number; detail?: string }
+  | { ok: false; retryable: false; error: Error };
+
+/**
+ * Tek bir modele istek atar. Dönen `retryable` sonuçlarda çağıran yedek modele
+ * geçer; `retryable: false` (400/401/403) anahtar/yapılandırma hatasıdır ve
+ * yedek model de aynı anahtarı kullanacağı için açıkça fırlatılır.
+ */
+async function requestModel(
+  model: string,
+  prompt: string,
+  apiKey: string,
+  deadline: number
+): Promise<ModelResult> {
+  const remaining = deadline - Date.now();
+  if (remaining <= 0) {
+    return { ok: false, retryable: true, kind: 'zaman-butcesi', status: 0 };
+  }
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const body = JSON.stringify({
+    generationConfig: { responseMimeType: 'application/json', temperature: 0.3 },
+    contents: [{ role: 'user', parts: [{ text: prompt }] }]
+  });
+
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body,
+      signal: AbortSignal.timeout(Math.min(GEMMA_TIMEOUT_MS, remaining))
+    });
+  } catch {
+    return { ok: false, retryable: true, kind: 'ag-hatasi', status: 0 };
+  }
+
+  if (!res.ok) {
+    // KVKK: bu gövde Google'ın hata açıklamasıdır, model çıktısı/yorum metni
+    // değildir; yine de kısa tutulur ve yalnızca console.warn'a gider.
+    let detail = '';
+    try {
+      detail = (await res.text()).slice(0, 300).replace(/\s+/g, ' ').trim();
+    } catch {
+      detail = '';
+    }
+    if (res.status === 404 || res.status === 429 || res.status >= 500) {
+      const kind =
+        res.status === 404 ? 'model-404' : res.status === 429 ? 'kota-429' : '5xx-veya-ag';
+      return { ok: false, retryable: true, kind, status: res.status, detail };
+    }
+    return {
+      ok: false,
+      retryable: false,
+      error: new Error(`Gemma hatası (${res.status}): ${detail}`)
+    };
+  }
+
+  // res.ok JSON garantisi DEĞİLDİR: edge/proxy HTML hata sayfası, kesik gövde,
+  // boş gövde ya da literal `null` burada SyntaxError/TypeError üretir.
+  let data: unknown = null;
+  try {
+    data = await res.json();
+  } catch {
+    data = null;
+  }
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    return { ok: false, retryable: true, kind: 'bozuk-govde', status: 0 };
+  }
+  const text =
+    (data as { candidates?: { content?: { parts?: { text?: string }[] } }[] })
+      .candidates?.[0]?.content?.parts
+      ?.map((p) => p.text || '')
+      .join('') || '';
+  try {
+    const parsed = extractJson(text) as AnalysisReport;
+    if (!isValidReport(parsed)) throw new Error('eksik/geçersiz alan');
+    return { ok: true, report: parsed };
+  } catch (e) {
+    return {
+      ok: false,
+      retryable: true,
+      kind: 'parse-veya-sema',
+      status: 0,
+      detail: e instanceof Error ? e.name : 'Error'
+    };
+  }
+}
+
 export async function analyzeReviews(
   businessName: string,
   reviews: ScrapedReview[],
@@ -213,114 +312,49 @@ export async function analyzeReviews(
   }
 
   const envModel = process.env.GEMMA_MODEL;
-  const model = envModel || GEMMA_MODEL_DEFAULT;
-  // GEMMA_MODEL_DEFAULT gerçek bir model id'si DEĞİL (bkz. .env.example/README):
-  // tanımlı değilse Google 404 döner. Sessizce patlamak yerine prod'da bir kez logla.
-  if (!envModel || envModel === GEMMA_MODEL_DEFAULT || PLACEHOLDER_MODEL_RE.test(envModel)) {
+  const primaryModel = envModel || GEMMA_MODEL_DEFAULT;
+  const fallbackModel = process.env.GEMMA_FALLBACK_MODEL || GEMMA_FALLBACK_MODEL_DEFAULT;
+  // Kopyala-yapıştır örnek değerleri (ornek/example/your-model/…) sessizce 404
+  // üretmesin; varsayılanlar gerçek model id'leri olduğu için uyarılmaz.
+  if (envModel && PLACEHOLDER_MODEL_RE.test(envModel)) {
     warnProdOnce(
       'gemma-model-placeholder',
-      `GEMMA_MODEL tanımlı değil ya da gerçek bir model id'si değil ("${model}") — Google 404 dönecek, tüm istekler heuristic rapora düşecek. AI Studio'daki gerçek id'yi yazın.`
+      `GEMMA_MODEL gerçek bir model id'si değil ("${primaryModel}") — Google 404 dönecek, istekler yedek modele düşecek. AI Studio'daki gerçek id'yi yazın.`
     );
   }
+
   const prompt = buildPrompt(businessName, reviews, locale);
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
-  const body = JSON.stringify({
-    generationConfig: { responseMimeType: 'application/json', temperature: 0.3 },
-    contents: [{ role: 'user', parts: [{ text: prompt }] }]
-  });
+  const deadline = Date.now() + GEMMA_TOTAL_BUDGET_MS;
+  const models = [primaryModel, fallbackModel];
 
-  // Tek giriş noktası: heuristic'e düşülen HER yol buradan geçer, böylece
-  // 5xx/ağ/sıfır-gövde/bozuk JSON/model-404 durumlarının hepsi aynı davranışı verir.
-  // `kind` kısa ve sabit bir kategori olmalı: warnProdOnce anahtarı bu değerden
-  // üretilir, upstream metin (yanıt gövdesi) anahtara giremez — aksi halde
-  // env-guard'ın `warned` kümesi her istekle büşür (bellek sızıntısı).
-  // KVKK: log'a model ÇIKTISI (yorum metni = kişisel veri olabilir) yazılmaz;
-  // yalnızca kısa kategori + hata tipi/status kodu gider.
-  const fallback = (kind: string, code?: string): { report: AnalysisReport; mocked: boolean } => {
+  for (let i = 0; i < models.length; i++) {
+    const model = models[i];
+    const result = await requestModel(model, prompt, apiKey, deadline);
+    if (result.ok) {
+      if (i > 0) {
+        warnProdOnce(
+          'gemma-primary-failed',
+          `Birincil model "${primaryModel}" başarısız — yedek model "${fallbackModel}" kullanılıyor; yedek de başarısız olursa heuristic rapor üretilecek.`
+        );
+      }
+      result.report.review_count = reviews.length;
+      result.report.business_name = businessName;
+      return { report: result.report, mocked: false };
+    }
+    if (!result.retryable) throw result.error;
+    // KVKK: yalnızca kategori/status ve Google'ın hata açıklaması loglanır;
+    // model çıktısı ya da yorum metni asla.
     // eslint-disable-next-line no-console
-    console.warn(`Gemma ${kind}${code ? ` (${code})` : ''} -> heuristic fallback (model=${model})`);
-    warnProdOnce(
-      `gemma-fallback-${kind}`,
-      `Gemma sürekli "${kind}" nedeniyle heuristic rapora düşüyor (model=${model}) — gerçek AI analizi üretilmiyor.`
+    console.warn(
+      `Gemma "${model}" başarısız (${result.kind}${result.status ? `, status=${result.status}` : ''})` +
+        `${result.detail ? `: ${result.detail.slice(0, 200)}` : ''}`
     );
-    return { report: heuristicReport(businessName, reviews, locale), mocked: true };
-  };
-
-  // 503/yoğunluk dalgaları geçicidir: bir kez kısa bekleyip tekrar dene.
-  // Hâlâ 5xx gelirse heuristic'e düş (kullanıcı rapor alır, mocked işaretlenir).
-  // 404 (model yok) ve 429 (kota) de düşülebilir durumlar; 400/401/403 ise
-  // gerçek config/anahtar hatasıdır — yüksek sesle patlamalı (500 kabul edilir).
-  let lastStatus = 0;
-  for (let attempt = 0; attempt < 2; attempt++) {
-    if (attempt > 0) await new Promise((r) => setTimeout(r, 2500));
-    let res: Response;
-    try {
-      res = await fetch(url, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body,
-        signal: AbortSignal.timeout(GEMMA_TIMEOUT_MS)
-      });
-    } catch {
-      // Ağ hatası ya da timeout: 5xx ile aynı muameleye tabidir.
-      lastStatus = 0;
-      continue;
-    }
-    if (res.ok) {
-      // res.ok JSON garantisi DEĞİLDİR: edge/proxy HTML hata sayfası, kesik
-      // gövde, boş gövde ya da literal `null` burada SyntaxError/TypeError fırlatır.
-      // Bu satır önceden try/catch DIŞINDAYDI ve hata analyzeReviews'ten kaçıp
-      // route'un catch'ine gidiyordu: kullanıcıya 500 dönüyor, heuristic
-      // fallback (tam olarak bunun için var) atılıyordu.
-      let data: unknown = null;
-      try {
-        data = await res.json();
-      } catch {
-        data = null;
-      }
-      if (!data || typeof data !== 'object' || Array.isArray(data)) {
-        return fallback('bozuk-gövde');
-      }
-      const text =
-        (data as { candidates?: { content?: { parts?: { text?: string }[] } }[] })
-          .candidates?.[0]?.content?.parts
-          ?.map((p) => p.text || '')
-          .join('') || '';
-      try {
-        const parsed = extractJson(text) as AnalysisReport;
-        if (!isValidReport(parsed)) throw new Error('eksik/geçersiz alan');
-        parsed.review_count = reviews.length;
-        parsed.business_name = businessName;
-        return { report: parsed, mocked: false };
-      } catch (e) {
-        return fallback('parse-veya-sema', e instanceof Error ? e.name : 'Error');
-      }
-    }
-    lastStatus = res.status;
-    let lastText = '';
-    try {
-      lastText = (await res.text()).slice(0, 300);
-    } catch {
-      lastText = '';
-    }
-    if (res.status === 404) {
-      warnProdOnce(
-        'gemma-model-404',
-        `Gemma modeli bulunamadı (404): "${model}" — AI Studio'daki gerçek model id'siyle eşleşmiyor. GEMMA_MODEL env'ini düzeltin.`
-      );
-      return fallback('model-404', `status=${res.status}`);
-    }
-    if (res.status === 429) {
-      // Kota: tekrar denemek anlamlı değil (bütçe dakikalar içinde dolar), düş.
-      return fallback('kota-429', `status=${res.status}`);
-    }
-    if (res.status < 500) {
-      throw new Error(`Gemma hatası (${res.status}): ${lastText}`);
-    }
   }
-  // Buraya yalnızca 5xx/ağ hatasıyla düşülür; 4xx ya yukarıda fırlatıldı ya da
-  // 404/429'da döndü. (Eskiden buradaki `lastStatus < 500` dalı, 4xx'in
-  // döngü içinde zaten fırlatılması nedeniyle ERİŞİLEMEZ durumdaydı; silindi.)
-  return fallback('5xx-veya-ag', `5xx/ağ hatası (status=${lastStatus})`);
+
+  warnProdOnce(
+    'gemma-fallback-heuristic',
+    `Gemma birincil ("${primaryModel}") ve yedek ("${fallbackModel}") model başarısız — heuristic rapora düşülüyor; gerçek AI analizi üretilmiyor.`
+  );
+  return { report: heuristicReport(businessName, reviews, locale), mocked: true };
 }
 

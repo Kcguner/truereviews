@@ -1,5 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { GEMMA_MODEL_DEFAULT, analyzeReviews, buildPrompt, clipQuote, extractJson } from '../lib/gemma';
+import {
+  GEMMA_FALLBACK_MODEL_DEFAULT,
+  GEMMA_MODEL_DEFAULT,
+  analyzeReviews,
+  buildPrompt,
+  clipQuote,
+  extractJson
+} from '../lib/gemma';
 
 const REVIEWS = [
   { rating: 5, text: 'Harika yemekler, hızlı servis.' },
@@ -8,6 +15,7 @@ const REVIEWS = [
 
 const PREV_KEY = process.env.GOOGLE_AI_API_KEY;
 const PREV_MODEL = process.env.GEMMA_MODEL;
+const PREV_FALLBACK = process.env.GEMMA_FALLBACK_MODEL;
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -17,11 +25,14 @@ afterEach(() => {
   else process.env.GOOGLE_AI_API_KEY = PREV_KEY;
   if (PREV_MODEL === undefined) delete process.env.GEMMA_MODEL;
   else process.env.GEMMA_MODEL = PREV_MODEL;
+  if (PREV_FALLBACK === undefined) delete process.env.GEMMA_FALLBACK_MODEL;
+  else process.env.GEMMA_FALLBACK_MODEL = PREV_FALLBACK;
 });
 
 describe('gemma', () => {
-  it('varsayılan model sabit ve env ile ezilebilir olmalı', () => {
-    expect(GEMMA_MODEL_DEFAULT).toBe('gemma-4-31b-it');
+  it('varsayılan birincil ve yedek model sabitleri doğru', () => {
+    expect(GEMMA_MODEL_DEFAULT).toBe('gemini-3.5-flash-lite');
+    expect(GEMMA_FALLBACK_MODEL_DEFAULT).toBe('gemma-4-26b-a4b-it');
   });
   it('prompt beklenen JSON şemasını ister', () => {
     const p = buildPrompt('Örnek Lokanta', REVIEWS as never, 'tr');
@@ -43,6 +54,66 @@ describe('gemma', () => {
     expect(mocked).toBe(true);
     expect(report.business_name).toBe('X');
     expect(report.review_count).toBe(2);
+  });
+
+  it('birincil model 500 verirse yedek modelle gerçek rapor üretir', async () => {
+    process.env.GOOGLE_AI_API_KEY = 'test-key';
+    const urls: string[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => {
+        urls.push(String(url));
+        if (String(url).includes('gemini-3.5-flash-lite')) {
+          return { ok: false, status: 500, text: async () => 'internal error' } as never;
+        }
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            candidates: [
+              {
+                content: {
+                  parts: [
+                    {
+                      text: JSON.stringify({
+                        score: 7.5,
+                        summary: 'Yedek model özeti.',
+                        top_complaints: [],
+                        top_praises: [],
+                        action_suggestion: 'Devam.'
+                      })
+                    }
+                  ]
+                }
+              }
+            ]
+          })
+        } as never;
+      })
+    );
+    const { report, mocked } = await analyzeReviews('X', REVIEWS as never, 'tr');
+    expect(mocked).toBe(false);
+    expect(report.score).toBe(7.5);
+    expect(urls).toHaveLength(2);
+    expect(urls[0]).toContain('gemini-3.5-flash-lite');
+    expect(urls[1]).toContain('gemma-4-26b-a4b-it');
+  });
+
+  it('env ile birincil ve yedek model ezilebilir', async () => {
+    process.env.GOOGLE_AI_API_KEY = 'test-key';
+    process.env.GEMMA_MODEL = 'birincil-test';
+    process.env.GEMMA_FALLBACK_MODEL = 'yedek-test';
+    const urls: string[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => {
+        urls.push(String(url));
+        return { ok: false, status: 500, text: async () => 'boom' } as never;
+      })
+    );
+    await analyzeReviews('X', REVIEWS as never, 'tr');
+    expect(urls[0]).toContain('birincil-test');
+    expect(urls[1]).toContain('yedek-test');
   });
   it('heuristic örneklerde metinli yorum önden gelir', async () => {
     delete process.env.GOOGLE_AI_API_KEY;
@@ -134,7 +205,8 @@ describe('gemma', () => {
       const { report, mocked } = await analyzeReviews('X', REVIEWS as never, 'tr');
       expect(mocked).toBe(true);
       expect(report.score).toBeLessThanOrEqual(10);
-      expect(fetchMock).toHaveBeenCalledTimes(1);
+      // Geçersiz şema birincil modelde de yedek modelde de reddedilir.
+      expect(fetchMock).toHaveBeenCalledTimes(2);
     }
   });
 
@@ -304,30 +376,35 @@ describe('gemma', () => {
     expect(Number.isFinite(report.score)).toBe(true);
   });
 
-  it('model 404 -> heuristic fallback (500 değil) ve prod uyarısı', async () => {
+  it('model 404 -> yedek model de denenir, ikisi de yoksa heuristic + prod uyarısı', async () => {
     vi.stubEnv('NODE_ENV', 'production');
     process.env.GOOGLE_AI_API_KEY = 'test-key';
     delete process.env.GEMMA_MODEL;
+    delete process.env.GEMMA_FALLBACK_MODEL;
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const fetchMock = vi.fn(async () => ({ ok: false, status: 404, text: async () => 'not found' }) as never);
     vi.stubGlobal('fetch', fetchMock);
     const { report, mocked } = await analyzeReviews('X', REVIEWS as never, 'tr');
     expect(mocked).toBe(true);
     expect(report.review_count).toBe(2);
-    // 404'te tekrar denenmez.
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const logged = errSpy.mock.calls.map((c) => c.join(' ')).join('\n');
-    expect(logged).toContain('GEMMA_MODEL');
-    delete process.env.GEMMA_MODEL;
+    // 404'te aynı model tekrar denenmez; yalnızca yedek modele geçilir.
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const logged = [...errSpy.mock.calls, ...warnSpy.mock.calls]
+      .map((c) => c.join(' '))
+      .join('\n');
+    expect(logged).toContain('gemini-3.5-flash-lite');
+    expect(logged).toContain('gemma-4-26b-a4b-it');
+    expect(logged).toContain('heuristic');
   });
 
-  it('429 kota -> heuristic fallback, tekrar denemez', async () => {
+  it('429 kota -> aynı model tekrar denenmez, yedek modele geçilir', async () => {
     process.env.GOOGLE_AI_API_KEY = 'test-key';
     const fetchMock = vi.fn(async () => ({ ok: false, status: 429, text: async () => 'quota' }) as never);
     vi.stubGlobal('fetch', fetchMock);
     const { mocked } = await analyzeReviews('X', REVIEWS as never, 'tr');
     expect(mocked).toBe(true);
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it('401/403 anahtar hatası yine de açıkça fırlar', async () => {

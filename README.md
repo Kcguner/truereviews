@@ -422,7 +422,8 @@ and the behavior of each key when it is missing are in the table below.
 | `APIFY_ACTOR_ID` | No | The actor to use | `compass/google-maps-reviews-scraper` is used by default |
 | `APIFY_TIMEOUT_MS` | No | Total wait budget for the Apify actor, in ms. **Must stay below the function's `maxDuration` (60 s)**; the code's own cap is 30000, so this can only narrow it | `30000`. A larger value is clamped to the cap — raising it above `maxDuration` would make the budget dead code and turn slow actors into a 504 with the Apify credit already spent |
 | `GOOGLE_AI_API_KEY` | No | Google AI Studio key | **Heuristic analysis**: a summary based on the average rating, theme counts and a one-sentence suggestion |
-| `GEMMA_MODEL` | No | The real model id in AI Studio | `gemma-4-31b-it` is used. A wrong id → API 404 → no report can be produced |
+| `GEMMA_MODEL` | No | Primary model id in AI Studio | `gemini-3.5-flash-lite` is used |
+| `GEMMA_FALLBACK_MODEL` | No | Model tried once if the primary fails (5xx/network/404/429/invalid body) | `gemma-4-26b-a4b-it` is used; if both fail, a heuristic report is produced |
 | `BREVO_API_KEY` | No | Brevo API key | **Mock email mode**: the confirmation link is logged and returned as `devPreviewUrl` in the API response; the double opt-in flow is still enforced |
 | `BREVO_FROM` | Yes if `BREVO_API_KEY` is set | Verified sender, e.g. `TrueReviews <address@domain>` | When a key is present the request **throws an explicit error** — no silent sending. The `ornek.com` / `example.com` placeholders are also rejected |
 | `ADMIN_EMAILS` | No | **Grants nothing.** Only an env-list/normalization helper; no code path uses it for authorization | Nothing — the normal double opt-in flow applies |

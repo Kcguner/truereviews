@@ -20,8 +20,10 @@ sadece aşağıdaki 5-10 dakikalık işlemler sizde kaldı (API anahtarları ben
 ## 3) Google AI Studio (zorunlu — gerçek AI analizi için)
 1. https://aistudio.google.com/app/apikey → API key alın
 2. `GOOGLE_AI_API_KEY` olarak yazın
-3. `GEMMA_MODEL` varsayılanı `gemma-4-31b-it` (`lib/gemma.ts`). AI Studio'daki
-   gerçek model id farklıysa buraya listenin gerçek id'sini yazın.
+3. `GEMMA_MODEL` varsayılanı `gemini-3.5-flash-lite`, yedek model
+   `GEMMA_FALLBACK_MODEL=gemma-4-26b-a4b-it` (`lib/gemma.ts`). Birincil model
+   5xx/ağ/404/429/bozuk yanıt verirse yedek model bir kez denenir; ikisi de
+   başarısızsa heuristic (ortalama-bazlı) özet üretilir.
 4. Anahtar yokken heuristic (ortalama-bazlı) özet üretilir.
 
 ## 4) Brevo (double opt-in e-postası için — domainsiz sender)
