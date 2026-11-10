@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import ReportView from '@/components/notebook/ReportView';
 import type { NbPreview, NbReport } from '@/components/notebook/types';
+import { UNLOCK_CHANNEL } from '@/components/notebook/unlock-channel';
 
 function ReportContent() {
   const t = useTranslations('report');
@@ -52,6 +53,17 @@ function ReportContent() {
             tone: d.report.rating_histogram
           });
           setState('ok');
+          // Asıl sekme (önizleme ekranı) hâlâ kilitliyse bu linki görmeden
+          // açılamıyordu; raporu aynı origin'deki sekmelere duyur.
+          try {
+            if (typeof BroadcastChannel !== 'undefined') {
+              const ch = new BroadcastChannel(UNLOCK_CHANNEL);
+              ch.postMessage({ reportId: d.reportId, report: d.report, email: d.email || '' });
+              ch.close();
+            }
+          } catch {
+            /* kanal yoksa sessiz geç: bu sekmede rapor zaten açık */
+          }
         })
         .catch((e) => {
           // Abort bir hata değil: bileşen uçtu ya da token değişti.

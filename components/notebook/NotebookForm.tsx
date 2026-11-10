@@ -294,6 +294,13 @@ export default function NotebookForm() {
           isMockMail={mockMail}
           devUrl={devUrl}
           onUnlock={unlock}
+          reportId={reportId}
+          onRemoteUnlock={(rep, mail) => {
+            setFull(rep);
+            setUnlocked(true);
+            if (mail) setSentEmail(mail);
+            setMailSent(true);
+          }}
           onReset={reset}
         />
       </section>

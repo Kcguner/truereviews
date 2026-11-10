@@ -79,6 +79,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       ok: true,
       email: consumed.email,
+      // `reportId` yalnızca aynı origin'deki sekme senkronu için: istemci zaten
+      // bu çağrıyla tam raporu alıyor, ek bilgi sızdırmıyor.
+      reportId: report.id,
       report: report.full_report,
       businessName: report.business_name,
       // `review_count` bu alan eklenmeden önce yazılmış eski satırlarda

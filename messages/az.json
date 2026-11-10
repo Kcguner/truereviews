@@ -116,9 +116,9 @@
       "cta": "Tam hesabatı aç",
       "note": "Reklam yoxdur, kütləvi e-poçt yoxdur. Sadəcə bu hesabat və istəsəniz ayda bir yeniləmə.",
       "err": "Zəhmət olmasa düzgün e-poçt ünvanı daxil edin.",
-      "done": "Açıldı",
-      "donet": "Tam hesabatınız aşağıda açıqdır. Bir nüsxə {e} ünvanına göndərilir.",
-      "donetMock": "Tam hesabatınız aşağıda açıqdır. (E-poçt xidməti qoşulmadığı üçün nüsxə göndərilmədi.)"
+      "done": "E-poçt gönderildi",
+      "donet": "Təsdiq linki {e} ünvanına gönderildi. Linki açanda tam hesabat burada açılacaq.",
+      "donetMock": "E-poçt xidməti qoşulmayıb. Aşağıdaki linki açanda tam hesabat burada açılacaq."
     },
     "act": {
       "k": "Bu həftə atacağınız tək addım"

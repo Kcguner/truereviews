@@ -116,9 +116,9 @@
       "cta": "Vollständigen Bericht freischalten",
       "note": "Keine Werbung, keine Massenmails. Nur dieser Bericht und auf Wunsch eine Aktualisierung im Monat.",
       "err": "Bitte eine gültige E-Mail-Adresse eingeben.",
-      "done": "Freigeschaltet",
-      "donet": "Dein vollständiger Bericht ist unten offen. Eine Kopie ist unterwegs an {e}.",
-      "donetMock": "Dein vollständiger Bericht ist unten offen. (Keine Kopie versendet, da der E-Mail-Dienst nicht verbunden ist.)"
+      "done": "E-Mail gesendet",
+      "donet": "Wir haben einen Bestätigungslink an {e} geschickt. Öffne ihn, dann wird der volle Bericht hier freigeschaltet.",
+      "donetMock": "Der E-Mail-Dienst ist nicht verbunden. Öffne den Link unten, um den vollen Bericht freizuschalten."
     },
     "act": {
       "k": "Der eine Schritt für diese Woche"

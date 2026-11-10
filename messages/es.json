@@ -116,9 +116,9 @@
       "cta": "Desbloquear el informe completo",
       "note": "Sin anuncios y sin correo masivo. Solo este informe y, si quieres, una actualización al mes.",
       "err": "Introduce una dirección de correo electrónico válida.",
-      "done": "Desbloqueado",
-      "donet": "Tu informe completo está abierto abajo. Una copia va en camino a {e}.",
-      "donetMock": "Tu informe completo está abierto abajo. (No se envió ninguna copia porque el servicio de correo no está conectado.)"
+      "done": "Correo enviado",
+      "donet": "Enviamos un enlace de confirmación a {e}. Ábrelo y el informe completo se desbloquea aquí.",
+      "donetMock": "El servicio de correo no está conectado. Abre el enlace de abajo para desbloquear el informe completo."
     },
     "act": {
       "k": "El único paso para esta semana"

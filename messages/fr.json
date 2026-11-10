@@ -116,9 +116,9 @@
       "cta": "Débloquer le rapport complet",
       "note": "Pas de publicité, pas d’envoi en masse. Juste ce rapport et, si vous le souhaitez, une mise à jour par mois.",
       "err": "Veuillez saisir une adresse e-mail valide.",
-      "done": "Débloqué",
-      "donet": "Votre rapport complet est ouvert ci-dessous. Une copie est en route vers {e}.",
-      "donetMock": "Votre rapport complet est ouvert ci-dessous. (Aucune copie envoyée, car le service e-mail n’est pas connecté.)"
+      "done": "E-mail envoyé",
+      "donet": "Nous avons envoyé un lien de confirmation à {e}. Ouvrez-le pour débloquer le rapport complet ici.",
+      "donetMock": "Le service e-mail n’est pas connecté. Ouvrez le lien ci-dessous pour débloquer le rapport complet."
     },
     "act": {
       "k": "Le seul pas à faire cette semaine"

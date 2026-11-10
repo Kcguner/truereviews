@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { getConsent } from '@/lib/legal';
@@ -8,6 +8,7 @@ import Gauge from './Gauge';
 import ToneBar from './ToneBar';
 import ThemeRow from './ThemeRow';
 import { bandOf, type NbPreview, type NbReport } from './types';
+import { UNLOCK_CHANNEL, type UnlockMessage } from './unlock-channel';
 
 const LAST_EMAIL_KEY = 'tr-last-email';
 
@@ -27,7 +28,9 @@ export default function ReportView({
   mailSent,
   isMockMail,
   devUrl,
+  reportId,
   onUnlock,
+  onRemoteUnlock,
   onReset
 }: {
   preview: NbPreview;
@@ -37,7 +40,10 @@ export default function ReportView({
   mailSent: boolean;
   isMockMail: boolean;
   devUrl?: string;
+  reportId?: string;
   onUnlock: (email: string, turnstileToken: string, consent: boolean) => Promise<string | null>;
+  /** E-postadaki onay linki BAŞKA bir sekmede açıldığında çağrılır. */
+  onRemoteUnlock?: (report: NbReport, email: string) => void;
   onReset: () => void;
 }) {
   const t = useTranslations('nb');
@@ -68,6 +74,25 @@ export default function ReportView({
       /* saklanamazsa sessiz geç */
     }
   }, [unlocked]);
+
+  // Onay linki BAŞKA bir sekmede açıldığında bu sekmeyi de aç: aksi hâlde
+  // kullanıcı "Açıldı" yazısını görüp raporu bulamıyordu.
+  const remoteUnlockRef = useRef(onRemoteUnlock);
+  useEffect(() => {
+    remoteUnlockRef.current = onRemoteUnlock;
+  }, [onRemoteUnlock]);
+
+  useEffect(() => {
+    if (unlocked || !reportId || typeof BroadcastChannel === 'undefined') return;
+    const ch = new BroadcastChannel(UNLOCK_CHANNEL);
+    ch.onmessage = (ev: MessageEvent) => {
+      const msg = (ev.data || null) as UnlockMessage | null;
+      if (!msg || msg.reportId !== reportId || !msg.report) return;
+      remoteUnlockRef.current?.(msg.report as NbReport, msg.email || '');
+      ch.close();
+    };
+    return () => ch.close();
+  }, [reportId, unlocked]);
 
   const consent = getConsent(locale);
 

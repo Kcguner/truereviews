@@ -116,9 +116,9 @@
       "cta": "Volledig rapport ontgrendelen",
       "note": "Geen advertenties, geen bulk-mail. Alleen dit rapport en, als je wilt, één update per maand.",
       "err": "Voer een geldig e-mailadres in.",
-      "done": "Ontgrendeld",
-      "donet": "Je volledige rapport staat hieronder open. Een kopie is onderweg naar {e}.",
-      "donetMock": "Je volledige rapport staat hieronder open. (Er is geen kopie verstuurd omdat de e-maildienst niet is gekoppeld.)"
+      "done": "E-mail verzonden",
+      "donet": "We hebben een bevestigingslink naar {e} gestuurd. Open die en het volledige rapport wordt hier ontgrendeld.",
+      "donetMock": "De e-maildienst is niet gekoppeld. Open de link hieronder om het volledige rapport te ontgrendelen."
     },
     "act": {
       "k": "De ene stap voor deze week"

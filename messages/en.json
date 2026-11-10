@@ -116,9 +116,9 @@
       "cta": "Unlock the full report",
       "note": "No ads, no bulk mail. Just this report and, if you want, one update a month.",
       "err": "Please enter a valid email address.",
-      "done": "Unlocked",
-      "donet": "Your full report is open below. A copy is on its way to {e}.",
-      "donetMock": "Your full report is open below. (No copy was emailed because the email service is not connected.)"
+      "done": "Email sent",
+      "donet": "We sent a confirmation link to {e}. Open it and the full report unlocks here.",
+      "donetMock": "Email service is not connected. Open the link below to unlock the full report."
     },
     "act": {
       "k": "The one step to take this week"

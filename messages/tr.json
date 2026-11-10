@@ -116,9 +116,9 @@
       "cta": "Tam raporu aç",
       "note": "Reklam yok, seri mail yok. Sadece bu rapor ve istersen ayda bir güncellemesi.",
       "err": "Geçerli bir e-posta adresi yaz.",
-      "done": "Açıldı",
-      "donet": "Tam raporun açık — aşağıda. Bir kopyası da {e} adresine yolda.",
-      "donetMock": "Tam raporun açık — aşağıda. (E-posta servisi bağlı olmadığı için kopya gönderilmedi.)"
+      "done": "E-posta gönderildi",
+      "donet": "Onay bağlantısı {e} adresine gitti. Linke tıklayınca tam rapor burada açılır.",
+      "donetMock": "E-posta servisi bağlı değil. Aşağıdaki bağlantıyı açınca tam rapor burada açılır."
     },
     "act": {
       "k": "Bu hafta atacağın tek adım"
