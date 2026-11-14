@@ -90,7 +90,7 @@ describe('hreflang / canonical', () => {
   it('10 dil + x-default üretir', () => {
     const map = hreflangMap();
     for (const locale of locales) expect(map[locale], locale).toBe(`${getSiteUrl()}/${locale}`);
-    expect(map[X_DEFAULT]).toBe(getSiteUrl());
+    expect(map[X_DEFAULT]).toBe(`${getSiteUrl()}/tr`);
     expect(Object.keys(map).length).toBe(locales.length + 1);
   });
 
@@ -98,7 +98,7 @@ describe('hreflang / canonical', () => {
     for (const slug of LEGAL_SLUGS) {
       const map = hreflangMap((l) => `${getSiteUrl()}/${l}/${slug}`);
       for (const locale of locales) expect(map[locale], slug).toBe(`${getSiteUrl()}/${locale}/${slug}`);
-      expect(map[X_DEFAULT], slug).toBe(getSiteUrl());
+      expect(map[X_DEFAULT], slug).toBe(`${getSiteUrl()}/tr/${slug}`);
     }
   });
 
@@ -115,7 +115,7 @@ describe('hreflang / canonical', () => {
     const b = getAlternates('fa', 'kvkk');
     expect(b.canonical).toBe(`${getSiteUrl()}/fa/kvkk`);
     expect(b.languages.tr).toBe(`${getSiteUrl()}/tr/kvkk`);
-    expect(b.languages[X_DEFAULT]).toBe(getSiteUrl());
+    expect(b.languages[X_DEFAULT]).toBe(`${getSiteUrl()}/tr/kvkk`);
   });
 });
 

@@ -3,11 +3,11 @@ import { locales } from '../i18n.config';
 import { FAQS, getFaqHeading, getFaqs } from '../lib/faq';
 
 describe('SSS kapsamı (10 dil)', () => {
-  it('her dilde en az 3 soru-cevap var', () => {
+  it('her dilde en az 7 soru-cevap var', () => {
     for (const locale of locales) {
       const faqs = FAQS[locale];
       expect(faqs, locale).toBeDefined();
-      expect(faqs.length).toBeGreaterThanOrEqual(3);
+      expect(faqs.length).toBeGreaterThanOrEqual(7);
       for (const f of faqs) {
         expect(f.q.trim().length).toBeGreaterThan(5);
         expect(f.a.trim().length).toBeGreaterThan(10);

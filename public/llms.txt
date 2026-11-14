@@ -28,7 +28,8 @@
 | `fa` | فارسی (RTL) | /fa |
 
 The bare root `/` negotiates the visitor's language and redirects to the matching
-homepage; it is the `hreflang` `x-default`.
+homepage; the `hreflang` `x-default` points at the default-locale homepage
+(`/tr`), not at the redirecting root.
 
 ## Legal and help pages
 

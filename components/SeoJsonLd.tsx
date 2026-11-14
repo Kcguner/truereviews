@@ -5,8 +5,8 @@ import { CURRENCY, getOgImageUrl, normalizeLocale } from '@/lib/seo';
 
 /**
  * Organization + WebSite + WebPage + SoftwareApplication + FAQPage — GEO için JSON-LD.
- * Her dil kendi `inLanguage`'i ve para birimini alır; `x-default` kök olduğu için
- * WebSite tüm locale'leri `inLanguage` dizisinde taşır.
+ * Her dil kendi `inLanguage`'i ve para birimini alır; `x-default` varsayılan
+ * dile (`/tr`) gittiği için WebSite tüm locale'leri `inLanguage` dizisinde taşır.
  */
 export default function SeoJsonLd({
   locale: rawLocale,

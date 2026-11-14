@@ -1,6 +1,6 @@
 // Değer importu relative: vitest `@/` alias'ı çözmez (bkz. lib/legal.ts'in
 // yalnızca type importu kullanması).
-import { locales, type Locale } from '../i18n.config';
+import { defaultLocale, locales, type Locale } from '../i18n.config';
 import { getSiteUrl } from './site';
 
 /**
@@ -205,8 +205,9 @@ export const CURRENCY: Record<Locale, string> = {
   az: 'AZN'
 };
 
-/** `x-default` site kökünü işaret eder; middleware eşleşmeyen istekleri
- *  `NEXT_LOCALE` → `Accept-Language` → `tr` sırasıyla yönlendirir. */
+/** `x-default` varsayılan dildeki karşılığı işaret eder; site kökü (`/`) içerik
+ *  taşımayıp `/{defaultLocale}`'e yönlendiği için kökü göstermek boşa
+ *  yönlendirme sinyali verirdi. */
 export const X_DEFAULT = 'x-default';
 
 export function isLocale(locale: string): locale is Locale {
@@ -227,11 +228,13 @@ export function localeUrl(locale: string, slug?: string): string {
 /**
  * Aynı sayfanın 10 dildeki mutlak adresleri + x-default.
  * `pathFor` verilmezse ana sayfa varsayılır.
+ * x-default köke (`/`, boş yönlendirme) değil varsayılan dildeki
+ * karşılığa gider.
  */
 export function hreflangMap(pathFor?: (locale: Locale) => string): Record<string, string> {
   const map: Record<string, string> = {};
   for (const l of locales) map[l] = pathFor ? pathFor(l) : localeUrl(l);
-  map[X_DEFAULT] = getSiteUrl();
+  map[X_DEFAULT] = pathFor ? pathFor(defaultLocale) : localeUrl(defaultLocale);
   return map;
 }
 
