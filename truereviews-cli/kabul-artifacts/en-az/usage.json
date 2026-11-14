@@ -1,0 +1,47 @@
+{
+  "calls": [
+    {
+      "step": "tag",
+      "profile": "mock",
+      "model": "mock-1",
+      "input_tokens": 871,
+      "output_tokens": 391,
+      "thinking_tokens": 0,
+      "duration_s": 0.00022079199698055163,
+      "cached": false,
+      "cost": null
+    },
+    {
+      "step": "write",
+      "profile": "mock",
+      "model": "mock-1",
+      "input_tokens": 3699,
+      "output_tokens": 794,
+      "thinking_tokens": 0,
+      "duration_s": 0.00047770799574209377,
+      "cached": false,
+      "cost": null
+    },
+    {
+      "step": "write",
+      "profile": "mock",
+      "model": "mock-1",
+      "input_tokens": 3752,
+      "output_tokens": 794,
+      "thinking_tokens": 0,
+      "duration_s": 0.0005075000008218922,
+      "cached": false,
+      "cost": null
+    }
+  ],
+  "totals": {
+    "calls": 3,
+    "cached_calls": 0,
+    "input_tokens": 8322,
+    "output_tokens": 1979,
+    "thinking_tokens": 0,
+    "total_tokens": 10301,
+    "duration_s": 0.001,
+    "cost": null
+  }
+}

@@ -1,0 +1,82 @@
+# TrueReviews CLI — çalışma config'i (plan §3, §4, §5, §6)
+# Bu dosyayı `config.yaml` olarak kopyalayın.
+
+# Adım → sağlayıcı profili. CLI `--tag-profile` / `--write-profile` ezer.
+steps:
+  tag:
+    profile: gemini-flash
+  write:
+    profile: gemini-write
+
+# Apify `compass/google-maps-reviews-scraper` alanları (plan §4 tablosu).
+# Anahtar = mantıksal ad, değer = JSON'daki alan adı. Farklı actor için burayı değiştirin.
+field_map:
+  text: text
+  stars: stars
+  date: publishedAtDate
+  id: reviewId
+  owner_response: responseFromOwnerText
+  images: reviewImageUrls
+  context: reviewContext
+  detailed_ratings: reviewDetailedRating
+  language: originalLanguage
+  title: title
+  category: categoryName
+  city: city
+  country_code: countryCode
+  total_score: totalScore
+  reviews_count: reviewsCount
+
+# Konu kanonikleştirme (C adımı): kanonik ad → eş anlamlılar.
+topic_aliases:
+  servis:
+    - garson
+    - servis hızı
+  lezzet:
+    - tat
+    - aroma
+  fiyat:
+    - pahalılık
+    - fiyat/performans
+
+# 0–100 skor ağırlıkları (plan §5-A). Toplam 1.0 olmalı.
+scoring:
+  weights:
+    average: 0.60
+    positive_ratio: 0.25
+    recent: 0.15
+
+# Skor bantları (plan §5-A2). 0–100'ü kesintisiz kapsamalı.
+bands:
+  - name: zayif
+    label: Zayıf
+    min: 0
+    max: 49
+  - name: orta
+    label: Orta
+    min: 50
+    max: 69
+  - name: iyi
+    label: İyi
+    min: 70
+    max: 84
+  - name: cok_iyi
+    label: Çok iyi
+    min: 85
+    max: 100
+
+# B adımı: 20'lik gruplar, grup başına yeniden deneme.
+tagging:
+  group_size: 20
+  max_group_retries: 2
+
+# PDF alt satırı (plan §6 madde 11).
+pdf:
+  footer:
+    # Sol CTA kapatılabilir; sağ künye her zaman basılır.
+    cta_enabled: true
+    cta_text: "İsterseniz bu raporu her ay yeni yorumlarla güncelleyip size gönderelim."
+    brand: TrueReviews
+    owner_name: Kaan Can Güner
+    email: kcguner@gmail.com
+    signature: "<KCG />"

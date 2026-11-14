@@ -1,0 +1,95 @@
+# TrueReviews CLI — sağlayıcı profilleri (plan §3)
+#
+# Bu dosyayı `providers.yaml` olarak kopyalayın. Adlandırılmış her profil:
+#   adapter            gemini | openai_compat | opencode | mock
+#   model              sağlayıcı model kimliği
+#   base_url           openai_compat için zorunlu
+#   api_key_env        anahtarın okunacağı ortam değişkeni (anahtar .env'de)
+#   thinking           low | medium | high (gemini); diğerlerinde serbest
+#   max_tokens         çıktı üst sınırı
+#   concurrency        profil başına eşzamanlı istek
+#   requests_per_minute / daily_request_limit   hız ve günlük kota
+#   pricing            {input, output} — 1M token başına USD (yoksa maliyet boş)
+#   extra_body         sağlayıcıya özel reasoning/thinking parametreleri
+#
+# API anahtarı yüklemede aranmaz; profil kullanılınca çözülür. `mock` anahtarsız çalışır.
+
+profiles:
+  # Ucuz etiketleme profili (B adımı): düşük düşünme.
+  gemini-flash:
+    adapter: gemini
+    model: gemini-3.8-flash
+    api_key_env: GEMINI_API_KEY
+    thinking: low
+    max_tokens: 4096
+    concurrency: 3
+    requests_per_minute: 60
+    daily_request_limit: 1000
+    # Örnek fiyatlar (USD / 1M token). Güncel fiyatla değiştirin.
+    pricing:
+      input: 0.30
+      output: 2.50
+
+  # Güçlü yazım profili (D adımı): orta düşünme.
+  gemini-write:
+    adapter: gemini
+    model: gemini-3.8-flash
+    api_key_env: GEMINI_API_KEY
+    thinking: medium
+    max_tokens: 8192
+    concurrency: 2
+    requests_per_minute: 30
+    daily_request_limit: 500
+    pricing:
+      input: 0.30
+      output: 2.50
+
+  # GLM / Z.ai — OpenAI uyumlu uç.
+  glm:
+    adapter: openai_compat
+    model: glm-5.3-flash
+    base_url: https://open.bigmodel.cn/api/paas/v4
+    api_key_env: GLM_API_KEY
+    thinking: medium
+    max_tokens: 4096
+    concurrency: 2
+    requests_per_minute: 30
+    daily_request_limit: 500
+    pricing:
+      input: 0.60
+      output: 2.20
+    extra_body: {}
+
+  # DeepSeek — OpenAI uyumlu uç.
+  deepseek:
+    adapter: openai_compat
+    model: deepseek-flash
+    base_url: https://api.deepseek.com
+    api_key_env: DEEPSEEK_API_KEY
+    thinking: medium
+    max_tokens: 4096
+    concurrency: 2
+    requests_per_minute: 30
+    daily_request_limit: 500
+    pricing:
+      input: 0.28
+      output: 0.42
+    extra_body: {}
+
+  # opencode CLI (subprocess). `provider/model` gerçek modelle değiştirilmeli.
+  opencode-main:
+    adapter: opencode
+    model: provider/model
+    thinking: medium
+    max_tokens: 4096
+    concurrency: 1
+    requests_per_minute: 10
+    daily_request_limit: 200
+    extra_body: {}
+
+  # Testler ve uçtan uca deneme: ağ ve anahtar gerekmez.
+  mock:
+    adapter: mock
+    model: mock-1
+    max_tokens: 4096
+    concurrency: 8

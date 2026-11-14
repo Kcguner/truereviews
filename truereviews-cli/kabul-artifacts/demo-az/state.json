@@ -1,0 +1,106 @@
+{
+  "step": "tag",
+  "groups": {
+    "0": [
+      {
+        "id": "ChdDSUhNMG9nS0VJQ0FnSURaz0000Q",
+        "sentiment": "positive",
+        "topics": [
+          "kahve",
+          "servis",
+          "kalabalık"
+        ],
+        "products": [
+          "kahve",
+          "servis",
+          "kalabalık"
+        ],
+        "severity": 1
+      },
+      {
+        "id": "ChdDSUhNMG9nS0VJQ0FnSURaz0001Q",
+        "sentiment": "positive",
+        "topics": [
+          "kahve",
+          "servis"
+        ],
+        "products": [
+          "kahve",
+          "servis"
+        ],
+        "severity": 1
+      },
+      {
+        "id": "ChdDSUhNMG9nS0VJQ0FnSURaz0002Q",
+        "sentiment": "negative",
+        "topics": [
+          "kahve",
+          "servis"
+        ],
+        "products": [
+          "kahve",
+          "servis"
+        ],
+        "severity": 2
+      },
+      {
+        "id": "ChdDSUhNMG9nS0VJQ0FnSURaz0003Q",
+        "sentiment": "positive",
+        "topics": [
+          "tatlı",
+          "müzik"
+        ],
+        "products": [
+          "tatlı",
+          "müzik"
+        ],
+        "severity": 1
+      },
+      {
+        "id": "ChdDSUhNMG9nS0VJQ0FnSURaz0004Q",
+        "sentiment": "neutral",
+        "topics": [
+          "kahve",
+          "fiyat"
+        ],
+        "products": [
+          "kahve",
+          "fiyat"
+        ],
+        "severity": 1
+      },
+      {
+        "id": "ChdDSUhNMG9nS0VJQ0FnSURaz0005Q",
+        "sentiment": "positive",
+        "topics": [
+          "tatlı"
+        ],
+        "products": [
+          "tatlı"
+        ],
+        "severity": 1
+      },
+      {
+        "id": "ChdDSUhNMG9nS0VJQ0FnSURaz0006Q",
+        "sentiment": "negative",
+        "topics": [],
+        "products": [],
+        "severity": 3
+      },
+      {
+        "id": "ChdDSUhNMG9nS0VJQ0FnSURaz0007Q",
+        "sentiment": "positive",
+        "topics": [
+          "fiyat"
+        ],
+        "products": [
+          "fiyat"
+        ],
+        "severity": 1
+      }
+    ]
+  },
+  "completed": [
+    0
+  ]
+}

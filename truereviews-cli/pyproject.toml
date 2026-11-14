@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rapor"
+version = "0.1.0"
+description = "TrueReviews Kişisel Rapor — bağımsız Python CLI"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "LicenseRef-Proprietary"
+authors = [{ name = "Kaan Can Güner", email = "kcguner@gmail.com" }]
+dependencies = [
+    "typer>=0.12",
+    "pydantic>=2.5",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0",
+    "tenacity>=8.2",
+    "reportlab>=4.0",
+    "google-genai>=1.0",
+    "openai>=1.40",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "respx>=0.21",
+    "freezegun>=1.4",
+]
+
+[project.scripts]
+rapor = "rapor.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rapor*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-m 'not live'"
+markers = [
+    "live: gerçek API çağrısı yapan testler",
+]
